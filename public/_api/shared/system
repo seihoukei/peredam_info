@@ -1,0 +1,45 @@
+{
+	"success": true,
+	"data": {
+		"name": "СЕВМАШ (Холодная вода)",
+		"period": "MONTHLY:DAY:1,15",
+		"template": "<ACCOUNT:NUM> <COLD_N:NUM:3> <COLD_V:NUM:5,1> <HOT_N:NUM:3> <HOT_V:NUM:5,1>",
+		"values": {
+			"ACCOUNT" : {
+				"name": "Лицевой счет №",
+				"type": "NUM",
+				"constant": true
+			},
+			"COLD_N" : {
+				"name": "Последние три цифры номера счетчика холодной воды",
+				"type": "NUM:3",
+				"constant": true				
+			},
+			"HOT_N" : {
+				"name": "Последние три цифры номера счетчика горячей воды",
+				"type": "NUM:3",
+				"constant": true
+			},
+			"COLD_V" : {
+				"name": "Показания счетчика холодной воды (номер кончается на <COLD_N>)",
+				"type": "NUM:5,1"				
+			},
+			"HOT_V" : {
+				"name": "Показания счетчика горячей воды (номер кончается на <COLD_V>)",
+				"type": "NUM:5,1"				
+			}
+		},
+		"methods": [{
+			"type": "SMS",
+			"number": "+79110551919"
+		}, {
+			"type": "PHONE",
+			"number": "+79110551919",
+			"memo": "Подсказка для звонящего заполняется сюда"
+		}, {
+			"type": "E-MAIL",
+			"address" : "pokaz@ceh19.sevmash.ru"
+		}]
+	}
+
+}

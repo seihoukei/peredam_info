@@ -1,0 +1,113 @@
+@font-face {
+    font-family: "Exo2";
+    src: url("/resources/fonts/exo2.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 350;
+}
+
+@font-face {
+    font-family: "Nova";
+    src: url("/resources/fonts/nova.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 350;
+}
+
+:root {
+    --background : #CCEEFF;
+    --text-color : #000000;
+
+    /*--login-background : url("../resources/login_bg_wip.jpg");*/
+
+    --element-background : #00000066;
+    --element-text-color : #FFFFFF;
+    --disabled-element-background : #00000033;
+    --disabled-element-text-color : #777777;
+    --input-placeholder-color : #FFFFFF99;
+
+    --status-ok-color: #008800;
+    --status-error-color: #880000;
+
+    --font-size : var(--4u);
+    --label-font-size : var(--3u);
+    --small-font-size : var(--2u);
+
+    --container-width : calc(var(--unit) * 50);
+    --container-height : calc(var(--unit) * 100);
+}
+
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background : #0E303D;
+        /*--login-background : url("../resources/login_bg.jpg");*/
+
+        --text-color : #FFFFFF;
+
+        --element-background : #00000066;
+        --element-text-color : #FFFFFF;
+
+        --disabled-element-background : #00000033;
+        --disabled-element-text-color : #777777;
+        --input-placeholder-color : #FFFFFF99;
+
+        --status-ok-color: #44CC44;
+        --status-error-color: #CC4444;
+    }
+}
+
+html, body {
+    padding : 0;
+    margin : 0;
+    width : 100vw;
+    height : 100vh;
+
+    font: var(--4u) Exo2, sans-serif;
+    background-color : var(--background);
+    color : var(--text-color);
+    overflow : hidden;
+}
+
+body.login {
+    /*
+    background-image: var(--login-background);
+    background-size: cover;
+    background-position: center;
+    */
+}
+
+div#app {
+}
+
+div.container {
+    position : absolute;
+    width : var(--container-width);
+    height : var(--container-height);
+    left : 50vw;
+    top : 50vh;
+    transform: translate(-50%, -50%);
+
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+
+    overflow: visible auto;
+}
+
+button, input {
+    font: var(--3u) Exo2, sans-serif;
+    background-color: var(--element-background);
+    color: var(--element-text-color);
+    border : 0;
+    padding : var(--0_5u) var(--2u) var(--1u);
+    border-radius : var(--3u);
+}
+
+button {
+    cursor : pointer;
+}
+
+button:disabled {
+    background-color: var(--disabled-element-background);
+    color: var(--disabled-element-text-color);
+    cursor : default;
+}
