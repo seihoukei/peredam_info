@@ -79,7 +79,7 @@ export default class Api {
         })
     }
     
-    static async getValues(providerId) {
+    static async getProviderDescription(providerId) {
         if (!providerId)
             return failure()
         

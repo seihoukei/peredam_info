@@ -29,10 +29,13 @@
 
 </script>
 
-<pre>
+{#if import.meta.env.MODE === "development"}
+<pre class="debug">
 Добавление системы
 {JSON.stringify(system, null, 1)}
 </pre>
+{/if}
+
 {#if settingCity}
     <SelectCity bind:city />
 {:else if settingProvider}
@@ -41,3 +44,16 @@
     <SetValues bind:provider bind:values on:finish={finalize}/>
 {/if}
 <button on:click={back}>Отмена</button>
+
+<style>
+    .debug {
+        color: var(--text-color);
+        position: absolute;
+        bottom : 0;
+        left : 0;
+        opacity: 0.2;
+        font-size: 20px;
+        pointer-events: none;
+        z-index:100;
+    }
+</style>
