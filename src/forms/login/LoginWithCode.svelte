@@ -24,7 +24,7 @@
 
 <style>
     span {
-        font-size: var(--3u);
+        font-size: var(--2u);
         margin: 0 0 var(--2u);
     }
 

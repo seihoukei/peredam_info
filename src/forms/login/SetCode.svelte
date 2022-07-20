@@ -74,7 +74,7 @@
 
 <style>
     span {
-        font-size: var(--3u);
+        font-size: var(--2u);
         text-align: center;
         margin: 0 0 var(--2u);
     }

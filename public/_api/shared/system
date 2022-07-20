@@ -8,25 +8,30 @@
 			"ACCOUNT" : {
 				"name": "Лицевой счет №",
 				"type": "NUM",
+				"mandatory": true,
 				"constant": true
 			},
 			"COLD_N" : {
 				"name": "Последние три цифры номера счетчика холодной воды",
 				"type": "NUM:3",
-				"constant": true				
+				"mandatory": true,
+				"constant": true
 			},
 			"HOT_N" : {
 				"name": "Последние три цифры номера счетчика горячей воды",
 				"type": "NUM:3",
+				"mandatory": true,
 				"constant": true
 			},
 			"COLD_V" : {
 				"name": "Показания счетчика холодной воды (номер кончается на <COLD_N>)",
-				"type": "NUM:5,1"				
+				"mandatory": true,
+				"type": "NUM:5,1"
 			},
 			"HOT_V" : {
 				"name": "Показания счетчика горячей воды (номер кончается на <COLD_V>)",
-				"type": "NUM:5,1"				
+				"mandatory": true,
+				"type": "NUM:5,1"
 			}
 		},
 		"methods": [{

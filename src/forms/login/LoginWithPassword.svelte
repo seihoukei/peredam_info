@@ -70,7 +70,7 @@
     }
 
     :global(div.login.container label){
-        font: var(--3u) Exo2, sans-serif;
+        font: var(--2u) Exo2, sans-serif;
     }
 
     :global(div.login.container button) {

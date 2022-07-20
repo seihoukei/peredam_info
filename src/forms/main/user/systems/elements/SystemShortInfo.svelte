@@ -1,4 +1,6 @@
 <script>
+    import {slide} from "svelte/transition"
+
     export let system = {
         name : "",
         id : -1,
@@ -8,7 +10,7 @@
         }
     }
 </script>
-<div>
+<div transition:slide>
     <button on:click> {system.name}</button>
     <span class="next">Передать с {system.next.from} по {system.next.to}</span>
 </div>

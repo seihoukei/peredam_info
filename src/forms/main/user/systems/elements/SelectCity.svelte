@@ -1,32 +1,43 @@
 <script>
     import Api from "../../../../../utility/api.js"
+    import {slide} from "svelte/transition"
 
-    export let city
+    export let city = null
 
     let getCities = Api.getCities()
 
-    const setCity = (value) => {
-        city = value
+    const switchCity = (value) => {
+        if (city === value)
+            city = null
+        else
+            city = value
     }
 </script>
 
 <div class="choice">
-{#await getCities}
-    ...получение списка городов...
-{:then result}
-    Выберите город:
-    {#each Object.entries(result.data) as [cityName, id]}
-        <button on:click={()=>setCity(id)}>{cityName}</button>
-    {/each}
-{/await}
+    {#await getCities}
+        <span class="title" transition:slide>...получение списка городов...</span>
+    {:then result}
+        <span class="title" transition:slide>Город:</span>
+        {#each Object.entries(result.data) as [cityName, id] (id)}
+            {#if !city || city === id}
+                <button on:click={()=>switchCity(id)} transition:slide>{cityName}</button>
+            {/if}
+        {/each}
+    {/await}
 </div>
 
 <style>
+    span.title {
+        font-size: var(--2u);
+        margin: 0 0 var(--2u);
+    }
     div.choice {
         display: flex;
         flex-direction: column;
         align-items: center;
-        row-gap: var(--1u);
-        padding: var(--3u);
+    }
+    button {
+        margin: 0 0 var(--2u);
     }
 </style>

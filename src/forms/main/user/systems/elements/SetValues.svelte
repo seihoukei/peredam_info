@@ -1,42 +1,64 @@
 <script>
-    import {createEventDispatcher} from "svelte"
     import Api from "../../../../../utility/api.js"
+    import {slide} from "svelte/transition"
 
-    export let provider
+    export let provider = null
     export let values = {}
+    export let ready = false
 
-    const dispatch = createEventDispatcher()
+    let valuesToFill = []
 
-    const getProviderDescription = Api.getProviderDescription(provider)
+    const getProviderDescription = Api.getProviderDescription(provider).then(result => {
+        valuesToFill = []
+        if (result.success) {
+            for (const [id, value] of Object.entries(result.data.values))
+                if (value.constant && value.mandatory)
+                    valuesToFill.push({
+                        name : value.name,
+                        type : value.type,
+                        id,
+                    })
+        }
+        return {
+            period : result.data.period
+        }
+    })
 
-    const back = () => {
-        provider = null
+    const validate = () => {
+        return valuesToFill.every(value => {
+            return values[value.id] !== undefined && values[value.id] !== ""
+        })
     }
 
-    const finish = () => {
-        dispatch("finish")
-    }
+    $: ready = validate(valuesToFill, values)
 </script>
 
-{#await getProviderDescription}
-    ...получение информации о поставщике...
-{:then result}
-    <span class="value-name">Название:</span> <span class="value"> {result.data.name}</span>
-    <span class="value-name">Период:</span> <span class="value">{result.data.period}</span>
-    {#each Object.entries(result.data.values) as [key, value]}
-        {#if value.constant}
-            <span class="value-name">{value.name}</span>
-            <input placeholder={value.type} bind:value={values[key]} />
-        {/if}
-    {/each}
-{/await}
-
-<button on:click={finish}>Готово</button>
-<button on:click={back}>Назад</button>
+<div class="list">
+    {#await getProviderDescription}
+        <span class="value-name" transition:slide>...получение информации о поставщике...</span>
+    {:then result}
+        <div class="entry" transition:slide>
+            <span class="value-name">Период:</span>
+            <span class="value">{result.period}</span>
+        </div>
+        {#each valuesToFill as value}
+                <div class="entry" transition:slide>
+                    <span class="value-name">{value.name}</span>
+                    <input placeholder={value.type} bind:value={values[value.id]} />
+                </div>
+        {/each}
+    {/await}
+</div>
 
 <style>
+    div.entry {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     span.value-name {
         font-size: var(--2u);
+        text-align: center;
     }
     span.value {
         font-size: var(--2_5u);

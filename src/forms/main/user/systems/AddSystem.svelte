@@ -1,11 +1,11 @@
 <script>
-    import Api from "../../../../utility/api.js"
     import SelectCity from "./elements/SelectCity.svelte"
     import SelectProvider from "./elements/SelectProvider.svelte"
     import SetValues from "./elements/SetValues.svelte"
+    import {slide} from "svelte/transition"
 
-    export let system = {}
     export let adding = true
+    export let systems = []
 
     const back = () => {
         adding = false
@@ -14,36 +14,43 @@
     let city = null
     let provider = null
     let values = {}
+    let ready = false
 
     $: settingCity = city === null
     $: settingProvider = !settingCity && provider === null
     $: settingValues = !settingProvider
 
-    $: system = {
+    $: newSystem = {
         city, provider, values
     }
 
     const finalize = () => {
+        systems = [...systems, {
+            ...newSystem,
+            id : Math.random(),
+            name : Math.random(),
+            next : {},
+        }]
         adding = false
     }
 
 </script>
 
 {#if import.meta.env.MODE === "development"}
-<pre class="debug">
-Добавление системы
-{JSON.stringify(system, null, 1)}
-</pre>
+    <pre class="debug">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
 {/if}
 
-{#if settingCity}
-    <SelectCity bind:city />
-{:else if settingProvider}
-    <SelectProvider bind:city bind:provider/>
-{:else if settingValues}
-    <SetValues bind:provider bind:values on:finish={finalize}/>
+<SelectCity bind:city />
+{#if city}
+    <SelectProvider {city} bind:provider/>
 {/if}
-<button on:click={back}>Отмена</button>
+{#if city && provider}
+    <SetValues {provider} bind:values bind:ready/>
+{/if}
+<div class="buttons" transition:slide>
+    <button on:click={finalize} disabled={!ready}>Готово</button>
+    <button on:click={back}>Отмена</button>
+</div>
 
 <style>
     .debug {

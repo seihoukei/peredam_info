@@ -1,12 +1,17 @@
 <script>
     import SystemShortInfo from "./elements/SystemShortInfo.svelte"
+    import SystemMain from "./SystemMain.svelte"
+    import {slide} from "svelte/transition"
 
     export let systems = []
     export let current = null
     export let adding = false
 
     const setSystem = (system) => {
-        current = system
+        if (current === system)
+            current = null
+        else
+            current = system
     }
 
     const addSystem = () => {
@@ -14,7 +19,13 @@
     }
 </script>
 
-{#each systems as system}
-    <SystemShortInfo {system} on:click={()=>setSystem(system)}/>
+{#each systems as system (system)}
+    {#if !current || system === current}
+        <SystemShortInfo {system} on:click={()=>setSystem(system)}/>
+    {/if}
 {/each}
-<button on:click={addSystem}>Добавить систему</button>
+{#if current}
+    <SystemMain system={current} />
+{:else}
+    <button on:click={addSystem} transition:slide>Добавить систему</button>
+{/if}
