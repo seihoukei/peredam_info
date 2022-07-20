@@ -4,7 +4,11 @@
 
     export let city = null
 
-    let getCities = Api.getCities()
+    let getCities = Api.getCities().then(result => {
+        if (result.success && Object.keys(result.data).length === 1)
+            city = Object.values(result.data)[0]
+        return result
+    })
 
     const switchCity = (value) => {
         if (city === value)
