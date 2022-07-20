@@ -1,5 +1,5 @@
 <script>
-    import tokens from "../../../stores/tokens.js"
+    import tokens from "../../../../stores/tokens.js"
 
     const logout = () => {
         tokens.reset("current")

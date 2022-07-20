@@ -61,12 +61,33 @@ export default class Api {
         if (!token)
             return failure()
         
-        await this.fakeFetch(1000)
-    
-        const name = token.split("(")[1].split(".")[0].split``.reverse().join``
-        
-        return success({
-            name,
+        return await this.#call("user/systems", {
+            token
         })
     }
+    
+    static async getCities() {
+        return await this.#call("shared/cities")
+    }
+    
+    static async getProviders(cityId) {
+        if (!cityId)
+            return failure()
+        
+        return await this.#call("shared/providers", {
+            cityId
+        })
+    }
+    
+    static async getValues(providerId) {
+        if (!providerId)
+            return failure()
+        
+        return await this.#call("shared/system", {
+            providerId
+        })
+    }
+    
+    
+    
 }

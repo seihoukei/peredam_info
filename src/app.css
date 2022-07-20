@@ -90,7 +90,7 @@ div.container {
     flex-direction: column;
     align-items: center;
 
-    overflow: visible auto;
+    overflow: hidden auto;
 }
 
 button, input {

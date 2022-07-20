@@ -1,19 +1,20 @@
 <script>
-    import LogoutButton from "./main/elements/LogoutButton.svelte"
-    import SetCodeButton from "./main/elements/SetCodeButton.svelte"
-    import { fade } from "svelte/transition"
     import Api from "../utility/api.js"
-    import Welcome from "./main/Welcome.svelte"
-    import StartingPage from "./main/StartingPage.svelte"
+    import Welcome from "./main/user/Welcome.svelte"
+    import UserView from "./main/user/UserView.svelte"
 
     export let token = ""
 
-    $: userData = Api.getUserData(token)
+    $: userSystems = Api.getUserData(token)
 
 </script>
 
-{#await userData}
+{#await userSystems}
     <Welcome />
-{:then user}
-    <StartingPage user={user.data}/>
+{:then result}
+    {#if result.success}
+        <UserView user={result.data}/>
+    {:else}
+        Прозошла ошибка :(
+    {/if}
 {/await}
