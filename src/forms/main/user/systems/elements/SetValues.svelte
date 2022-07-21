@@ -1,6 +1,8 @@
 <script>
     import library from "../../../../../stores/library.js"
     import {slide} from "svelte/transition"
+    import StaticDetail from "./StaticDetail.svelte"
+    import VariableDetail from "./VariableDetail.svelte"
 
     export let provider = null
     export let values = {}
@@ -36,34 +38,12 @@
 
 {#if providerInfo !== null}
 <div class="list">
-    <div class="entry" transition:slide>
-        <span class="value-name">Период:</span>
-        <span class="value">{providerInfo.period}</span>
-    </div>
+    <StaticDetail name="Период:" value={providerInfo.period} />
     {#each valuesToFill as value}
-            <div class="entry" transition:slide>
-                <span class="value-name">{value.name}</span>
-                <input placeholder={value.type} bind:value={values[value.id]} />
-            </div>
+        <VariableDetail name={value.name} type={value.type} bind:value={values[value.id]} />
     {/each}
 </div>
 {/if}
 
 <style>
-    div.entry {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    span.value-name {
-        font-size: var(--2u);
-        text-align: center;
-    }
-    span.value {
-        font-size: var(--2_5u);
-        margin : 0 0 var(--2u);
-    }
-    input {
-        margin : 0 0 var(--2u);
-    }
 </style>

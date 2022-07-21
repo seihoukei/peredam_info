@@ -23,10 +23,8 @@
     {#if !current || system === current}
         <SystemShortInfo {system} on:click={()=>setSystem(system)}/>
     {/if}
-    {#if system === current}
-        <SystemMain {system} />
-    {/if}
 {/each}
+<SystemMain system={current} />
 {#if !current}
     <button on:click={addSystem} transition:slide>Добавить систему</button>
 {/if}
