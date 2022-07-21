@@ -2,6 +2,7 @@
     import Api from "../utility/api.js"
     import Welcome from "./main/user/Welcome.svelte"
     import UserView from "./main/user/UserView.svelte"
+    import {isLibraryReady} from "../stores/library.js"
 
     export let token = ""
 
@@ -13,7 +14,11 @@
     <Welcome />
 {:then result}
     {#if result.success}
-        <UserView user={result.data}/>
+        {#if isLibraryReady}
+            <UserView user={result.data}/>
+        {:else}
+            Загрузка библиотеки...
+        {/if}
     {:else}
         Прозошла ошибка :(
     {/if}

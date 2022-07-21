@@ -7,15 +7,16 @@
     export let system = {}
     let input = {}
 
-    const getProvider = (library, system) => {
+    const getProvider = (id) => {
         input = {}
-        if (system === null)
+
+        if (id === null)
             return null
 
-        return library.providers[system.provider] ?? null
+        return library.providers[id] ?? null
     }
 
-    $: provider = getProvider($library, system)
+    $: provider = getProvider(system?.provider ?? null)
 </script>
 
 {#if system !== null}

@@ -4,8 +4,8 @@
 
     export let current = null
 
-    $: if (Object.keys($library.cities).length === 1)
-        current = Object.keys($library.cities)[0]
+    $: if (Object.keys(library.cities).length === 1)
+        current = Object.keys(library.cities)[0]
 
     const switchCurrent = (value) => {
         if (current === value)
@@ -17,7 +17,7 @@
 
 <div class="choice">
     <span class="title" transition:slide>Город:</span>
-    {#each Object.entries($library.cities) as [id, city] (id)}
+    {#each Object.entries(library.cities) as [id, city] (id)}
         {#if !current || current === id}
             <button on:click={()=>switchCurrent(id)} transition:slide>{city.name}</button>
         {/if}

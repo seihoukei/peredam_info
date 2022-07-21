@@ -24,7 +24,7 @@
         return result
     }
 
-    $: providerInfo = $library.providers[provider] || null
+    $: providerInfo = library.providers[provider] || null
     $: valuesToFill = getValuesToFill(providerInfo)
 
     const validate = () => {

@@ -4,7 +4,7 @@
 
     export let system
 
-    $: provider = system ? $library.providers[system.provider] ?? null : null
+    $: provider = system ? library.providers[system.provider] ?? null : null
 
 </script>
 
