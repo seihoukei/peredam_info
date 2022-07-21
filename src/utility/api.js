@@ -65,29 +65,4 @@ export default class Api {
             token
         })
     }
-    
-    static async getCities() {
-        return await this.#call("shared/cities")
-    }
-    
-    static async getProviders(cityId) {
-        if (!cityId)
-            return failure()
-        
-        return await this.#call("shared/providers", {
-            cityId
-        })
-    }
-    
-    static async getProviderDescription(providerId) {
-        if (!providerId)
-            return failure()
-        
-        return await this.#call("shared/system", {
-            providerId
-        })
-    }
-    
-    
-    
 }

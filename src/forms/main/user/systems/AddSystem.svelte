@@ -21,15 +21,13 @@
     $: settingValues = !settingProvider
 
     $: newSystem = {
-        city, provider, values
+        provider, values
     }
 
     const finalize = () => {
         systems = [...systems, {
             ...newSystem,
-            id : Math.random(),
-            name : Math.random(),
-            next : {},
+            name : "",
         }]
         adding = false
     }
@@ -40,13 +38,10 @@
     <pre class="debug">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
 {/if}
 
-<SelectCity bind:city />
-{#if city}
-    <SelectProvider {city} bind:provider/>
-{/if}
-{#if city && provider}
-    <SetValues {provider} bind:values bind:ready/>
-{/if}
+<SelectCity bind:current={city} />
+<SelectProvider {city} bind:current={provider}/>
+<SetValues {provider} bind:values bind:ready/>
+
 <div class="buttons" transition:slide>
     <button on:click={finalize} disabled={!ready}>Готово</button>
     <button on:click={back}>Отмена</button>

@@ -1,28 +1,29 @@
 <script>
-    import Api from "../../../../../utility/api.js"
+    import library from "../../../../../stores/library.js"
     import {slide} from "svelte/transition"
 
     export let provider = null
     export let values = {}
     export let ready = false
 
-    let valuesToFill = []
+    const getValuesToFill = (providerInfo) => {
+        const result = []
+        if (providerInfo === null)
+            return result
 
-    const getProviderDescription = Api.getProviderDescription(provider).then(result => {
-        valuesToFill = []
-        if (result.success) {
-            for (const [id, value] of Object.entries(result.data.values))
-                if (value.constant && value.mandatory)
-                    valuesToFill.push({
-                        name : value.name,
-                        type : value.type,
-                        id,
-                    })
-        }
-        return {
-            period : result.data.period
-        }
-    })
+        for (const [id, value] of Object.entries(providerInfo.values))
+            if (value.constant)
+                result.push({
+                    name : value.name,
+                    type : value.type,
+                    mandatory : value.mandatory,
+                    id,
+                })
+        return result
+    }
+
+    $: providerInfo = $library.providers[provider] || null
+    $: valuesToFill = getValuesToFill(providerInfo)
 
     const validate = () => {
         return valuesToFill.every(value => {
@@ -33,22 +34,20 @@
     $: ready = validate(valuesToFill, values)
 </script>
 
+{#if providerInfo !== null}
 <div class="list">
-    {#await getProviderDescription}
-        <span class="value-name" transition:slide>...получение информации о поставщике...</span>
-    {:then result}
-        <div class="entry" transition:slide>
-            <span class="value-name">Период:</span>
-            <span class="value">{result.period}</span>
-        </div>
-        {#each valuesToFill as value}
-                <div class="entry" transition:slide>
-                    <span class="value-name">{value.name}</span>
-                    <input placeholder={value.type} bind:value={values[value.id]} />
-                </div>
-        {/each}
-    {/await}
+    <div class="entry" transition:slide>
+        <span class="value-name">Период:</span>
+        <span class="value">{providerInfo.period}</span>
+    </div>
+    {#each valuesToFill as value}
+            <div class="entry" transition:slide>
+                <span class="value-name">{value.name}</span>
+                <input placeholder={value.type} bind:value={values[value.id]} />
+            </div>
+    {/each}
 </div>
+{/if}
 
 <style>
     div.entry {

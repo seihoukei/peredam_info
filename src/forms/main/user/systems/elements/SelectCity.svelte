@@ -1,34 +1,27 @@
 <script>
-    import Api from "../../../../../utility/api.js"
     import {slide} from "svelte/transition"
+    import library from "../../../../../stores/library.js"
 
-    export let city = null
+    export let current = null
 
-    let getCities = Api.getCities().then(result => {
-        if (result.success && Object.keys(result.data).length === 1)
-            city = Object.values(result.data)[0]
-        return result
-    })
+    $: if (Object.keys($library.cities).length === 1)
+        current = Object.keys($library.cities)[0]
 
-    const switchCity = (value) => {
-        if (city === value)
-            city = null
+    const switchCurrent = (value) => {
+        if (current === value)
+            current = null
         else
-            city = value
+            current = value
     }
 </script>
 
 <div class="choice">
-    {#await getCities}
-        <span class="title" transition:slide>...получение списка городов...</span>
-    {:then result}
-        <span class="title" transition:slide>Город:</span>
-        {#each Object.entries(result.data) as [cityName, id] (id)}
-            {#if !city || city === id}
-                <button on:click={()=>switchCity(id)} transition:slide>{cityName}</button>
-            {/if}
-        {/each}
-    {/await}
+    <span class="title" transition:slide>Город:</span>
+    {#each Object.entries($library.cities) as [id, city] (id)}
+        {#if !current || current === id}
+            <button on:click={()=>switchCurrent(id)} transition:slide>{city.name}</button>
+        {/if}
+    {/each}
 </div>
 
 <style>

@@ -1,19 +1,19 @@
 <script>
     import {slide} from "svelte/transition"
+    import library from "../../../../../stores/library.js"
 
-    export let system = {
-        name : "",
-        id : -1,
-        next : {
-            from: "никогда",
-            to: "никогда",
-        }
-    }
+    export let system = {}
+
+    $: provider = $library.providers[system.provider] ?? null
+
 </script>
+
+{#if provider !== null}
 <div transition:slide>
-    <button on:click> {system.name}</button>
-    <span class="next">Передать с {system.next.from} по {system.next.to}</span>
+    <button on:click> {system.name || `${provider.type}`}</button>
+<!--    <span class="next">Передать с {system.next.from} по {system.next.to}</span>-->
 </div>
+{/if}
 
 <style>
     div {
