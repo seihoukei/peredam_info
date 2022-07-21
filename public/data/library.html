@@ -59,7 +59,11 @@
         }, {
           type: "PHONE",
           number: "+79110551919",
-          memo: "Подсказка для звонящего заполняется сюда",
+          memo: "Автоответчик. Круглосуточно.",
+        }, {
+          type: "PHONE",
+          number: "88184548111",
+          memo: "Городской 548-111. По будням с 8:00 до 12:00 и с 13:00 до 16:00.",
         }, {
           type: "E-MAIL",
           address : "pokaz@ceh19.sevmash.ru",
@@ -70,7 +74,7 @@
         city : 1,
         name : "ПАО \"ТГК-2\"",
         type : "Горячая вода",
-        period : "MONTHLY:1,22",
+        period : "MONTHLY:12,22",
         template: "<ACCOUNT> <HOT_N> <HOT_V>",
         values: {
           ACCOUNT : {
@@ -97,7 +101,7 @@
         }, {
           type: "PHONE",
           number: "+88184506336",
-          memo: "Добавочный код 1, круглосуточно",
+          memo: "Городской 50-63-36. Добавочный код 1. Круглосуточно",
         }, {
           type: "E-MAIL",
           address : "arh.uesds.pokaz@tgc-2.ru",
@@ -111,6 +115,50 @@
         city : 1,
         name : "ООО \"ТГК-2 Энергосбыт\"",
         type : "Электроэнергия",
+        period : "MONTHLY:20,25",
+        template: "<ACCOUNT> <DAY> <NIGHT>",
+        values: {
+          ACCOUNT : {
+            name: "Лицевой счёт №",
+            type: "NUM",
+            mandatory: true,
+            constant: true,
+          },
+          DAY : {
+            name: "Показания счётчика (день)",
+            type: "NUM:5",
+            mandatory: true,
+          },
+          NIGHT : {
+            name: "Показания счётчика (ночь)",
+            comment: "Только при двухтарифном счётчике",
+            type: "NUM:5",
+          },
+        },
+        methods: [{
+          type: "SMS",
+          number: "+79037676800",
+        }, {
+          type: "PHONE",
+          number: "+88184920460",
+          memo: "Оператор. По будням с 8:30 до 12:00 и с 13:00 до 16:30.",
+        }, {
+          type: "PHONE",
+          number: "+88184920482",
+          memo: "Автоответчик. Круглосуточно.",
+        }, {
+          type: "E-MAIL",
+          address : "info@aes.tgc-2.ru",
+        }, {
+          type: "WEB",
+          address : "https://tgc2-energo.ru/OnlineServices",
+        },],
+      },
+
+      4 : {
+        city : 1,
+        name : "АО \"Архангельскоблгаз\"",
+        type : "Газоснабжение",
         period : "MONTHLY:20,25",
         template: "<ACCOUNT> <DAY> <NIGHT>",
         values: {
@@ -150,7 +198,7 @@
           address : "https://tgc2-energo.ru/OnlineServices",
         },],
       },
-    }
+    },
   }
 
   document.write(JSON.stringify(library))
