@@ -1,17 +1,20 @@
 <script>
     import {slide} from "svelte/transition"
     import library from "../../../../../stores/library.js"
+    import Period from "../../../../../utility/period.js"
 
     export let system
 
     $: provider = system ? library.providers[system.provider] ?? null : null
-
+    $: displayName = system.name || `${provider.type}`
+    $: period = new Period(provider?.period)
+    $: nextTime = period.nextString(system?.last?.date)
 </script>
 
 {#if provider !== null}
     <div transition:slide>
-        <button on:click> {system.name || `${provider.type}`}</button>
-    <!--    <span class="next">Передать с {system.next.from} по {system.next.to}</span>-->
+        <button on:click> {displayName}</button>
+        <span class="next">Передать {nextTime}</span>
     </div>
 {/if}
 

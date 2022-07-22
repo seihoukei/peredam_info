@@ -4,11 +4,18 @@
     export let name = ""
     export let value = ""
     export let type = "ANY"
+    export let old = ""
+
+    $: inputType = type.split(":")[0]
 </script>
 
 <div class="detail" transition:slide>
     <span class="name">{name}</span>
-    <input bind:value placeholder={type}/>
+    {#if inputType === "NUM"}
+        <input type="number" bind:value placeholder={old} />
+    {:else}
+        <input type="text" bind:value placeholder={old} />
+    {/if}
 </div>
 
 <style>
@@ -24,9 +31,5 @@
     span.name {
          font-size: var(--2u);
          text-align: center;
-    }
-    span.value {
-        font-size: var(--2_5u);
-        margin : 0 0 var(--2u);
     }
 </style>

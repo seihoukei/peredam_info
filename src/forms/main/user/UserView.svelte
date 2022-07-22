@@ -5,18 +5,43 @@
     import SelectSystem from "./systems/SelectSystem.svelte"
     import AddSystem from "./systems/AddSystem.svelte"
     import UserMenu from "./elements/UserMenu.svelte"
+    import library from "../../../stores/library.js"
+    import Period from "../../../utility/period.js"
+
+    import syncUser from "../../../utility/sync-user.js"
 
     export let user = {
         systems : []
     }
+    export let token = null
 
-    let systems = user.systems
-    $: user.systems = systems
+    function sortByDate(systems) {
+        const now = Date.now()
+        const dateMap = new Map()
+        systems.map(system => dateMap.set(system, new Period(library.providers[system.provider].period).next(system.last?.date)))
+        return systems.sort((a, b) => {
+            const aDate = dateMap.get(a)
+            const bDate = dateMap.get(b)
+            if (aDate.first < now && bDate.first < now) {
+                return aDate.last - bDate.last
+            } else if (aDate.first < now)
+                return -1
+            else if (bDate.first < now)
+                return 1
+            else
+                return aDate.first - bDate.first || aDate.last - bDate.last
+        })
+    }
+
+    let systems = sortByDate(user.systems)
+    $: user.systems = sortByDate(systems)
 
     let current = null
     let adding = false
 
     $: selecting = !current && !adding
+
+    $: savingUser = syncUser(token, user)
 
 </script>
 
@@ -31,7 +56,7 @@
     {#if adding}
         <AddSystem bind:systems={systems} bind:adding />
     {:else}
-        <SelectSystem systems={systems} bind:current bind:adding />
+        <SelectSystem bind:systems={systems} bind:current bind:adding />
     {/if}
     <UserMenu />
 </div>

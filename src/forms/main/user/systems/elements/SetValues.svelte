@@ -3,6 +3,8 @@
     import {slide} from "svelte/transition"
     import StaticDetail from "./StaticDetail.svelte"
     import VariableDetail from "./VariableDetail.svelte"
+    import Period from "../../../../../utility/period.js"
+    import formatValue from "../../../../../utility/format-value.js"
 
     export let provider = null
     export let values = {}
@@ -27,18 +29,28 @@
     $: providerInfo = library.providers[provider] || null
     $: valuesToFill = getValuesToFill(providerInfo)
 
+/*
     const validate = () => {
         return valuesToFill.every(value => {
             return values[value.id] !== undefined && values[value.id] !== ""
         })
     }
+*/
+
+    const validate = () => {
+        return valuesToFill.every(value => {
+            return formatValue(value.type, values[value.id]) !== null || !value.mandatory && values[value.id] === ""
+        })
+    }
+
 
     $: ready = validate(valuesToFill, values)
+    $: period = new Period(providerInfo?.period)
 </script>
 
 {#if providerInfo !== null}
 <div class="list">
-    <StaticDetail name="Период:" value={providerInfo.period} />
+    <StaticDetail name="Период:" value={period.toString()} />
     {#each valuesToFill as value}
         <VariableDetail name={value.name} type={value.type} bind:value={values[value.id]} />
     {/each}

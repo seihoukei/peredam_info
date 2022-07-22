@@ -21,10 +21,10 @@
 
 {#each systems as system (system)}
     {#if !current || system === current}
-        <SystemShortInfo {system} on:click={()=>setSystem(system)}/>
+        <SystemShortInfo bind:system on:click={()=>setSystem(system)}/>
     {/if}
 {/each}
-<SystemMain system={current} />
+<SystemMain bind:system={current} />
 {#if !current}
     <button on:click={addSystem} transition:slide>Добавить систему</button>
 {/if}

@@ -3,6 +3,7 @@
     import SelectProvider from "./elements/SelectProvider.svelte"
     import SetValues from "./elements/SetValues.svelte"
     import {slide} from "svelte/transition"
+    import syncUser from "../../../../utility/sync-user.js"
 
     export let adding = true
     export let systems = []
@@ -30,6 +31,8 @@
             name : "",
         }]
         adding = false
+
+        //syncUser()
     }
 
 </script>

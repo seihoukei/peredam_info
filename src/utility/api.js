@@ -65,4 +65,14 @@ export default class Api {
             token
         })
     }
+    
+    static async saveUserData(token, data) {
+        if (!token)
+            return failure()
+        
+        return await this.#call("user/systems", {
+            token,
+            data
+        })
+    }
 }
