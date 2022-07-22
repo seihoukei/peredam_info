@@ -15,10 +15,10 @@
 </script>
 
 {#if city !== null}
-    {#if Object.keys($library.cities[city].providers).length}
+    {#if Object.keys(library.cities[city].providers).length}
         <div class="choice">
             <span class="title" transition:slide>Поставщик услуг:</span>
-            {#each Object.entries($library.cities[city].providers) as [id, provider](id)}
+            {#each Object.entries(library.cities[city].providers) as [id, provider](id)}
                 {#if !current || current === id}
                     <div class="item" transition:slide>
                         <button on:click={()=>switchCurrent(id)}>{provider.name}</button>
