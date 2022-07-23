@@ -15,8 +15,9 @@
 :root {
     --background : #CCEEFF;
     --text-color : #000000;
+    --link-color : #003366;
 
-    /*--login.php-background : url("../resources/login_bg_wip.jpg");*/
+    /*--login-background : url("../resources/login_bg_wip.jpg");*/
 
     --element-background : #00000066;
     --element-text-color : #FFFFFF;
@@ -27,22 +28,17 @@
     --status-ok-color: #008800;
     --status-error-color: #880000;
 
-    --font-size : var(--2u);
-    --label-font-size : var(--3u);
-    --small-font-size : var(--2u);
+    --font-size : 18px;
 
-    --container-width : calc(var(--unit) * 50);
-    --container-height : calc(var(--unit) * 100);
 }
-
 
 @media (prefers-color-scheme: dark) {
     :root {
         --background : #0E303D;
-        /*--login.php-background : url("../resources/login_bg.jpg");*/
+        /*--login-background : url("../resources/login_bg.jpg");*/
 
         --text-color : #FFFFFF;
-
+        --link-color : #99CCFF;
         --element-background : #00000066;
         --element-text-color : #FFFFFF;
 
@@ -61,45 +57,66 @@ html, body {
     width : 100vw;
     height : 100vh;
 
-    font: var(--2u) Exo2, sans-serif;
+    font: var(--font-size) Exo2, sans-serif;
     background-color : var(--background);
     color : var(--text-color);
     overflow : hidden;
 }
 
-body.login {
-    /*
-    background-image: var(--login.php-background);
-    background-size: cover;
-    background-position: center;
-    */
-}
-
 div#app {
 }
 
-div.container {
-    position : absolute;
-    width : var(--container-width);
-    height : var(--container-height);
-    left : 50vw;
-    top : 50vh;
-    transform: translate(-50%, -50%);
-
-    display:flex;
+div.flex {
+    display : flex;
     flex-direction: column;
-    align-items: center;
+}
 
-    overflow: hidden auto;
+div.flex.centered {
+    align-items: center;
+}
+
+div.flex.spaced {
+    row-gap : 20px;
+}
+
+div.central {
+    position: absolute;
+    left: 50vw;
+    top: 50vh;
+    transform: translate(-50%, -50%);
+}
+
+div.center-text {
+    text-align: center;
+}
+
+div.top-central {
+    position: absolute;
+    left: 50vw;
+    top: 0;
+    transform: translate(-50%, 0);
+}
+
+div.opaque {
+    background-color: var(--background);
+}
+
+.large {
+    font-size : x-large;
 }
 
 button, input {
-    font: var(--3u) Exo2, sans-serif;
+    font: var(--font-size) Exo2, sans-serif;
     background-color: var(--element-background);
     color: var(--element-text-color);
     border : 0;
-    padding : var(--0_5u) var(--2u) var(--1u);
-    border-radius : var(--3u);
+    padding : 5px 10px 8px;
+    border-radius : 30px;
+}
+
+a {
+    color : var(--link-color);
+    cursor : pointer;
 }
 
 button {
@@ -110,4 +127,13 @@ button:disabled {
     background-color: var(--disabled-element-background);
     color: var(--disabled-element-text-color);
     cursor : default;
+}
+
+.debug {
+    color: var(--text-color);
+    position: absolute;
+    opacity: 0.2;
+    font-size: 20px;
+    pointer-events: none;
+    z-index:100;
 }

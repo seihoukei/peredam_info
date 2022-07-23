@@ -1,0 +1,24 @@
+<script>
+    import CodeInput from "../CodeInput.svelte"
+    import {slide, fly} from "svelte/transition"
+    import {createEventDispatcher} from "svelte"
+    import {loginFlyRight} from "../../../utility/transitions.js"
+
+    export let code
+    export let login
+
+    const dispatch = createEventDispatcher()
+
+    function cancel() {
+        dispatch("cancel")
+    }
+
+</script>
+
+<div class="centered central spaced flex" transition:fly={loginFlyRight}>
+    <div class="large center-text" transition:slide|local>Введите код для быстрого входа как {login}:</div>
+    <CodeInput bind:code on:submit/>
+    <div class="buttons">
+        <button on:click={cancel}>◀ Войти с паролем</button>
+    </div>
+</div>

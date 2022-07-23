@@ -1,5 +1,5 @@
 import {derived, writable} from "svelte/store"
-import TokenEncryption from "../utility/token-encryption.js"
+import TokenEncryption from "../src/utility/token-encryption.js"
 
 const {update, subscribe} = writable({
     new : "",

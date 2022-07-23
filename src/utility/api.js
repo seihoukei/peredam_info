@@ -40,6 +40,15 @@ export default class Api {
         return success("Допустимый логин")
     }
     
+    static async loginExists(login) {
+        await this.fakeFetch(1000)
+        
+        if (login[0] === "1")
+            return success({exists : true})
+        
+        return success({exists : false})
+    }
+    
     static async logIn(login, password) {
         const result = await this.#call("auth/login", {
             login

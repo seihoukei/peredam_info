@@ -13,9 +13,9 @@
 
     const add = (x) => {
         code += x
-        if (code.length === length) {
+        if (code.length >= length) {
+            code = code.slice(0,length)
             dispatch("submit", code)
-            reset()
         }
     }
 
@@ -71,8 +71,8 @@
         display : flex;
         flex-direction: column;
         align-items: center;
-        width : var(--42u);
-        row-gap: var(--5u);
+        width : 360px;
+        row-gap: 50px;
     }
 
     div.code {
@@ -82,23 +82,23 @@
 
         background: var(--element-background);
         color : var(--element-text-color);
-        font: var(--7u) Nova, monospace;
+        font: 70px Nova, monospace;
 
-        border-radius: var(--3u);
-        padding : 0 var(--3u);
+        border-radius: 30px;
+        padding : 0 30px;
         white-space: nowrap;
     }
 
     div.keypad {
         display:grid;
-        --key-size : var(--8u);
+        --key-size : 60px;
         grid-template-columns: var(--key-size) var(--key-size) var(--key-size);
         grid-template-rows: var(--key-size) var(--key-size) var(--key-size) var(--key-size);
-        grid-gap: var(--3u);
+        grid-gap: 25px;
     }
 
     div.keypad button {
-        font: var(--5u) Nova, monospace;
+        font: 40px Nova, monospace;
         border-radius: 50%;
         border : none;
         cursor : pointer;
