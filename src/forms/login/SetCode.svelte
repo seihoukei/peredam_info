@@ -10,8 +10,7 @@
     let message = "Вы можете установить код для быстрого входа:"
 
     const checkCode = ({detail : code}) => {
-        console.log(code, firstCode)
-        if (firstCode === "") {
+       if (firstCode === "") {
             firstCode = code
         } else {
             if (code === firstCode) {

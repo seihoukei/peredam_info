@@ -2,6 +2,7 @@
     import Main from "./forms/Main.svelte"
     import Login from "./forms/Login.svelte"
     import tokens, {loggedIn, userToken} from "./stores/tokens.js"
+    import LoginSequence from "./forms/LoginSequence.svelte"
 
     $: document.body.classList.toggle("login", !$loggedIn)
 </script>

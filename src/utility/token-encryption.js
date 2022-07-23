@@ -1,3 +1,5 @@
+//TODO: real encryption
+
 export default class TokenEncryption {
     static encrypt(decrypted, code) {
         return `encode(${decrypted}, ${code})`

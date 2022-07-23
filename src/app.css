@@ -16,7 +16,7 @@
     --background : #CCEEFF;
     --text-color : #000000;
 
-    /*--login-background : url("../resources/login_bg_wip.jpg");*/
+    /*--login.php-background : url("../resources/login_bg_wip.jpg");*/
 
     --element-background : #00000066;
     --element-text-color : #FFFFFF;
@@ -39,7 +39,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --background : #0E303D;
-        /*--login-background : url("../resources/login_bg.jpg");*/
+        /*--login.php-background : url("../resources/login_bg.jpg");*/
 
         --text-color : #FFFFFF;
 
@@ -69,7 +69,7 @@ html, body {
 
 body.login {
     /*
-    background-image: var(--login-background);
+    background-image: var(--login.php-background);
     background-size: cover;
     background-position: center;
     */

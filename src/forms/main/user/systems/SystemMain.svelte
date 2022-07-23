@@ -7,11 +7,14 @@
     import Period from "../../../../utility/period.js"
     import formatValue from "../../../../utility/format-value.js"
     import syncUser from "../../../../utility/sync-user.js"
+    import Api from "../../../../utility/api.js"
+    import fillTemplate from "../../../../utility/template.js"
 
     export let system = {}
     let input = {}
     let sending = false
     let editing = false
+    export let offline = false
 
     let editorValues = {}
 
@@ -61,7 +64,7 @@
 
     $: ready = validate(input)
 
-    const send = () => {
+    const finalize = () => {
         system.last = {
             date: Date.now(),
             values: input,
@@ -73,6 +76,23 @@
         editing = false
 
         //syncUser()
+    }
+
+    let submitting = false
+
+    const submitOnline = async () => {
+        submitting = true
+        await Api.submitData({
+            system : system.id,
+            data : fillTemplate(provider.onlineTemplate, {
+                ...system.values,
+                ...input
+            }),
+        })
+
+        submitting = false
+
+        finalize()
     }
 
 </script>
@@ -102,10 +122,13 @@
                 <button on:click={stopEditing}>Отмена</button>
             </div>
         {:else if sending}
-            {#if ready}
-                <SendingMethods {system} {input} methods={provider.methods} on:click={send}/>
+            {#if ready && offline}
+                <SendingMethods {system} {input} methods={provider.methods} on:click={finalize}/>
             {/if}
             <div class="buttons" transition:slide>
+                {#if !offline}
+                    <button on:click={submitOnline} disabled={!ready || submitting}>Отправить</button>
+                {/if}
                 <button on:click={stopSending}>Отмена</button>
             </div>
         {:else}

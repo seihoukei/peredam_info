@@ -7,7 +7,6 @@ export default async function syncUser(token, user) {
     if (lastSync === data)
         return
     lastSync = data
-    console.log(lastSync)
-    
+   
     return Api.saveUserData(token, user)
 }

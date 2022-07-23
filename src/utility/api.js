@@ -3,7 +3,7 @@ import Web from "./web.js"
 
 export default class Api {
 //    static server = "https://api.peredam.info/"
-    static server = "/_api/"
+    static server = "http://localhost:5174/"
     
     static #apiUrl (address) {
         return `${this.server}${address}`
@@ -21,40 +21,47 @@ export default class Api {
     }
     
     static async checkLogin(login) {
-        await this.fakeFetch(300)
-        
-/*
-        console.log(await this.#call("auth/check_login", {
+        const result = await this.#call("auth/check_login", {
             login
-        }))
+        })
         
-*/
-        if (login.slice(0,1) !== "1")
+        if (result?.success !== true) {
+            return failure(result?.error ?? "Неизвестная ошибка")
+        }
+        
+        if (result.data.taken) {
             return failure("Логин занят")
-    
+        }
+        
+        if (result.data.invalid) {
+            return failure("Некорректный логин")
+        }
+        
         return success("Допустимый логин")
     }
     
     static async logIn(login, password) {
-        await this.fakeFetch(1000)
-        
-        if (login !== password)
-            return failure("Логин и пароль должны совпадать (тестовый режим)")
-    
-        return success({
-            token : `login(${login}.${password})`
+        const result = await this.#call("auth/login", {
+            login
         })
+    
+        if (result?.success !== true) {
+            return failure(result?.error ?? "Неизвестная ошибка")
+        }
+        
+        return result
     }
     
     static async register(login, password) {
-        await this.fakeFetch(1000)
-        
-        if (login === password)
-            return failure("Логин и пароль не должны совпадать (тестовый режим)")
-        
-        return success({
-            token : `register(${login}.${password})`
+        const result = await this.#call("auth/register", {
+            login, password
         })
+    
+        if (result?.success !== true) {
+            return failure(result?.error ?? "Неизвестная ошибка")
+        }
+    
+        return result
     }
     
     static async getUserData(token = null) {
@@ -72,6 +79,13 @@ export default class Api {
         
         return await this.#call("user/systems", {
             token,
+            data
+        })
+    }
+    
+    static async submitData(data) {
+        return await this.#call("user/submit", {
+//            token,
             data
         })
     }
