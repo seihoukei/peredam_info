@@ -72,7 +72,7 @@
                 city : 1,
                 name : "ПАО \"ТГК-2\"",
                 type : "Горячая вода",
-                period : "MONTHLY:1,22",
+                period : "MONTHLY:12,22",
                 onlineTemplate: "<ACCOUNT> <HOT_N> <HOT_V>",
                 values: {
                     ACCOUNT : {
@@ -130,8 +130,7 @@
                         mandatory: true,
                     },
                     NIGHT : {
-                        name: "Показания счётчика (ночь)",
-                        comment: "Только при двухтарифном счётчике",
+                        name: "Показания счётчика (ночь, если есть)",
                         type: "NUM:,0",
                     },
                 },

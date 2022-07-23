@@ -24,18 +24,16 @@
     }
 </script>
 
-<div class="flex central centered spaced" transition:fly={loginFlyLeft}>
+<div class="flex central centered spaced wrapper" transition:fly={loginFlyLeft}>
     <p class="large">Пользователь {login} не найден.</p>
     <p>Если вы здесь впервые, то для регистрации вам необходимо подтвердить, что вы принимаете <a on:click={rules}>условия использования сервиса</a> и задать пароль.</p>
     <label>
         <input type="checkbox" bind:checked={agreed} /> Я принимаю условия пользования сервисом.
     </label>
-    <div class="buttons">
+    <div class="row-flex">
         <button on:click={cancel}>◀ Другой пользователь</button>
         <button disabled={!agreed} on:click={confirm}>Задать пароль ▶</button>
     </div>
 </div>
 
-<Rules bind:visible={showRules}>
-
-</Rules>
+<Rules bind:visible={showRules}/>

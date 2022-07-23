@@ -1,7 +1,7 @@
 <script>
     import { fade } from "svelte/transition"
 
-    export let message
+    export let message = "Неизвестная ошибка"
 </script>
 
 <div class="central spaced flex" transition:fade>

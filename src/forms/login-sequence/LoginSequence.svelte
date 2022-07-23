@@ -1,19 +1,22 @@
 <script>
-    import RequestPhone from "./login-sequence/stages/RequestPhone.svelte"
-    import RequestUsername from "./login-sequence/stages/RequestUsername.svelte"
-    import RequestPassword from "./login-sequence/stages/RequestPassword.svelte"
-    import ConfirmNewUser from "./login-sequence/stages/ConfirmNewUser.svelte"
-    import SetPassword from "./login-sequence/stages/SetPassword.svelte"
-    import SetCode from "./login-sequence/stages/SetCode.svelte"
-    import RequestCode from "./login-sequence/stages/RequestCode.svelte"
-    import Error from "./login-sequence/stages/Error.svelte"
-    import Waiting from "./login-sequence/stages/Waiting.svelte"
+    import RequestPhone from "./stages/RequestPhone.svelte"
+    import RequestUsername from "./stages/RequestUsername.svelte"
+    import RequestPassword from "./stages/RequestPassword.svelte"
+    import ConfirmNewUser from "./stages/ConfirmNewUser.svelte"
+    import SetPassword from "./stages/SetPassword.svelte"
+    import SetCode from "./stages/SetCode.svelte"
+    import RequestCode from "./stages/RequestCode.svelte"
+    import Error from "./elements/Error.svelte"
+    import Waiting from "./elements/Waiting.svelte"
 
-    import Tokens from "../utility/tokens.js"
-    import Api from "../utility/api.js"
+    import Tokens from "../../utility/tokens.js"
+    import Api from "../../utility/api.js"
+    import TopLogo from "../TopLogo.svelte"
+    import token from "../../stores/token.js"
+    import {onMount} from "svelte"
 
-    export let token
-    export let login
+    export let login = localStorage.login ?? ""
+    export let username = localStorage.login ?? ""
 
     let password = ""
     let code = ""
@@ -39,15 +42,22 @@
         ERROR : 102,
     }
 
-    let stage = STAGES.REQUEST_USERNAME
+    let stage = STAGES.NONE
 
-    if (tokens.current !== "") {
+    $: if (stage === STAGES.COMPLETE)
         finalize()
-    } else if (tokens.encrypted !== "") {
-        stage = STAGES.REQUEST_CODE
-    } else if (login !== "") {
-        stage = STAGES.REQUEST_OLD_PASSWORD
-    }
+
+    onMount(() => {
+        if (tokens.current !== "") {
+            stage = STAGES.COMPLETE
+        } else if (tokens.encrypted !== "") {
+            stage = STAGES.REQUEST_CODE
+        } else if (login !== "") {
+            stage = STAGES.REQUEST_OLD_PASSWORD
+        } else {
+            stage = STAGES.REQUEST_USERNAME
+        }
+    })
 
     function error(message, retryStage = STAGES.REQUEST_USERNAME) {
         status = message
@@ -94,14 +104,15 @@
         if (code === "") {
             tokens.open = tokens.current
             tokens.encrypted = ""
-            finalize()
+            stage = STAGES.COMPLETE
         } else {
             const result = Tokens.encrypt(tokens.current, code)
 
             if (result.success) {
                 tokens.encrypted = result.data
                 tokens.open = ""
-                finalize()
+                stage = STAGES.COMPLETE
+
             } else {
                 error("Ошибка шифрования", STAGES.SET_CODE)
             }
@@ -114,7 +125,7 @@
 
         if (result.success) {
             tokens.current = result
-            finalize()
+            stage = STAGES.COMPLETE
 
         } else {
             error("Неправильный код")
@@ -123,9 +134,8 @@
     }
 
     function finalize() {
-        token = tokens.current
-        stage = STAGES.COMPLETE
-
+        username = login
+        token.set(tokens.current)
     }
 
     async function checkLogin() {
@@ -185,6 +195,10 @@
     <pre class="debug">{JSON.stringify(tokens,null,1)}</pre>
 {/if}
 
+<div class="top-central">
+    <TopLogo />
+</div>
+
 {#if stage === STAGES.REQUEST_USERNAME}
     {#if isUsingPhone}
         <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin}/>
@@ -209,9 +223,8 @@
 {:else if stage === STAGES.ERROR}
     <Error message={status} on:click={retry} />
 
-{:else if stage === STAGES.COMPLETE}
-
 {/if}
+
 
 <style>
 

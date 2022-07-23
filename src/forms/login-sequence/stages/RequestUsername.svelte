@@ -1,5 +1,5 @@
 <script>
-    import LoginPrompt from "../LoginPrompt.svelte"
+    import LoginPrompt from "../elements/LoginPrompt.svelte"
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
     import {loginFlyLeft} from "../../../utility/transitions.js"

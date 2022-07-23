@@ -1,6 +1,6 @@
 <script>
     import {createEventDispatcher} from "svelte"
-    import {failure, success} from "../../utility/messages.js"
+    import {failure, success} from "../../../utility/messages.js"
 
     export let type = "text"
     export let value
@@ -35,16 +35,16 @@
 </script>
 
 <div class="flex centered spaced container">
-    <span class="large prompt"><slot /></span>
-    <div class="input flex">
+    <span class="large center-text prompt"><slot /></span>
+    <div class="input row-flex">
         {#if type === "tel"}
-            <input class="large" type="tel" bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
+            <input class="large" type="tel" autofocus bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
         {:else if type === "number"}
-            <input class="large" type="number" bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
+            <input class="large" type="number" autofocus bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
         {:else if type === "password"}
-            <input class="large" type="password" bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
+            <input class="large" type="password" autofocus bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
         {:else}
-            <input class="large" bind:value placeholder={hint} on:keydown={checkKey}/>
+            <input class="large" autofocus bind:value placeholder={hint} on:keydown={checkKey}/>
         {/if}
         <button class="large submit" on:click={submit} disabled={!validityCheck.success}>▶</button>
     </div>
@@ -74,7 +74,6 @@
     }
 
     div.input {
-        flex-direction: row;
         column-gap : 2px;
     }
 </style>

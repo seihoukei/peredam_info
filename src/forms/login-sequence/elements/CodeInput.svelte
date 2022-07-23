@@ -27,7 +27,7 @@
         code = code.slice(0,-1)
     }
 
-    // keyCodes: [main, numpad without numlock, numpad with numlock]
+    // keyCodes: [user, numpad without numlock, numpad with numlock]
     //noinspection MagicNumberJS
     const buttons = [
         {text: "1", keyCodes: [49, 35, 97 ], action: () => add(1)},
@@ -71,7 +71,7 @@
         display : flex;
         flex-direction: column;
         align-items: center;
-        width : 360px;
+        width : 320px;
         row-gap: 50px;
     }
 
@@ -82,7 +82,7 @@
 
         background: var(--element-background);
         color : var(--element-text-color);
-        font: 70px Nova, monospace;
+        font: 50px Nova, monospace;
 
         border-radius: 30px;
         padding : 0 30px;
@@ -91,14 +91,14 @@
 
     div.keypad {
         display:grid;
-        --key-size : 60px;
+        --key-size : 50px;
         grid-template-columns: var(--key-size) var(--key-size) var(--key-size);
         grid-template-rows: var(--key-size) var(--key-size) var(--key-size) var(--key-size);
         grid-gap: 25px;
     }
 
     div.keypad button {
-        font: 40px Nova, monospace;
+        font: 30px Nova, monospace;
         border-radius: 50%;
         border : none;
         cursor : pointer;

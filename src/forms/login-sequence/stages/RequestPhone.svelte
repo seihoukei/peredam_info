@@ -1,5 +1,5 @@
 <script>
-    import LoginPrompt from "../LoginPrompt.svelte"
+    import LoginPrompt from "../elements/LoginPrompt.svelte"
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
     import {loginFlyLeft} from "../../../utility/transitions.js"
@@ -14,7 +14,7 @@
         dispatch("nophone")
     }
 
-    $: phone = raw.replace(/[^0-9]*/g,"").slice(-10)
+    $: phone = `📞${raw.replace(/[^0-9]*/g,"").slice(-10)}`
 
 </script>
 

@@ -60,15 +60,25 @@ html, body {
     font: var(--font-size) Exo2, sans-serif;
     background-color : var(--background);
     color : var(--text-color);
-    overflow : hidden;
+    overflow : hidden auto;
 }
 
 div#app {
 }
 
+div.wrapper {
+    min-width: 340px;
+}
+
 div.flex {
     display : flex;
     flex-direction: column;
+}
+
+div.row-flex {
+    display : flex;
+    flex-direction: row;
+    column-gap: 10px;
 }
 
 div.flex.centered {
@@ -82,12 +92,8 @@ div.flex.spaced {
 div.central {
     position: absolute;
     left: 50vw;
-    top: 50vh;
+    top: calc(50vh + 50px);
     transform: translate(-50%, -50%);
-}
-
-div.center-text {
-    text-align: center;
 }
 
 div.top-central {
@@ -97,8 +103,16 @@ div.top-central {
     transform: translate(-50%, 0);
 }
 
-div.opaque {
+.opaque {
     background-color: var(--background);
+}
+
+.center-text {
+    text-align: center;
+}
+
+.spacy-below {
+    margin-bottom: 20px;
 }
 
 .large {
@@ -121,6 +135,10 @@ a {
 
 button {
     cursor : pointer;
+}
+
+button.large input.large {
+    padding : 9px 14px 12px;
 }
 
 button:disabled {
