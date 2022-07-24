@@ -7,14 +7,14 @@
     export let current = null
     export let adding = false
 
-    const setSystem = (system) => {
+    function setSystem(system) {
         if (current === system)
             current = null
         else
             current = system
     }
 
-    const addSystem = () => {
+    function addSystem() {
         adding = true
     }
 </script>

@@ -5,7 +5,7 @@
     export let city = null
     export let current = null
 
-    const switchCurrent = (value) => {
+    function switchCurrent(value)  {
         if (current === value)
             current = null
         else

@@ -7,11 +7,11 @@
 
     let showMenu = false
 
-    const toggleMenu = () => {
+    function toggleMenu() {
         showMenu = !showMenu
     }
 
-    const hideMenu = () => {
+    function hideMenu() {
         showMenu = false
     }
 </script>

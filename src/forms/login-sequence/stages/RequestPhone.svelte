@@ -14,6 +14,10 @@
         dispatch("nophone")
     }
 
+    function nologin() {
+        dispatch("nologin")
+    }
+
     $: phone = `📞${raw.replace(/[^0-9]*/g,"").slice(-10)}`
 
 </script>
@@ -23,4 +27,6 @@
         Введите номер телефона
     </LoginPrompt>
     <button on:click={noPhone}>◀ Вход без телефона</button>
+    <br>
+    <button on:click={nologin}>Просто передать показания</button>
 </div>

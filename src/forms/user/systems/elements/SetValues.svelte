@@ -7,14 +7,19 @@
     export let provider = null
     export let values = {}
     export let ready
+    export let all = false
 
-    const getValuesToFill = (providerInfo) => {
+    $: providerInfo = library.providers[provider] || null
+    $: valuesToFill = getValuesToFill(providerInfo)
+    $: ready = validate(valuesToFill, values)
+
+    function getValuesToFill(providerInfo) {
         const result = []
         if (providerInfo === null)
             return result
 
         for (const [id, value] of Object.entries(providerInfo.values))
-            if (value.constant)
+            if (value.constant || all)
                 result.push({
                     name : value.name,
                     type : value.type,
@@ -23,10 +28,6 @@
                 })
         return result
     }
-
-    $: providerInfo = library.providers[provider] || null
-    $: valuesToFill = getValuesToFill(providerInfo)
-    $: ready = validate(valuesToFill, values)
 
     function validate() {
         if (providerInfo === null)

@@ -17,6 +17,7 @@
 
     export let login = localStorage.login ?? ""
     export let username = localStorage.login ?? ""
+    export let anonymous = false
 
     let password = ""
     let code = ""
@@ -134,8 +135,15 @@
     }
 
     function finalize() {
-        username = login
-        token.set(tokens.current)
+        if (!anonymous) {
+            username = login
+            token.set(tokens.current)
+        }
+    }
+
+    function noLogin() {
+        anonymous = true
+        stage = STAGES.COMPLETE
     }
 
     async function checkLogin() {
@@ -201,9 +209,9 @@
 
 {#if stage === STAGES.REQUEST_USERNAME}
     {#if isUsingPhone}
-        <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin}/>
+        <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin} on:nologin={noLogin}/>
     {:else}
-        <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone}/>
+        <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone} on:nologin={noLogin}/>
     {/if}
 
 {:else if stage === STAGES.CONFIRM_NEW_USER}
@@ -211,7 +219,7 @@
 {:else if stage === STAGES.SET_NEW_PASSWORD}
     <SetPassword {login} bind:password on:cancel={restart} on:submit={register}/>
 {:else if stage === STAGES.REQUEST_OLD_PASSWORD}
-    <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in}/>
+    <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in} on:nologin={noLogin}/>
 
 {:else if stage === STAGES.SET_CODE}
     <SetCode {login} bind:code on:cancel={restart} on:submit={setCode}/>

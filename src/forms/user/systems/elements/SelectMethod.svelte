@@ -6,16 +6,10 @@
     import {slide} from "svelte/transition"
     import MethodButton from "./MethodButton.svelte"
 
-    export let system
-    export let input
+    export let values
     export let methods
 
     let current = null
-
-    $: values = {
-        ...system.values,
-        ...input,
-    }
 
     const methodComponents = {
         "E-MAIL": EMailMethod,
@@ -25,7 +19,7 @@
         "SITE" : SiteMethod,
     }
 
-    const setMethod = (method) => {
+    function setMethod(method) {
         current = method
     }
 </script>
@@ -35,7 +29,7 @@
 
     <div class="spacy-below flex buttons">
         {#each methods as method}
-            <MethodButton type={method.type} on:click={setMethod(method)}/>
+            <MethodButton type={method.type} on:click={() => setMethod(method)}/>
         {/each}
     </div>
 

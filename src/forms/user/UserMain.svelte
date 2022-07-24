@@ -15,14 +15,14 @@
         systems : []
     }
 
-    let systems = Systems.sortByDate(user.systems)
-    $: user.systems = Systems.sortByDate(systems)
-
     let current = null
     let adding = false
 
-    $: selecting = !current && !adding
+    let systems = Systems.sortByDate(user.systems)
+    $: user.systems = Systems.sortByDate(systems)
 
+
+    $: selecting = !current && !adding
     $: savingUser = syncUser($token, user)
 
 </script>

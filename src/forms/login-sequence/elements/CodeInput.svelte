@@ -9,24 +9,6 @@
         code.slice(-1) +
         " ○".repeat(Math.max(0, length - code.length))
 
-    const dispatch = createEventDispatcher()
-
-    const add = (x) => {
-        code += x
-        if (code.length >= length) {
-            code = code.slice(0,length)
-            dispatch("submit", code)
-        }
-    }
-
-    const reset = () => {
-        code = ""
-    }
-
-    const back = () => {
-        code = code.slice(0,-1)
-    }
-
     // keyCodes: [user, numpad without numlock, numpad with numlock]
     //noinspection MagicNumberJS
     const buttons = [
@@ -44,7 +26,25 @@
         {text: "<", keyCodes: [8]          , action: () => back()},
     ]
 
-    const onKeyDown = (event) => {
+    const dispatch = createEventDispatcher()
+
+    function add(x) {
+        code += x
+        if (code.length >= length) {
+            code = code.slice(0,length)
+            dispatch("submit", code)
+        }
+    }
+
+    function reset() {
+        code = ""
+    }
+
+    function back() {
+        code = code.slice(0,-1)
+    }
+
+    function onKeyDown(event) {
         for (const button of buttons) {
             if (button.keyCodes.includes(event.keyCode)) {
                 button.action()

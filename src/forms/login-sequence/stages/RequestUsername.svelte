@@ -12,6 +12,10 @@
         dispatch("phone")
     }
 
+    function nologin() {
+        dispatch("nologin")
+    }
+
     $: username = username.replace(/[^0-9a-zA-Zа-яА-Я_\- ]*/g,"")
 
 </script>
@@ -21,4 +25,6 @@
         Введите имя пользователя
     </LoginPrompt>
     <button on:click={phone}>◀ Вход по номеру телефона</button>
+    <br>
+    <button on:click={nologin}>Просто передать показания</button>
 </div>

@@ -10,14 +10,24 @@
     import fillTemplate from "../../../utility/template.js"
 
     export let system = {}
-    let input = {}
-    let sending = false
-    let editing = false
     export let offline = true
 
+    let input = {}
+    let editing = false
     let editorValues = {}
+    let sending = false
+    let submitting = false
 
-    const getProvider = (system) => {
+    $: provider = getProvider(system)
+    $: period = new Period(provider?.period)
+    $: ready = validate(input)
+
+    $: values = {
+        ...system?.values,
+        ...input,
+    }
+
+    function getProvider(system) {
         input = {}
         sending = false
         editing = false
@@ -28,42 +38,37 @@
         return library.providers[system.provider] ?? null
     }
 
-    const startSending = () => {
+    function startSending()  {
         sending = true
     }
 
-    const startEditing = () => {
+    function startEditing() {
         editorValues = {...system.values}
         editing = true
     }
 
-    const stopSending = () => {
+    function stopSending() {
         sending = false
     }
 
-    const stopEditing = () => {
+    function stopEditing() {
         editing = false
     }
 
-    const saveEdit = () => {
+    function saveEdit() {
         system.values = editorValues
         editing = false
 
         //syncUser()
     }
 
-    $: provider = getProvider(system)
-    $: period = new Period(provider?.period)
-
-    const validate = () => {
+    function validate() {
         return Object.entries(input).every(([id,value]) => {
             return formatValue(provider.values[id].type, value) !== null || !provider.values[id].mandatory && value === ""
         })
     }
 
-    $: ready = validate(input)
-
-    const finalize = () => {
+    function finalize() {
         system.last = {
             date: Date.now(),
             values: input,
@@ -77,9 +82,7 @@
         //syncUser()
     }
 
-    let submitting = false
-
-    const submitOnline = async () => {
+    async function submitOnline() {
         submitting = true
         await Api.submitData({
             system : system.id,
@@ -122,12 +125,12 @@
             </div>
         {:else if sending}
             {#if !ready}
-                <div class="large important spacy-below" transition:slide>
+                <div class="large important center-text spacy-below" transition:slide>
                     Заполните поля для показаний выше
                 </div>
             {/if}
             {#if ready && offline}
-                <SelectMethod {system} {input} methods={provider.methods} on:click={finalize}/>
+                <SelectMethod {values} methods={provider.methods} on:click={finalize}/>
             {/if}
             <div class="row-flex spacy-below" transition:slide>
                 {#if !offline}

@@ -7,7 +7,7 @@
     $: if (Object.keys(library.cities).length === 1)
         current = Object.keys(library.cities)[0]
 
-    const switchCurrent = (value) => {
+    function switchCurrent(value) {
         if (current === value)
             current = null
         else

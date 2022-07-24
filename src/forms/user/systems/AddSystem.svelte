@@ -16,21 +16,21 @@
     let values = {}
     let ready = false
 
-    $: settingCity = city === null
-    $: settingProvider = !settingCity && provider === null
-    $: settingValues = !settingProvider
-
-    $: if (city === null) provider = null
+    $: if (city === null)
+        provider = null
 
     $: newSystem = {
         provider, values
     }
 
-    const finalize = () => {
-        systems = [...systems, {
-            ...newSystem,
-            name : "",
-        }]
+    $: values = empty(provider)
+
+    function empty() {
+        return {}
+    }
+
+    function finalize () {
+        systems = [...systems, newSystem]
         adding = false
     }
 

@@ -6,16 +6,19 @@
     import Welcome from "./forms/Welcome.svelte"
     import token from "./stores/token.js"
     import Error from "./forms/login-sequence/elements/Error.svelte"
+    import AnonymousMain from "./forms/anonymous/AnonymousMain.svelte"
 
     let username = localStorage.login ?? ""
-
+    let anonymous = false
     $: loading = loadLibrary
         .then(async () => await Api.getUserData(token))
 
 </script>
 
-{#if $token === ""}
-    <LoginSequence bind:username/>
+{#if anonymous}
+    <AnonymousMain bind:anonymous/>
+{:else if $token === ""}
+    <LoginSequence bind:username bind:anonymous/>
 {:else}
     {#await loading}
         <Welcome />

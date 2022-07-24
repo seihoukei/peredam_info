@@ -13,6 +13,10 @@
         dispatch("cancel")
     }
 
+    function nologin() {
+        dispatch("nologin")
+    }
+
 </script>
 
 <div class="central centered spaced flex container" transition:fly={loginFlyRight}>
@@ -20,4 +24,6 @@
         Введите пароль пользователя {login}
     </LoginPrompt>
     <button on:click={cancel}>◀ Другой пользователь</button>
+    <br>
+    <button on:click={nologin}>Просто передать показания</button>
 </div>
