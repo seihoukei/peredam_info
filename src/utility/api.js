@@ -20,40 +20,23 @@ export default class Api {
         return Math.random()
     }
     
-    static async checkLogin(login) {
-        const result = await this.#call("auth/check_login", {
+    static async loginExists(login) {
+        const result = await this.#call("auth/login_exists", {
             login
         })
         
         if (result?.success !== true) {
             return failure(result?.error ?? "Неизвестная ошибка")
         }
-        
-        if (result.data.taken) {
-            return failure("Логин занят")
-        }
-        
-        if (result.data.invalid) {
-            return failure("Некорректный логин")
-        }
-        
-        return success("Допустимый логин")
-    }
     
-    static async loginExists(login) {
-        await this.fakeFetch(1000)
-        
-        if (login[0] === "1")
-            return success({exists : true})
-        
-        return success({exists : false})
+        return result
     }
     
     static async logIn(login, password) {
         const result = await this.#call("auth/login", {
-            login
+            login, password
         })
-    
+        
         if (result?.success !== true) {
             return failure(result?.error ?? "Неизвестная ошибка")
         }
@@ -65,7 +48,7 @@ export default class Api {
         const result = await this.#call("auth/register", {
             login, password
         })
-    
+        
         if (result?.success !== true) {
             return failure(result?.error ?? "Неизвестная ошибка")
         }

@@ -5,9 +5,9 @@ export function success (data) {
     }
 }
 
-export function failure (data) {
+export function failure (error) {
     return {
-        data,
+        error,
         success : false,
     }
 }

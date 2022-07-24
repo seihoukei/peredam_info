@@ -61,6 +61,7 @@
     })
 
     function error(message, retryStage = STAGES.REQUEST_USERNAME) {
+        stage = STAGES.ERROR
         status = message
         errorRetryStage = retryStage
     }
