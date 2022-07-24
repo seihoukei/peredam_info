@@ -5,7 +5,8 @@
     import SetValues from "../user/systems/elements/SetValues.svelte"
     import Api from "../../utility/api.js"
     import fillTemplate from "../../utility/template.js"
-    import {slide} from "svelte/transition"
+    import {slide, fly, fade} from "svelte/transition"
+    import {dialogFlyUp} from "../../utility/transitions.js"
     import SelectMethod from "../user/systems/elements/SelectMethod.svelte"
     import library from "../../stores/library.js"
 
@@ -55,7 +56,7 @@
     }
 </script>
 
-<div class="top-central centered wrapper flex">
+<div class="top-central centered wrapper flex" in:fade out:fly={dialogFlyUp}>
     <TopLogo />
     <SelectCity bind:current={city} />
     <SelectProvider {city} bind:current={provider}/>
@@ -74,7 +75,7 @@
         {#if !offline}
             <button on:click={submitOnline} disabled={!ready || submitting}>Отправить</button>
         {/if}
-        <button on:click={leave}>Отмена</button>
+        <button on:click={leave}>◀ Выход</button>
     </div>
 
 </div>

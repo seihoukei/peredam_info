@@ -1,6 +1,0 @@
-{
-	"success" : true,
-	"data": {
-		"token" : "login(123456.123456)"
-	}
-}

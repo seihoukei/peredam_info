@@ -10,8 +10,18 @@
 
     let username = localStorage.login ?? ""
     let anonymous = false
-    $: loading = loadLibrary
-        .then(async () => await Api.getUserData(token))
+    let attempt = 0
+
+    $: loading = loadUser($token, attempt)
+
+    async function loadUser(token) {
+        await loadLibrary
+        return await Api.getUserData(token)
+    }
+
+    function retry() {
+        attempt++
+    }
 
 </script>
 
@@ -26,7 +36,7 @@
         {#if result?.success}
             <UserMain {username} user={result.data}/>
         {:else}
-            <Error message={result?.error ?? "Ошибка связи"} />
+            <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
         {/if}
     {/await}
 {/if}

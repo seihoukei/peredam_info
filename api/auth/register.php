@@ -1,6 +1,0 @@
-{
-	"success" : true,
-	"data" : {
-		"token" : "register(123456.654321)"
-	}
-}
