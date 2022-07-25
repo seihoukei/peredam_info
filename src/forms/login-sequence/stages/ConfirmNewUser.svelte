@@ -25,7 +25,7 @@
 </script>
 
 <div class="flex central centered spaced wrapper" transition:fly={loginFlyLeft}>
-    <p class="large">Пользователь {login} не найден.</p>
+    <p class="large">Пользователь <span class="nowrap">{login}</span> не найден.</p>
     <p>Если вы здесь впервые, то для регистрации вам необходимо подтвердить, что вы принимаете <a on:click={rules}>условия использования сервиса</a> и задать пароль.</p>
     <label>
         <input type="checkbox" bind:checked={agreed} /> Я принимаю условия пользования сервисом.

@@ -16,7 +16,9 @@
 </script>
 
 <div class="centered central spaced flex" transition:fly={loginFlyRight}>
-    <div class="large center-text" transition:slide|local>Введите код для быстрого входа как {login}:</div>
+    <div class="large center-text" transition:slide|local>
+        Введите код для быстрого входа как <span class="nowrap">{login}</span>:
+    </div>
     <CodeInput bind:code on:submit/>
     <div class="row-flex ">
         <button on:click={cancel}>◀ Войти с паролем</button>

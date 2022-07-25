@@ -12,7 +12,7 @@
     import {createEventDispatcher} from "svelte"
 
     export let system = {}
-    export let offline = false
+    export let offline = true
 
     let input = {}
     let editing = false
@@ -128,7 +128,7 @@
     async function submitOnline() {
         waiting = true
 
-        const result = await Api.submitUserData($token, system, values)
+        const result = await Api.submitUserValues($token, system, values)
 
         if (result.success) {
             finalize()

@@ -4,6 +4,7 @@ import Web from "./web.js"
 export default class Api {
 //    static server = "https://api.peredam.info/"
     static server = "http://localhost:5174/"
+    static library = `${this.server}library/library.json`
     
     static #apiUrl (address) {
         return `${this.server}${address}`
@@ -20,11 +21,25 @@ export default class Api {
         return result
     }
     
+    static async #get(api) {
+        const result = await Web.getJSONData(this.#apiUrl(api))
+
+        if (result.error) {
+            return failure(result?.error ?? "Неизвестная ошибка")
+        }
+
+        return success(result)
+    }
+    
     static async #fakeFetch(delay) {
         await new Promise((resolve) => {
             setTimeout(resolve, delay)
         })
         return Math.random()
+    }
+    
+    static async getLibrary() {
+        return await this.#get("library/library.json")
     }
     
     static async loginExists(login) {
@@ -103,18 +118,18 @@ export default class Api {
         })
     }
     
-    static async submitUserData(token, system, data) {
+    static async submitUserValues(token, system, values) {
         return await this.#call("submit/user", {
             token,
             system,
-            data
+            values
         })
     }
     
-    static async submitAnonymousData(provider, data) {
+    static async submitAnonymousValues(provider, values) {
         return await this.#call("submit/anonymous", {
             provider,
-            data
+            values
         })
     }
 }

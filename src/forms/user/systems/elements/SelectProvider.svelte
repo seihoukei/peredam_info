@@ -23,10 +23,10 @@
                 <span transition:slide>Поставщик услуг:</span>
             {/if}
             {#each Object.entries(library.cities[city].providers) as [id, provider](id)}
-                {#if !current || current === id}
+                {#if !current || current === +id}
                     <div class="spacy-below centered flex" transition:slide>
                         <button class="large" on:click={()=>switchCurrent(id)}>
-                            {current === id ? "◀" : ""} {provider.name}
+                            {current === +id ? "◀" : ""} {provider.name}
                         </button>
                         <span class="spacy-below">{provider.type}</span>
                     </div>

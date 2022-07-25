@@ -42,7 +42,9 @@
 <div class="centered central spaced flex" transition:fly={loginFlyLeft}>
     <div class="message flex">
         {#if first === "" && !repeat}
-            <div class="large center-text" transition:slide|local>Введите новый код для быстрого входа как {login}:</div>
+            <div class="large center-text" transition:slide|local>
+                Введите новый код для быстрого входа как <span class="nowrap">{login}</span>:
+            </div>
         {:else if first === ""}
             <div class="large center-text" transition:slide|local>Введеные коды не совпали, попробуйте ещё раз:</div>
         {:else}

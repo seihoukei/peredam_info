@@ -123,6 +123,10 @@ div.top-central {
     height : var(--font-size);
 }
 
+.nowrap {
+    white-space: nowrap;
+}
+
 button, input {
     font: var(--font-size) Exo2, sans-serif;
     background-color: var(--element-background);

@@ -21,7 +21,7 @@
 
 <div class="central centered spaced flex container" transition:fly={loginFlyRight}>
     <LoginPrompt type="password" bind:value={password} on:submit hint="Пароль" minLength=0>
-        Введите пароль пользователя {login}
+        Введите пароль пользователя <span class="nowrap">{login}</span>
     </LoginPrompt>
     <button on:click={cancel}>◀ Другой пользователь</button>
     <br>

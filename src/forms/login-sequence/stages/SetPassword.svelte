@@ -41,7 +41,9 @@
     {#key first}
         <LoginPrompt type="password" on:submit={proceed} bind:value={password} hint={hint} minLength=6>
             {#if first === "" && !repeat}
-                <div class="center-text" transition:slide|local>Введите новый пароль для пользователя {login}:</div>
+                <div class="center-text" transition:slide|local>
+                    Введите новый пароль для пользователя <span class="nowrap">{login}</span>:
+                </div>
             {:else if first === ""}
                 <div class="center-text" transition:slide|local>Введеные пароли не совпали, попробуйте ещё раз:</div>
             {:else}

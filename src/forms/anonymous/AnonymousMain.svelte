@@ -37,7 +37,7 @@
     const submitOnline = async () => {
         submitting = true
 
-        await Api.submitAnonymousData(provider, values)
+        await Api.submitAnonymousValues(provider, values)
 
         submitting = false
 
