@@ -6,9 +6,7 @@
     import SelectSystem from "./systems/SelectSystem.svelte"
     import AddSystem from "./systems/AddSystem.svelte"
 
-    import syncUser from "../../utility/sync-user.js"
     import Systems from "../../utility/systems.js"
-    import token from "../../stores/token.js"
 
     export let username = ""
     export let user = {
@@ -21,10 +19,19 @@
     let systems = Systems.sortByDate(user.systems)
     $: user.systems = Systems.sortByDate(systems)
 
-
     $: selecting = !current && !adding
-    $: savingUser = syncUser($token, user)
+//    $: savingUser = syncUser($token, user)
 
+    function add({detail:system}) {
+        systems = [
+            ...systems,
+            system
+        ]
+    }
+
+    function remove({detail:id}) {
+        systems = systems.filter(x => x.id !== id)
+    }
 </script>
 
 {#if import.meta.env.MODE === "development"}
@@ -36,8 +43,8 @@
     <UserMenu {username}/>
 
     {#if adding}
-        <AddSystem bind:systems={systems} bind:adding />
+        <AddSystem bind:systems={systems} bind:adding on:add={add}/>
     {:else}
-        <SelectSystem bind:systems={systems} bind:current bind:adding />
+        <SelectSystem bind:systems={systems} bind:current bind:adding on:remove={remove}/>
     {/if}
 </div>

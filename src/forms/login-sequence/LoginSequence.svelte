@@ -130,7 +130,7 @@
             stage = STAGES.COMPLETE
 
         } else {
-            error("Неправильный код")
+            error("Неправильный код", STAGES.REQUEST_CODE)
             code = ""
         }
     }

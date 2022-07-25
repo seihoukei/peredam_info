@@ -6,10 +6,10 @@
     export let current = null
 
     function switchCurrent(value)  {
-        if (current === value)
+        if (current === +value)
             current = null
         else
-            current = value
+            current = +value
     }
 
 </script>

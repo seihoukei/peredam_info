@@ -10,10 +10,17 @@ export default class Api {
     }
     
     static async #call(api, data) {
-        return Web.getJSONData(this.#apiUrl(api), data)
+        const result = await Web.getJSONData(this.#apiUrl(api), data)
+
+        console.log(result)
+        if (result?.success !== true) {
+            return failure(result?.error ?? "Неизвестная ошибка")
+        }
+
+        return result
     }
     
-    static async fakeFetch(delay) {
+    static async #fakeFetch(delay) {
         await new Promise((resolve) => {
             setTimeout(resolve, delay)
         })
@@ -21,63 +28,92 @@ export default class Api {
     }
     
     static async loginExists(login) {
-        const result = await this.#call("auth/login_exists", {
+        return await this.#call("auth/login_exists", {
             login
         })
-        
-        if (result?.success !== true) {
-            return failure(result?.error ?? "Неизвестная ошибка")
-        }
-    
-        return result
     }
     
     static async logIn(login, password) {
-        const result = await this.#call("auth/login", {
+        return await this.#call("auth/login", {
             login, password
         })
-        
-        if (result?.success !== true) {
-            return failure(result?.error ?? "Неизвестная ошибка")
-        }
-        
-        return result
     }
     
     static async register(login, password) {
-        const result = await this.#call("auth/register", {
+        return await this.#call("auth/register", {
             login, password
         })
-        
-        if (result?.success !== true) {
-            return failure(result?.error ?? "Неизвестная ошибка")
-        }
-    
-        return result
     }
     
-    static async getUserData(token = null) {
+    static async getUserSystems(token = null) {
         if (!token)
             return failure()
         
-        return await this.#call("user/systems", {
+        const result = await this.#call("systems/list", {
             token
+        })
+        
+        if (result.success) {
+            try {
+                result.data = result.data.map(record => ({
+                    id: +record.id,
+                    provider: +record.provider,
+                    values: JSON.parse(record.values),
+                }))
+            } catch (e) {
+                return failure("Неизвестная ошибка")
+            }
+        }
+
+        return result
+    }
+
+    static async addSystem(token, system) {
+        if (!token)
+            return failure()
+    
+        return await this.#call("systems/add", {
+            token,
+            system : {
+                provider : system.provider,
+                values : JSON.stringify(system.values)
+            }
         })
     }
     
-    static async saveUserData(token, data) {
+    static async updateSystem(token, id, values) {
         if (!token)
             return failure()
-        
-        return await this.#call("user/systems", {
+    
+        return await this.#call("systems/update", {
             token,
+            system : {
+                id,
+                values : JSON.stringify(values)
+            }
+        })
+    }
+    
+    static async removeSystem(token, id) {
+        if (!token)
+            return failure()
+    
+        return await this.#call("systems/remove", {
+            token, id
+        })
+    }
+    
+    static async submitUserData(token, system, data) {
+        return await this.#call("submit/user", {
+            token,
+            system,
             data
         })
     }
     
-    static async submitData(data) {
-        return await this.#call("user/submit", {
-//            token,
+    static async submitAnonymousData(provider, data) {
+        return await this.#call("submit/anonymous", {
+            provider,
             data
         })
     }

@@ -36,9 +36,9 @@
 
 <div class="flex centered spaced container">
     <span class="large center-text prompt"><slot /></span>
-    <div class="input row-flex">
+    <div class="input row-flex centered">
         {#if type === "tel"}
-            <input class="large" type="tel" autofocus bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
+            <span class="tel-icon large">📞</span><input class="large tel" type="tel" autofocus bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
         {:else if type === "number"}
             <input class="large" type="number" autofocus bind:value placeholder={hint} on:keydown={checkKey} maxlength={maxLength}/>
         {:else if type === "password"}
@@ -48,16 +48,12 @@
         {/if}
         <button class="large submit" on:click={submit} disabled={!validityCheck.success}>▶</button>
     </div>
-    <span class="validation" class:error={!validityCheck.success}>{validityCheck.data ?? ""}</span>
+    <span class="font-high" class:error={!validityCheck.success}>{validityCheck.data ?? ""}</span>
 </div>
 
 <style>
     div.container {
 
-    }
-
-    span.validation {
-        height : var(--font-size);
     }
 
     span.error {
@@ -75,5 +71,15 @@
 
     div.input {
         column-gap : 2px;
+    }
+
+    input.tel {
+        padding-left : 40px;
+    }
+
+    span.tel-icon {
+        position : absolute;
+        padding : 5px;
+        pointer-events: none;
     }
 </style>

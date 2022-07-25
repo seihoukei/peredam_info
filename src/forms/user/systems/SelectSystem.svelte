@@ -2,6 +2,7 @@
     import SystemShortInfo from "./elements/SystemShortInfo.svelte"
     import SystemMain from "./SystemMain.svelte"
     import {slide} from "svelte/transition"
+    import {createEventDispatcher} from "svelte"
 
     export let systems = []
     export let current = null
@@ -24,7 +25,7 @@
         <SystemShortInfo bind:system current={current === system} on:click={()=>setSystem(system)}/>
     {/if}
 {/each}
-<SystemMain bind:system={current} />
+<SystemMain bind:system={current} on:remove />
 {#if !current}
     <button on:click={addSystem} transition:slide>＋ Добавить систему</button>
 {/if}

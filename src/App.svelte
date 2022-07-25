@@ -16,7 +16,7 @@
 
     async function loadUser(token) {
         await loadLibrary
-        return await Api.getUserData(token)
+        return await Api.getUserSystems(token)
     }
 
     function retry() {
@@ -34,7 +34,7 @@
         <Welcome />
     {:then result}
         {#if result?.success}
-            <UserMain {username} user={result.data}/>
+            <UserMain {username} user={{systems:result.data}}/>
         {:else}
             <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
         {/if}

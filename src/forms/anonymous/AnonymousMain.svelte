@@ -37,10 +37,7 @@
     const submitOnline = async () => {
         submitting = true
 
-        await Api.submitData({
-            system : provider,
-            data : fillTemplate(provider.onlineTemplate, values),
-        })
+        await Api.submitAnonymousData(provider, values)
 
         submitting = false
 

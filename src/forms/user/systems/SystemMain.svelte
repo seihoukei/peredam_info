@@ -8,15 +8,19 @@
     import formatValue from "../../../utility/format-value.js"
     import Api from "../../../utility/api.js"
     import fillTemplate from "../../../utility/template.js"
+    import token from "../../../stores/token.js"
+    import {createEventDispatcher} from "svelte"
 
     export let system = {}
-    export let offline = true
+    export let offline = false
 
     let input = {}
     let editing = false
     let editorValues = {}
     let sending = false
-    let submitting = false
+    let waiting = false
+    let removing = false
+    let status = ""
 
     $: provider = getProvider(system)
     $: period = new Period(provider?.period)
@@ -26,6 +30,8 @@
         ...system?.values,
         ...input,
     }
+
+    const dispatch = createEventDispatcher()
 
     function getProvider(system) {
         input = {}
@@ -55,9 +61,45 @@
         editing = false
     }
 
-    function saveEdit() {
-        system.values = editorValues
-        editing = false
+    function startRemoving() {
+        removing = true
+        remove() //TODO: confirmation instead
+    }
+
+    async function remove() {
+        waiting = true
+        status = "Обновление данных..."
+        const result = await Api.removeSystem($token, system.id)
+
+        if (result.success) {
+            dispatch("remove", system.id)
+            input = {}
+            system = null
+            sending = false
+            editing = false
+            removing = false
+
+        } else {
+            status = result.error
+
+        }
+
+        waiting = false
+        status = ""
+    }
+
+    async function saveEdit() {
+        waiting = true
+        status = "Обновление данных..."
+        const result = await Api.updateSystem($token, system.id, editorValues)
+
+        if (result.success) {
+            system.values = editorValues
+            editing = false
+        } else {
+            status = result.error
+        }
+        waiting = false
 
         //syncUser()
     }
@@ -68,7 +110,8 @@
         })
     }
 
-    function finalize() {
+    async function finalize() {
+        //TODO: update submit flow
         system.last = {
             date: Date.now(),
             values: input,
@@ -83,18 +126,19 @@
     }
 
     async function submitOnline() {
-        submitting = true
-        await Api.submitData({
-            system : system.id,
-            data : fillTemplate(provider.onlineTemplate, {
-                ...system.values,
-                ...input
-            }),
-        })
+        waiting = true
 
-        submitting = false
+        const result = await Api.submitUserData($token, system, values)
 
-        finalize()
+        if (result.success) {
+            finalize()
+
+        } else {
+            //TODO : force offline
+            console.log(result.error)
+        }
+        waiting = false
+
     }
 
 </script>
@@ -120,7 +164,8 @@
         </div>
         {#if editing}
             <div class="row-flex spacy-below" transition:slide>
-                <button on:click={saveEdit}>Сохранить</button>
+                <button on:click={saveEdit} disabled={waiting}>Сохранить</button>
+                <button on:click={startRemoving} disabled={waiting}>Удалить</button>
                 <button on:click={stopEditing}>Отмена</button>
             </div>
         {:else if sending}
@@ -134,7 +179,7 @@
             {/if}
             <div class="row-flex spacy-below" transition:slide>
                 {#if !offline}
-                    <button on:click={submitOnline} disabled={!ready || submitting}>Отправить</button>
+                    <button on:click={submitOnline} disabled={!ready || waiting}>Отправить</button>
                 {/if}
                 <button on:click={stopSending}>Отмена</button>
             </div>
@@ -144,6 +189,7 @@
                 <button on:click={startSending}>Передать</button>
             </div>
         {/if}
+        <span class="font-high spacy-below" transition:slide>{status}</span>
     {:else}
         <span class="error" transition:slide>Неизвестный поставщик услуг</span>
     {/if}

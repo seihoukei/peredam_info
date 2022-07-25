@@ -119,6 +119,10 @@ div.top-central {
     font-size : x-large;
 }
 
+.font-high {
+    height : var(--font-size);
+}
+
 button, input {
     font: var(--font-size) Exo2, sans-serif;
     background-color: var(--element-background);
