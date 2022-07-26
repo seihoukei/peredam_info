@@ -76,6 +76,10 @@ export default class Api {
                     id: +record.id,
                     provider_id: +record.provider_id,
                     values: JSON.parse(record.values),
+                    last : record.last_values ? {
+                        date : record.last_date * 1000,
+                        values : JSON.parse(record.last_values),
+                    } : null
                 }))
             } catch (e) {
                 return failure("Неизвестная ошибка")
