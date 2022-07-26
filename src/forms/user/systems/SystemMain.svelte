@@ -170,7 +170,7 @@
             {#each Object.entries(provider.values) as [id, value] (id)}
                 {#if value.constant}
                     {#if editing}
-                        <VariableDetail name={value.name} bind:value={editorValues[id]} />
+                        <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type} />
                     {:else}
                         <StaticDetail name={value.name} value={system.values[id]} />
                     {/if}
