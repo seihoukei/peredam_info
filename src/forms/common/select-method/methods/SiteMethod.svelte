@@ -1,6 +1,6 @@
 <script>
-    import fillTemplate from "../../../../../utility/template.js"
-    import MethodDetail from "../MethodDetail.svelte"
+    import fillTemplate from "../../../../utility/template.js"
+    import MethodDetail from "./MethodDetail.svelte"
     import {slide} from "svelte/transition"
 
     export let method

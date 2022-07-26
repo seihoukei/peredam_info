@@ -1,12 +1,12 @@
 <script>
-    import TopLogo from "../TopLogo.svelte"
-    import SelectCity from "../user/systems/elements/SelectCity.svelte"
-    import SelectProvider from "../user/systems/elements/SelectProvider.svelte"
-    import SetValues from "../user/systems/elements/SetValues.svelte"
+    import TopLogo from "../common/TopLogo.svelte"
+    import SelectCity from "../common/system-management/SelectCity.svelte"
+    import SelectProvider from "../common/system-management/SelectProvider.svelte"
+    import SetValues from "../common/system-management/SetValues.svelte"
     import Api from "../../utility/api.js"
     import {slide, fly, fade} from "svelte/transition"
     import {dialogFlyUp} from "../../utility/transitions.js"
-    import SelectMethod from "../user/systems/elements/SelectMethod.svelte"
+    import SelectMethod from "../common/select-method/methods/SelectMethod.svelte"
     import library from "../../stores/library.js"
     import status from "../../stores/status.js"
 

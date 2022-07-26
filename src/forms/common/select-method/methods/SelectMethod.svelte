@@ -1,8 +1,8 @@
 <script>
-    import EMailMethod from "./methods/EMailMethod.svelte"
-    import PhoneMethod from "./methods/PhoneMethod.svelte"
-    import SmsMethod from "./methods/SmsMethod.svelte"
-    import SiteMethod from "./methods/SiteMethod.svelte"
+    import EMailMethod from "./EMailMethod.svelte"
+    import PhoneMethod from "./PhoneMethod.svelte"
+    import SmsMethod from "./SmsMethod.svelte"
+    import SiteMethod from "./SiteMethod.svelte"
     import {slide} from "svelte/transition"
     import MethodButton from "./MethodButton.svelte"
 

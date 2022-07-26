@@ -11,7 +11,7 @@
 
     import Tokens from "../../utility/tokens.js"
     import Api from "../../utility/api.js"
-    import TopLogo from "../TopLogo.svelte"
+    import TopLogo from "../common/TopLogo.svelte"
     import token from "../../stores/token.js"
     import {onMount} from "svelte"
 

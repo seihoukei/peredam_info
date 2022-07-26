@@ -103,6 +103,35 @@ div.top-central {
     transform: translate(-50%, 0);
 }
 
+div.fullscreen-container {
+    background-color: #00000088;
+    position: absolute;
+    left :0;
+    top : 0;
+    width : 100vw;
+    height : 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.dialog {
+    display : flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 20px;
+    min-width : 300px;
+    min-height : 200px;
+    padding : 20px;
+    justify-content: space-around;
+    background-color: var(--background);
+}
+
+.relative {
+    position: relative;
+}
+
 .opaque {
     background-color: var(--background);
 }

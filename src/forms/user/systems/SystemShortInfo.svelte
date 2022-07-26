@@ -1,7 +1,7 @@
 <script>
     import {slide} from "svelte/transition"
-    import library from "../../../../stores/library.js"
-    import Period from "../../../../utility/period.js"
+    import library from "../../../stores/library.js"
+    import Period from "../../../utility/period.js"
 
     export let system
     export let current = false

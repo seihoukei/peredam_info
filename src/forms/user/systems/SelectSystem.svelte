@@ -1,5 +1,5 @@
 <script>
-    import SystemShortInfo from "./elements/SystemShortInfo.svelte"
+    import SystemShortInfo from "./SystemShortInfo.svelte"
     import SystemMain from "./SystemMain.svelte"
     import {slide} from "svelte/transition"
     import {createEventDispatcher} from "svelte"

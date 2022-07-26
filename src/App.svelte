@@ -3,12 +3,13 @@
     import LoginSequence from "./forms/login-sequence/LoginSequence.svelte"
     import Api from "./utility/api.js"
     import {loadLibrary} from "./stores/library.js"
-    import Welcome from "./forms/Welcome.svelte"
+    import Welcome from "./forms/welcome/Welcome.svelte"
     import token from "./stores/token.js"
     import Error from "./forms/login-sequence/elements/Error.svelte"
     import AnonymousMain from "./forms/anonymous/AnonymousMain.svelte"
     import ProviderMain from "./forms/provider/ProviderMain.svelte"
-    import StatusReporter from "./forms/StatusReporter.svelte"
+    import StatusReporter from "./forms/common/StatusReporter.svelte"
+    import KnowledgeBase from "./forms/knowledge/KnowledgeBase.svelte"
 
     let username = localStorage.login ?? ""
     let anonymous = false
@@ -49,3 +50,4 @@
 {/if}
 
 <StatusReporter />
+<KnowledgeBase />

@@ -1,7 +1,7 @@
 <script>
-    import SelectCity from "./elements/SelectCity.svelte"
-    import SelectProvider from "./elements/SelectProvider.svelte"
-    import SetValues from "./elements/SetValues.svelte"
+    import SelectCity from "../../common/system-management/SelectCity.svelte"
+    import SelectProvider from "../../common/system-management/SelectProvider.svelte"
+    import SetValues from "../../common/system-management/SetValues.svelte"
     import {slide} from "svelte/transition"
     import Api from "../../../utility/api.js"
     import token from "../../../stores/token.js"

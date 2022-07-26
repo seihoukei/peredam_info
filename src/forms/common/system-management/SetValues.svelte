@@ -1,7 +1,7 @@
 <script>
-    import library from "../../../../stores/library.js"
+    import library from "../../../stores/library.js"
     import VariableDetail from "./VariableDetail.svelte"
-    import formatValue from "../../../../utility/format-value.js"
+    import formatValue from "../../../utility/format-value.js"
     import { slide } from "svelte/transition"
 
     export let provider_id = null

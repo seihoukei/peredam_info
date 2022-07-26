@@ -1,7 +1,7 @@
 <script>
     import { fly, fade } from "svelte/transition"
-    import {dialogFlyDown} from "../utility/transitions.js"
-    import TopLogo from "./TopLogo.svelte"
+    import {dialogFlyDown} from "../../utility/transitions.js"
+    import TopLogo from "../common/TopLogo.svelte"
 
     const hour = new Date().getHours()
 

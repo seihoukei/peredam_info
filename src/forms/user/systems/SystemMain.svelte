@@ -1,9 +1,9 @@
 <script>
     import library from "../../../stores/library.js"
     import {slide} from "svelte/transition"
-    import StaticDetail from "./elements/StaticDetail.svelte"
-    import VariableDetail from "./elements/VariableDetail.svelte"
-    import SelectMethod from "./elements/SelectMethod.svelte"
+    import StaticDetail from "../../common/system-management/StaticDetail.svelte"
+    import VariableDetail from "../../common/system-management/VariableDetail.svelte"
+    import SelectMethod from "../../common/select-method/methods/SelectMethod.svelte"
     import Period from "../../../utility/period.js"
     import formatValue from "../../../utility/format-value.js"
     import Api from "../../../utility/api.js"
@@ -115,7 +115,7 @@
         })
     }
 
-    async function finalize() {
+    function finalize() {
         system.last = {
             date: Date.now(),
             values: input,

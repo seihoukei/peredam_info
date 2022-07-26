@@ -1,6 +1,6 @@
 <script>
-    import TopLogo from "../TopLogo.svelte"
-    import UserMenu from "../user/elements/UserMenu.svelte"
+    import TopLogo from "../common/TopLogo.svelte"
+    import UserMenu from "../common/user-menu/UserMenu.svelte"
     import { fly, fade } from "svelte/transition"
     import {dialogFlyUp} from "../../utility/transitions.js"
     import library from "../../stores/library.js"

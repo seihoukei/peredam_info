@@ -1,6 +1,6 @@
 <script>
     import {slide} from "svelte/transition"
-    import library from "../../../../stores/library.js"
+    import library from "../../../stores/library.js"
 
     export let city_id = null
     export let current = null

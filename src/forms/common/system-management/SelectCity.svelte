@@ -1,11 +1,12 @@
 <script>
     import {slide} from "svelte/transition"
-    import library from "../../../../stores/library.js"
+    import library from "../../../stores/library.js"
 
     export let current = localStorage.defaultCity ?? null
 
     $: if (Object.keys(library.cities).length === 1)
         current = Object.keys(library.cities)[0]
+
     $: if (current !== null)
         localStorage.defaultCity = current
 

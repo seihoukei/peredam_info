@@ -23,3 +23,7 @@ export const dialogFlyDown = {
     y : DIALOG_FLY_DISTANCE,
     duration : DIALOG_FLY_DURATION
 }
+
+export const fastFade = {
+    duration : 100,
+}
