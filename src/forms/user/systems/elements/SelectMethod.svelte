@@ -25,7 +25,7 @@
 </script>
 
 <div class="centered spacy-below flex" transition:slide>
-    <div class="spacy-below large important center-text"> Отправка онлайн недоступна, выберите один из ручных способов: </div>
+    <div class="spacy-below large important center-text"> Для отправки вручную выберите один из следующих способов: </div>
 
     <div class="spacy-below flex buttons">
         {#each methods as method}
@@ -35,7 +35,6 @@
 
     {#if current !== null}
         <svelte:component this={methodComponents[current.type]} {values} method={current}/>
-        <button on:click>Завершить</button>
     {/if}
 </div>
 

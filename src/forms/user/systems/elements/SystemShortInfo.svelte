@@ -6,7 +6,7 @@
     export let system
     export let current = false
 
-    $: provider = system ? library.providers[system.provider] ?? null : null
+    $: provider = system ? library.providers[system.provider_id] ?? null : null
     $: displayName = `${current ? "◀" : ""} ${provider.type} (${system?.values?.ACCOUNT ?? ""})`
     $: period = new Period(provider?.period)
     $: nextTime = period.nextString(system?.last?.date)

@@ -4,21 +4,21 @@
     import formatValue from "../../../../utility/format-value.js"
     import { slide } from "svelte/transition"
 
-    export let provider = null
+    export let provider_id = null
     export let values = {}
     export let ready
     export let all = false
 
-    $: providerInfo = library.providers[provider] || null
-    $: valuesToFill = getValuesToFill(providerInfo)
+    $: provider = library.providers[provider_id] || null
+    $: valuesToFill = getValuesToFill(provider)
     $: ready = validate(valuesToFill, values)
 
-    function getValuesToFill(providerInfo) {
+    function getValuesToFill(provider) {
         const result = []
-        if (providerInfo === null)
+        if (provider === null)
             return result
 
-        for (const [id, value] of Object.entries(providerInfo.values))
+        for (const [id, value] of Object.entries(provider.values))
             if (value.constant || all)
                 result.push({
                     name : value.name,
@@ -30,7 +30,7 @@
     }
 
     function validate() {
-        if (providerInfo === null)
+        if (provider === null)
             return false
         return valuesToFill.every(value => {
             return formatValue(value.type, values[value.id]) !== null || !value.mandatory && values[value.id] === ""
@@ -38,7 +38,7 @@
     }
 </script>
 
-{#if providerInfo !== null}
+{#if provider !== null}
     <div class="centered flex">
         <div class="important large spacy-below" transition:slide>Заполните обязательные поля:</div>
         {#each valuesToFill as value}

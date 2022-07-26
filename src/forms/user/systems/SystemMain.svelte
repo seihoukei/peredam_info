@@ -7,24 +7,25 @@
     import Period from "../../../utility/period.js"
     import formatValue from "../../../utility/format-value.js"
     import Api from "../../../utility/api.js"
-    import fillTemplate from "../../../utility/template.js"
     import token from "../../../stores/token.js"
     import {createEventDispatcher} from "svelte"
+    import status from "../../../stores/status.js"
 
     export let system = {}
-    export let offline = true
+    export let offline = false
 
     let input = {}
     let editing = false
     let editorValues = {}
     let sending = false
-    let waiting = false
     let removing = false
-    let status = ""
+    let manual = false
 
     $: provider = getProvider(system)
     $: period = new Period(provider?.period)
     $: ready = validate(input)
+    $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual
+
 
     $: values = {
         ...system?.values,
@@ -37,11 +38,16 @@
         input = {}
         sending = false
         editing = false
+        manual = false
 
         if (system === null)
             return null
 
-        return library.providers[system.provider] ?? null
+        return library.providers[system.provider_id] ?? null
+    }
+
+    function setManual() {
+        manual = true
     }
 
     function startSending()  {
@@ -67,8 +73,7 @@
     }
 
     async function remove() {
-        waiting = true
-        status = "Обновление данных..."
+        status.startWaiting("Удаление данных...")
         const result = await Api.removeSystem($token, system.id)
 
         if (result.success) {
@@ -80,28 +85,28 @@
             removing = false
 
         } else {
-            status = result.error
+            status.error(result.error)
 
         }
 
-        waiting = false
-        status = ""
+        status.stopWaiting()
     }
 
     async function saveEdit() {
-        waiting = true
-        status = "Обновление данных..."
+        status.startWaiting("Обновление данных...")
+
         const result = await Api.updateSystem($token, system.id, editorValues)
 
         if (result.success) {
             system.values = editorValues
             editing = false
-        } else {
-            status = result.error
-        }
-        waiting = false
 
-        //syncUser()
+        } else {
+            status.error(result.error)
+
+        }
+
+        status.stopWaiting()
     }
 
     function validate() {
@@ -111,7 +116,6 @@
     }
 
     async function finalize() {
-        //TODO: update submit flow
         system.last = {
             date: Date.now(),
             values: input,
@@ -121,12 +125,26 @@
         system = null
         sending = false
         editing = false
-
-        //syncUser()
     }
 
     async function submitOnline() {
-        waiting = true
+        status.startWaiting("Передача показаний...")
+
+        const result = await Api.submitUserValues($token, system, values, true)
+
+        if (result.success) {
+            finalize()
+
+        } else {
+            status.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
+            manual = true
+
+        }
+        status.stopWaiting()
+    }
+
+    async function reportSubmission() {
+        status.startWaiting("Сохранение данных...")
 
         const result = await Api.submitUserValues($token, system, values)
 
@@ -134,11 +152,10 @@
             finalize()
 
         } else {
-            //TODO : force offline
-            console.log(result.error)
-        }
-        waiting = false
+            status.error("Не удалось сохранить данные. Это не страшно, если вы передали данные вручную.")
 
+        }
+        status.stopWaiting()
     }
 
 </script>
@@ -164,8 +181,8 @@
         </div>
         {#if editing}
             <div class="row-flex spacy-below" transition:slide>
-                <button on:click={saveEdit} disabled={waiting}>Сохранить</button>
-                <button on:click={startRemoving} disabled={waiting}>Удалить</button>
+                <button on:click={saveEdit} disabled={$status.waiting}>Сохранить</button>
+                <button on:click={startRemoving} disabled={$status.waiting}>Удалить</button>
                 <button on:click={stopEditing}>Отмена</button>
             </div>
         {:else if sending}
@@ -175,11 +192,15 @@
                 </div>
             {/if}
             {#if ready && offline}
-                <SelectMethod {values} methods={provider.methods} on:click={finalize}/>
+                <SelectMethod {values} methods={provider.methods}/>
+                <span class="spacy-below">После успешной передачи показаний нажмите "Сохранить".</span>
             {/if}
             <div class="row-flex spacy-below" transition:slide>
                 {#if !offline}
-                    <button on:click={submitOnline} disabled={!ready || waiting}>Отправить</button>
+                    <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
+                    <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
+                {:else}
+                    <button on:click={reportSubmission}>Сохранить</button>
                 {/if}
                 <button on:click={stopSending}>Отмена</button>
             </div>
@@ -189,8 +210,8 @@
                 <button on:click={startSending}>Передать</button>
             </div>
         {/if}
-        <span class="font-high spacy-below" transition:slide>{status}</span>
     {:else}
         <span class="error" transition:slide>Неизвестный поставщик услуг</span>
     {/if}
+
 {/if}

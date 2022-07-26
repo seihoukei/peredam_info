@@ -7,9 +7,12 @@
     import token from "./stores/token.js"
     import Error from "./forms/login-sequence/elements/Error.svelte"
     import AnonymousMain from "./forms/anonymous/AnonymousMain.svelte"
+    import ProviderMain from "./forms/provider/ProviderMain.svelte"
+    import StatusReporter from "./forms/StatusReporter.svelte"
 
     let username = localStorage.login ?? ""
     let anonymous = false
+    let provider_id = localStorage.provider_id ?? null
     let attempt = 0
 
     $: loading = loadUser($token, attempt)
@@ -28,15 +31,21 @@
 {#if anonymous}
     <AnonymousMain bind:anonymous/>
 {:else if $token === ""}
-    <LoginSequence bind:username bind:anonymous/>
+    <LoginSequence bind:username bind:anonymous bind:provider_id/>
 {:else}
     {#await loading}
         <Welcome />
     {:then result}
         {#if result?.success}
-            <UserMain {username} user={{systems:result.data}}/>
+            {#if provider_id}
+                <ProviderMain {provider_id} />
+            {:else}
+                <UserMain {username} user={{systems:result.data}}/>
+            {/if}
         {:else}
             <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
         {/if}
     {/await}
 {/if}
+
+<StatusReporter />

@@ -19,7 +19,7 @@ export const loadLibrary = Api.getLibrary().then(result => {
         }
         
         for (let [id, provider] of Object.entries(library.providers)) {
-            library.cities[provider.city].providers[id] = provider
+            library.cities[provider.city_id].providers[id] = provider
         }
         libraryReady.set(true)
     }

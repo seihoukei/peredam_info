@@ -1,5 +1,7 @@
 import {failure, success} from "./messages.js"
 import Web from "./web.js"
+import fillTemplate from "./template.js"
+import library from "../stores/library.js"
 
 export default class Api {
 //    static server = "https://api.peredam.info/"
@@ -72,7 +74,7 @@ export default class Api {
             try {
                 result.data = result.data.map(record => ({
                     id: +record.id,
-                    provider: +record.provider,
+                    provider_id: +record.provider_id,
                     values: JSON.parse(record.values),
                 }))
             } catch (e) {
@@ -80,6 +82,30 @@ export default class Api {
             }
         }
 
+        return result
+    }
+    
+    static async getProviderRecords(token, page = 0) {
+        if (!token)
+            return failure()
+    
+        const result = await this.#call("provider/list", {
+            token,
+            page
+        })
+    
+        if (result.success) {
+            try {
+                const template = library.providers[result.data.provider_id].providerData.viewTemplate
+                result.data.records = result.data.records.map(record => ({
+                    date: record.date,
+                    status : record.status,
+                    record: fillTemplate(template, JSON.parse(record.values)),
+                }))
+            } catch (e) {
+                return failure("Неизвестная ошибка")
+            }
+        }
         return result
     }
 
@@ -90,7 +116,7 @@ export default class Api {
         return await this.#call("systems/add", {
             token,
             system : {
-                provider : system.provider,
+                provider_id : system.provider_id,
                 values : JSON.stringify(system.values)
             }
         })
@@ -118,18 +144,21 @@ export default class Api {
         })
     }
     
-    static async submitUserValues(token, system, values) {
+    static async submitUserValues(token, system, values, queue = false) {
         return await this.#call("submit/user", {
             token,
-            system,
-            values
+            system_id : system.id,
+            provider_id : system.provider_id,
+            values : JSON.stringify(values),
+            queue
         })
     }
     
-    static async submitAnonymousValues(provider, values) {
+    static async submitAnonymousValues(provider_id, values, queue = false) {
         return await this.#call("submit/anonymous", {
-            provider,
-            values
+            provider_id,
+            values : JSON.stringify(values),
+            queue
         })
     }
 }

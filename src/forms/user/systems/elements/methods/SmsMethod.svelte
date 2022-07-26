@@ -6,7 +6,7 @@
     export let method
     export let values
 
-    $: message = fillTemplate(method.template, values)
+    $: message = fillTemplate(method.message, values)
     $: comment = fillTemplate(method.comment, values)
     $: link = `sms:${method.number}?body=${encodeURIComponent(message)}`
 
@@ -20,5 +20,5 @@
         <MethodDetail name="Примечание">{comment}</MethodDetail>
     {/if}
     <br>
-    <MethodDetail name="Подсказка">Нажмите на ссылку в поле "Номер" для отправки сообщения с вашего устройства, или отправьте указанное собщение на указанный номер вручную. После успешной отправки сообщения нажмите "Завершить".</MethodDetail>
+    <MethodDetail name="Подсказка">Нажмите на ссылку в поле "Номер" для отправки сообщения с вашего устройства, или отправьте указанное собщение на указанный номер вручную. </MethodDetail>
 </div>

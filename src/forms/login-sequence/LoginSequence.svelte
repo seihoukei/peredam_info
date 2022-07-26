@@ -17,6 +17,7 @@
 
     export let login = localStorage.login ?? ""
     export let username = localStorage.login ?? ""
+    export let provider_id = localStorage.provider_id ?? null
     export let anonymous = false
 
     let password = ""
@@ -28,6 +29,12 @@
     let tokens = Tokens.retrieve()
 
     $: Tokens.store(tokens)
+
+    $: if (provider_id) {
+        localStorage.provider_id = provider_id
+    } else {
+        delete localStorage.provider_id
+    }
 
     const STAGES = {
         NONE : 0,
@@ -172,6 +179,7 @@
         if (result.success) {
             tokens.current = result.data.token
             localStorage.login = login
+            provider_id = null
             code = ""
             stage = STAGES.SET_CODE
 
@@ -189,6 +197,7 @@
         if (result.success) {
             tokens.current = result.data.token
             localStorage.login = login
+            provider_id = result.data.provider ?? null
             code = ""
             stage = STAGES.SET_CODE
 

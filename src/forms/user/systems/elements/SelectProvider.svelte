@@ -2,7 +2,7 @@
     import {slide} from "svelte/transition"
     import library from "../../../../stores/library.js"
 
-    export let city = null
+    export let city_id = null
     export let current = null
 
     function switchCurrent(value)  {
@@ -14,15 +14,15 @@
 
 </script>
 
-{#if city !== null}
-    {#if Object.keys(library.cities[city].providers).length}
+{#if city_id !== null}
+    {#if Object.keys(library.cities[city_id].providers).length}
         <div class="centered flex">
             {#if current === null}
                 <span class="large spacy-below important" transition:slide>Выберите поставщика услуг:</span>
             {:else}
                 <span transition:slide>Поставщик услуг:</span>
             {/if}
-            {#each Object.entries(library.cities[city].providers) as [id, provider](id)}
+            {#each Object.entries(library.cities[city_id].providers) as [id, provider](id)}
                 {#if !current || current === +id}
                     <div class="spacy-below centered flex" transition:slide>
                         <button class="large" on:click={()=>switchCurrent(id)}>
