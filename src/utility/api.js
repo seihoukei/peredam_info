@@ -13,7 +13,7 @@ export default class Api {
     }
     
     static async #call(api, data) {
-        const result = await Web.getJSONData(this.#apiUrl(api), data)
+        const result = await Web.getJSONData(this.#apiUrl(api), data, true)
 
         console.log(result)
         if (result?.success !== true) {

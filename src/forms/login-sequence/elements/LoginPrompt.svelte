@@ -7,12 +7,16 @@
     export let hint
     export let minLength = 5
     export let maxLength = 32
+    export let extraCheck = success()
 
     const dispatch = createEventDispatcher()
 
-    $: validityCheck = validate(value)
+    $: validityCheck = validate(value, extraCheck)
 
     function validate(value) {
+        if (!extraCheck.success)
+            return failure(extraCheck.error)
+
         if (value.length < minLength)
             return failure(`Введите хотя бы ${minLength} символов`)
 

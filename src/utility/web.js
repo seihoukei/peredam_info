@@ -8,18 +8,21 @@ export default class Web {
 		}
 	}
 
-	static fetch(url, postData) {
-		if (postData === undefined)
-			return fetch(url)
+	static fetch(url, postData, credentials = false) {
+		if (postData === undefined || postData === null)
+			return fetch(url, {
+				credentials : credentials ? 'include' : 'same-origin',
+			})
 		
 		return fetch(url, {
 			method : "POST",
+			credentials : credentials ? 'include' : 'same-origin',
 			body : JSON.stringify(postData),
 		})
 	}
 	
-	static getTextData(url, postData) {
-		return this.fetch(url, postData)
+	static getTextData(url, postData, credentials = false) {
+		return this.fetch(url, postData, credentials)
 			.then(this.httpStatus)
 			.then((response) => response.text())
 			.catch((message) => {
@@ -27,8 +30,8 @@ export default class Web {
 			})
 	}
 	
-	static getJSONData(url, postData) {
-		return this.fetch(url, postData)
+	static getJSONData(url, postData, credentials = false) {
+		return this.fetch(url, postData, credentials)
 			.then(this.httpStatus)
 			.then((response) => response.text())
 			.then(text => {
