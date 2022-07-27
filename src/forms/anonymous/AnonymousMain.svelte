@@ -18,7 +18,7 @@
     let values = {}
 
     let ready = false
-    let manual = false
+    let manual = true
 
     $: if (city_id === null)
         provider_id = null
@@ -32,7 +32,7 @@
 
     function getProviderInfo(provider_id) {
         values = {}
-        manual = false
+        manual = true
 
         if (provider_id === null)
             return null

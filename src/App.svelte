@@ -10,6 +10,7 @@
     import ProviderMain from "./forms/provider/ProviderMain.svelte"
     import StatusReporter from "./forms/common/StatusReporter.svelte"
     import KnowledgeBase from "./forms/knowledge/KnowledgeBase.svelte"
+    import Tokens from "./utility/tokens.js"
 
     let username = localStorage.login ?? ""
     let anonymous = false
@@ -24,30 +25,44 @@
     }
 
     function retry() {
+        Tokens.clear()
+        token.set("")
         attempt++
     }
 
 </script>
 
-{#if anonymous}
-    <AnonymousMain bind:anonymous/>
-{:else if $token === ""}
-    <LoginSequence bind:username bind:anonymous bind:provider_id/>
-{:else}
-    {#await loading}
-        <Welcome />
-    {:then result}
-        {#if result?.success}
-            {#if provider_id}
-                <ProviderMain {provider_id} />
+<div class="app-container">
+    {#if anonymous}
+        <AnonymousMain bind:anonymous/>
+    {:else if $token === ""}
+        <LoginSequence bind:username bind:anonymous bind:provider_id/>
+    {:else}
+        {#await loading}
+            <Welcome />
+        {:then result}
+            {#if result?.success}
+                {#if provider_id}
+                    <ProviderMain {provider_id} />
+                {:else}
+                    <UserMain {username} user={{systems:result.data}}/>
+                {/if}
             {:else}
-                <UserMain {username} user={{systems:result.data}}/>
+                <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
             {/if}
-        {:else}
-            <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
-        {/if}
-    {/await}
-{/if}
+        {/await}
+    {/if}
+</div>
 
 <StatusReporter />
 <KnowledgeBase />
+
+<style>
+    div.app-container {
+        display: flex;
+        width : 100vw;
+        height : 100vh;
+        position: relative;
+        overflow: hidden auto;
+    }
+</style>

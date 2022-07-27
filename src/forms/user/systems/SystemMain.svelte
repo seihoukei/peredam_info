@@ -19,7 +19,7 @@
     let editorValues = {}
     let sending = false
     let removing = false
-    let manual = false
+    let manual = true
 
     $: provider = getProvider(system)
     $: period = new Period(provider?.period)
@@ -38,7 +38,7 @@
         input = {}
         sending = false
         editing = false
-        manual = false
+        manual = true
 
         if (system === null)
             return null
