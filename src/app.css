@@ -60,7 +60,7 @@ html, body {
     font: var(--font-size) Exo2, sans-serif;
     background-color : var(--background);
     color : var(--text-color);
-    overflow : hidden auto;
+    overflow : hidden;
 }
 
 div#app {

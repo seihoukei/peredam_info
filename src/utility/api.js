@@ -4,6 +4,7 @@ import fillTemplate from "./template.js"
 import library from "../stores/library.js"
 
 export default class Api {
+//    static server = "https://dev-api.peredam.info/"
 //    static server = "https://api.peredam.info/"
     static server = "http://localhost:5174/"
     static library = `${this.server}library/library.json`
@@ -15,7 +16,7 @@ export default class Api {
     static async #call(api, data) {
         const result = await Web.getJSONData(this.#apiUrl(api), data, true)
 
-        console.log(result)
+//        console.log(result)
         if (result?.success !== true) {
             return failure(result?.error ?? "Неизвестная ошибка")
         }

@@ -5,21 +5,30 @@
     import VariableDetail from "../../common/system-management/VariableDetail.svelte"
     import SelectMethod from "../../common/select-method/methods/SelectMethod.svelte"
     import Period from "../../../utility/period.js"
-    import formatValue from "../../../utility/format-value.js"
     import Api from "../../../utility/api.js"
     import token from "../../../stores/token.js"
     import {createEventDispatcher} from "svelte"
     import status from "../../../stores/status.js"
+    import Address from "../../../utility/address.js"
+    import Values from "../../../utility/values.js"
+
+    const DEFAULT_MANUAL = true
 
     export let system = {}
     export let offline = false
 
-    let input = {}
-    let editing = false
+    let input = inputTemplate()
     let editorValues = {}
-    let sending = false
+    let mode = Address.getPart(3,`user`, `system`)
     let removing = false
-    let manual = false
+    let manual = DEFAULT_MANUAL
+
+    $: Address.set(`user`,
+        system?.id ? `system` : null,
+        system?.id ?? null,
+        mode,
+        Address.stringify(input)
+    )
 
     $: provider = getProvider(system)
     $: period = new Period(provider?.period)
@@ -27,23 +36,44 @@
     $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual
 
 
-    $: values = {
+    $: values = Values.formatValues(provider?.values, {
         ...system?.values,
         ...input,
-    }
+    })
 
     const dispatch = createEventDispatcher()
 
     function getProvider(system) {
         input = {}
-        sending = false
-        editing = false
-        manual = false
+        mode = Address.getPart(3,`user`, `system`)
+        manual = DEFAULT_MANUAL
 
         if (system === null)
             return null
 
-        return library.providers[system.provider_id] ?? null
+        const provider = library.providers[system.provider_id] ?? null
+
+        resetInput()
+        Object.assign(input, inputTemplate())
+
+        return provider
+    }
+
+    function inputTemplate() {
+        const template = Address.getPart(4, `user`, `system`)
+        if (template) {
+            return Address.parse(template)
+        }
+        return {}
+    }
+
+    function resetInput() {
+        input = Object.entries(provider?.values ?? {})
+            .filter(([key, value]) => !value.constant)
+            .reduce((output, [key, value]) => ({
+                ... output,
+                [key]: "",
+            }), {})
     }
 
     function setManual() {
@@ -51,20 +81,20 @@
     }
 
     function startSending()  {
-        sending = true
+        mode = `send`
     }
 
     function startEditing() {
         editorValues = {...system.values}
-        editing = true
+        mode = `edit`
     }
 
     function stopSending() {
-        sending = false
+        mode = ``
     }
 
     function stopEditing() {
-        editing = false
+        mode = ``
     }
 
     function startRemoving() {
@@ -80,8 +110,7 @@
             dispatch("remove", system.id)
             input = {}
             system = null
-            sending = false
-            editing = false
+            mode = ``
             removing = false
 
         } else {
@@ -95,11 +124,13 @@
     async function saveEdit() {
         status.startWaiting("Обновление данных...")
 
+        editorValues = Values.formatValues(provider.values,editorValues)
+
         const result = await Api.updateSystem($token, system.id, editorValues)
 
         if (result.success) {
             system.values = editorValues
-            editing = false
+            mode = ``
 
         } else {
             status.error(result.error)
@@ -110,8 +141,10 @@
     }
 
     function validate() {
-        return Object.entries(input).every(([id,value]) => {
-            return formatValue(provider.values[id].type, value) !== null || !provider.values[id].mandatory && value === ""
+        if (!values || !provider?.values)
+            return false
+        return Object.entries(provider.values).every(([id,value]) => {
+            return Values.formatValue(value.type, values[id]) !== null || !value.mandatory && values[id] === ""
         })
     }
 
@@ -123,8 +156,7 @@
 
         input = {}
         system = null
-        sending = false
-        editing = false
+        mode = ``
     }
 
     async function submitOnline() {
@@ -163,29 +195,29 @@
 {#if system !== null}
     {#if provider !== null}
         <div class="system">
-            {#if !sending}
+            {#if mode !== `send`}
                 <StaticDetail name="Поставщик" value={provider.name} />
                 <StaticDetail name="Период" value={period?.toString()} />
             {/if}
             {#each Object.entries(provider.values) as [id, value] (id)}
                 {#if value.constant}
-                    {#if editing}
+                    {#if mode === `edit`}
                         <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type} />
                     {:else}
                         <StaticDetail name={value.name} value={system.values[id]} />
                     {/if}
-                {:else if sending}
+                {:else if mode === `send`}
                     <VariableDetail name={value.name} bind:value={input[id]} old={system.last?.values[id]} type={value.type}/>
                 {/if}
             {/each}
         </div>
-        {#if editing}
+        {#if mode === `edit`}
             <div class="row-flex spacy-below" transition:slide>
                 <button on:click={saveEdit} disabled={$status.waiting}>Сохранить</button>
                 <button on:click={startRemoving} disabled={$status.waiting}>Удалить</button>
                 <button on:click={stopEditing}>Отмена</button>
             </div>
-        {:else if sending}
+        {:else if mode === `send`}
             {#if !ready}
                 <div class="large important center-text spacy-below" transition:slide>
                     Заполните поля для показаний выше
@@ -200,7 +232,7 @@
                     <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
                     <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
                 {:else}
-                    <button on:click={reportSubmission}>Сохранить</button>
+                    <button on:click={reportSubmission} disabled={!ready || $status.waiting}>Сохранить</button>
                 {/if}
                 <button on:click={stopSending}>Отмена</button>
             </div>

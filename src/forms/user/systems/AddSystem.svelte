@@ -7,9 +7,11 @@
     import token from "../../../stores/token.js"
     import {createEventDispatcher} from "svelte"
     import status from "../../../stores/status.js"
+    import Address from "../../../utility/address.js"
+    import Values from "../../../utility/values.js"
+    import library from "../../../stores/library.js"
 
     export let adding = true
-    export let systems = []
 
     let city_id = localStorage.defaultCity ?? null
     let provider_id = null
@@ -17,11 +19,13 @@
 
     let ready = false
 
+    $: Address.set(`user`, `add`, city_id, provider_id)
+
     $: if (city_id === null)
         provider_id = null
 
     $: newSystem = {
-        provider_id: provider_id, values
+        provider_id, values
     }
 
     $: values = empty(provider_id)
@@ -39,6 +43,7 @@
     async function finalize () {
         status.startWaiting("Добавление данных")
 
+        newSystem.values = Values.formatValues(library.providers[provider_id].values, newSystem.values)
         const result = await Api.addSystem($token, newSystem)
 
         if (!result.success) {
@@ -46,7 +51,6 @@
 
         } else {
             newSystem.id = result.data.id
-            console.log(newSystem)
             dispatch("add", newSystem)
             adding = false
         }

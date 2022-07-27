@@ -1,8 +1,8 @@
 <script>
     import library from "../../../stores/library.js"
     import VariableDetail from "./VariableDetail.svelte"
-    import formatValue from "../../../utility/format-value.js"
     import { slide } from "svelte/transition"
+    import Values from "../../../utility/values.js"
 
     export let provider_id = null
     export let values = {}
@@ -33,7 +33,7 @@
         if (provider === null)
             return false
         return valuesToFill.every(value => {
-            return formatValue(value.type, values[value.id]) !== null || !value.mandatory && values[value.id] === ""
+            return Values.formatValue(value.type, values[value.id]) !== null || !value.mandatory && values[value.id] === ""
         })
     }
 </script>

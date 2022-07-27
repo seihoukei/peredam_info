@@ -9,41 +9,66 @@
     import SelectMethod from "../common/select-method/methods/SelectMethod.svelte"
     import library from "../../stores/library.js"
     import status from "../../stores/status.js"
+    import Address from "../../utility/address.js"
+    import Values from "../../utility/values.js"
 
+    const DEFAULT_MANUAL = true
 
     export let anonymous = true
 
-    let city_id = localStorage.defaultCity ?? null
-    let provider_id = null
-    let values = {}
+    let city_id = localStorage.defaultCity ?? (+Address.getPart(1) || null)
+    let provider_id = +Address.getPart(2) || null
+    let values = inputTemplate()
 
     let ready = false
-    let manual = false
+    let manual = DEFAULT_MANUAL
 
     $: if (city_id === null)
         provider_id = null
 
-    $: provider = getProviderInfo(provider_id)
+    $: Address.set(`anon`, city_id, provider_id, Address.stringify(values))
+
+    $: provider = getProvider(provider_id)
     $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual
 
     function setManual() {
         manual = true
     }
 
-    function getProviderInfo(provider_id) {
+    function inputTemplate() {
+        const template = Address.getPart(3, `anon`)
+        if (template) {
+            return Address.parse(template)
+        }
+        return {}
+    }
+
+    function resetInput() {
+        values = Object.keys(provider?.values ?? {})
+            .reduce((output, key) => ({
+                ... output,
+                [key]: "",
+            }), {})
+    }
+
+    function getProvider(provider_id) {
         values = {}
-        manual = false
+        manual = DEFAULT_MANUAL
 
-        if (provider_id === null)
-            return null
+        const provider = library.providers[provider_id] ?? null
 
-        return library.providers[provider_id] ?? null
+        resetInput()
+        Object.assign(values, inputTemplate())
+
+        return provider
     }
 
     async function submitOnline() {
+        const submitValues = Values.formatValues(provider.values, values)
+
         status.startWaiting("Передача показаний...")
 
-        const result = await Api.submitAnonymousValues(provider_id, values, true)
+        const result = await Api.submitAnonymousValues(provider_id, submitValues, true)
 
         if (result.success) {
             finalize()
@@ -62,6 +87,7 @@
 
     function leave() {
         anonymous = false
+        Address.set()
     }
 </script>
 
@@ -78,12 +104,17 @@
     {/if}
 
     {#if ready && offline && provider !== null}
-        <SelectMethod {values} methods={provider.methods} on:click={finalize}/>
+        {#if DEFAULT_MANUAL}
+            <span class="spacy-below"> Пока что доступна только отправка вручную.</span>
+        {/if}
+        <SelectMethod {values} methods={provider.methods} />
     {/if}
     <div class="row-flex spacy-below" transition:slide>
         {#if !offline}
             <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
             <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
+        {:else if provider !== null}
+            <button on:click={finalize} disabled={!ready || $status.waiting}>Готово</button>
         {/if}
         <button on:click={leave}>◀ Выход</button>
     </div>

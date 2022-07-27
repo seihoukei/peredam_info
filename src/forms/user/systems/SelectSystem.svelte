@@ -3,10 +3,13 @@
     import SystemMain from "./SystemMain.svelte"
     import {slide} from "svelte/transition"
     import {createEventDispatcher} from "svelte"
+    import Address from "../../../utility/address.js"
 
     export let systems = []
     export let current = null
     export let adding = false
+
+    $: if (!current) Address.set(`user`)
 
     function setSystem(system) {
         if (current === system)

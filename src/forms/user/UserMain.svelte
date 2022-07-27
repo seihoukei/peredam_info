@@ -7,13 +7,14 @@
     import AddSystem from "./systems/AddSystem.svelte"
 
     import Systems from "../../utility/systems.js"
+    import Address from "../../utility/address.js"
 
     export let username = ""
     export let user = {
         systems : []
     }
 
-    let current = null
+    let current = user.systems.find(system => system.id === +Address.getPart(2, `user`, `system`)) ?? null
     let adding = false
 
     let systems = Systems.sortByDate(user.systems)
@@ -43,7 +44,7 @@
     <UserMenu {username}/>
 
     {#if adding}
-        <AddSystem bind:systems={systems} bind:adding on:add={add}/>
+        <AddSystem bind:adding on:add={add}/>
     {:else}
         <SelectSystem bind:systems={systems} bind:current bind:adding on:remove={remove}/>
     {/if}

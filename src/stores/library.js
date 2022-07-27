@@ -21,6 +21,11 @@ export const loadLibrary = Api.getLibrary().then(result => {
         for (let [id, provider] of Object.entries(library.providers)) {
             library.cities[provider.city_id].providers[id] = provider
         }
+        localStorage.library = JSON.stringify(library)
+        libraryReady.set(true)
+    } else {
+        if (localStorage.library)
+            library = JSON.parse(localStorage.library)
         libraryReady.set(true)
     }
 })
