@@ -4,8 +4,8 @@ import fillTemplate from "./template.js"
 import library from "../stores/library.js"
 
 export default class Api {
-    static server = "https://api.peredam.info/"
-//    static server = "http://localhost:5174/"
+//    static server = "https://api.peredam.info/"
+    static server = "http://localhost:5174/"
     static library = `${this.server}library/library.json`
     
     static #apiUrl (address) {
