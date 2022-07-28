@@ -105,7 +105,7 @@
 
     {#if ready && offline && provider !== null}
         {#if DEFAULT_MANUAL}
-            <span class="spacy-below"> Пока что доступна только отправка вручную.</span>
+            <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
         {/if}
         <SelectMethod {values} methods={provider.methods} />
     {/if}

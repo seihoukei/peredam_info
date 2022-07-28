@@ -224,8 +224,11 @@
                 </div>
             {/if}
             {#if ready && offline}
+                {#if DEFAULT_MANUAL}
+                    <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
+                {/if}
                 <SelectMethod {values} methods={provider.methods}/>
-                <span class="spacy-below">После успешной передачи показаний нажмите "Сохранить".</span>
+                <span class="spacy-below" transition:slide>После успешной передачи показаний нажмите "Сохранить".</span>
             {/if}
             <div class="row-flex spacy-below" transition:slide>
                 {#if !offline}
