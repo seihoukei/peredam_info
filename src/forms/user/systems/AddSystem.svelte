@@ -67,7 +67,7 @@
     <SelectProvider />
     <SetValues bind:values bind:ready/>
 
-    <div class="row-flex" transition:slide>
+    <div class="spacy-below row-flex" transition:slide>
         <button on:click={finalize} disabled={!ready || $status.waiting}>Добавить</button>
         <button on:click={back}>Отмена</button>
     </div>

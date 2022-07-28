@@ -15,15 +15,11 @@
 
     const DEFAULT_MANUAL = true
 
-    let city_id = null
-    let provider_id = null
+    $: provider_id = $appState.provider_id
     let values = inputTemplate()
 
     let ready = false
     let manual = DEFAULT_MANUAL
-
-    $: if (city_id === null)
-        provider_id = null
 
     $: provider = getProvider(provider_id)
     $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual

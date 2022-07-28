@@ -3,11 +3,15 @@ import Web from "./web.js"
 import fillTemplate from "./template.js"
 import library from "../stores/library.js"
 
+let apiServer = "https://dev-api.peredam.info/"
+if (import.meta.env.MODE === "development")
+    apiServer = "http://localhost:5174/"
+if (new URL(window.location).origin === "https://peredam.info" )
+    apiServer = "https://api.peredam.info/"
+
 export default class Api {
-//    static server = "https://dev-api.peredam.info/"
-//    static server = "https://api.peredam.info/"
-        static server = "http://localhost:5174/"
-    static library = `${this.server}library/library.json`
+    static server = apiServer
+    static library = `${apiServer}library/library.json`
     
     static #apiUrl (address) {
         return `${this.server}${address}`

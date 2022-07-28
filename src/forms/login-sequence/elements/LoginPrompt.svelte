@@ -26,8 +26,8 @@
         return success()
     }
 
-    function checkKey(event) {
-        if (event.keyCode === 13)
+    function checkKey({keyCode}) {
+        if (keyCode === 13)
             submit()
     }
 
