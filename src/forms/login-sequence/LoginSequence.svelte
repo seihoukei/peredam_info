@@ -133,7 +133,7 @@
         const result = Tokens.decrypt(tokens.encrypted, code)
 
         if (result.success) {
-            tokens.current = result
+            tokens.current = result.data
             stage = STAGES.COMPLETE
 
         } else {
@@ -209,41 +209,38 @@
 
 </script>
 
-{#if import.meta.env.MODE === "development"}
-    <pre class="debug">{JSON.stringify(tokens,null,1)}</pre>
-{/if}
-
-<div class="top-central">
-    <TopLogo />
-</div>
-
-{#if stage === STAGES.REQUEST_USERNAME}
-    {#if isUsingPhone}
-        <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin} on:nologin={noLogin}/>
-    {:else}
-        <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone} on:nologin={noLogin}/>
+{#if !anonymous && $token === ""}
+    {#if import.meta.env.MODE === "development"}
+        <pre class="debug">{JSON.stringify(tokens,null,1)}</pre>
     {/if}
 
-{:else if stage === STAGES.CONFIRM_NEW_USER}
-    <ConfirmNewUser {login} on:cancel={restart} on:confirm={newUser}/>
-{:else if stage === STAGES.SET_NEW_PASSWORD}
-    <SetPassword {login} bind:password on:cancel={restart} on:submit={register}/>
-{:else if stage === STAGES.REQUEST_OLD_PASSWORD}
-    <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in} on:nologin={noLogin}/>
+    <div class="top-central">
+        <TopLogo />
+    </div>
 
-{:else if stage === STAGES.SET_CODE}
-    <SetCode {login} bind:code on:cancel={restart} on:submit={setCode}/>
-{:else if stage === STAGES.REQUEST_CODE}
-    <RequestCode {login} bind:code on:cancel={usePassword} on:submit={checkCode}/>
+    {#if stage === STAGES.REQUEST_USERNAME}
+        {#if isUsingPhone}
+            <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin} on:nologin={noLogin}/>
+        {:else}
+            <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone} on:nologin={noLogin}/>
+        {/if}
 
-{:else if stage === STAGES.WAITING}
-    <Waiting message={status} />
-{:else if stage === STAGES.ERROR}
-    <Error message={status} on:click={retry} />
+    {:else if stage === STAGES.CONFIRM_NEW_USER}
+        <ConfirmNewUser {login} on:cancel={restart} on:confirm={newUser}/>
+    {:else if stage === STAGES.SET_NEW_PASSWORD}
+        <SetPassword {login} bind:password on:cancel={restart} on:submit={register}/>
+    {:else if stage === STAGES.REQUEST_OLD_PASSWORD}
+        <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in} on:nologin={noLogin}/>
 
+    {:else if stage === STAGES.SET_CODE}
+        <SetCode {login} bind:code on:cancel={restart} on:submit={setCode}/>
+    {:else if stage === STAGES.REQUEST_CODE}
+        <RequestCode {login} bind:code on:cancel={usePassword} on:submit={checkCode}/>
+
+    {:else if stage === STAGES.WAITING}
+        <Waiting message={status} />
+    {:else if stage === STAGES.ERROR}
+        <Error message={status} on:click={retry} />
+
+    {/if}
 {/if}
-
-
-<style>
-
-</style>
