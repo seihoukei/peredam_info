@@ -3,6 +3,7 @@
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
     import {loginFlyRight} from "../../../utility/transitions.js"
+    import appState from "../../../stores/app-state.js"
 
     export let login
     export let password
@@ -14,7 +15,7 @@
     }
 
     function nologin() {
-        dispatch("nologin")
+        appState.setPage("anon")
     }
 
 </script>

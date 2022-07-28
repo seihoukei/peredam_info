@@ -1,51 +1,63 @@
 <script>
     import TopLogo from "../common/TopLogo.svelte"
     import UserMenu from "../common/user-menu/UserMenu.svelte"
-    import { fly, fade } from "svelte/transition"
+    import { fly, fade, slide } from "svelte/transition"
     import {dialogFlyUp} from "../../utility/transitions.js"
     import SelectSystem from "./systems/SelectSystem.svelte"
     import AddSystem from "./systems/AddSystem.svelte"
 
     import Systems from "../../utility/systems.js"
-    import Address from "../../utility/address.js"
+    import appState from "../../stores/app-state.js"
+    import ProviderReader from "./provider/ProviderReader.svelte"
 
-    export let username = ""
     export let user = {
         systems : []
     }
 
-    let current = user.systems.find(system => system.id === +Address.getPart(2, `user`, `system`)) ?? null
-    let adding = false
-
     let systems = Systems.sortByDate(user.systems)
     $: user.systems = Systems.sortByDate(systems)
-
-    $: selecting = !current && !adding
-//    $: savingUser = syncUser($token, user)
+    $: if ($appState.page === "") {
+        if ($appState.user_provider_id)
+            appState.setPage("read")
+        else
+            appState.setPage("user")
+    }
 
     function add({detail:system}) {
         systems = [
             ...systems,
             system
         ]
+        appState.setPage("user")
     }
 
     function remove({detail:id}) {
         systems = systems.filter(x => x.id !== id)
+        appState.setSystemId(null)
+    }
+
+    function toAdd() {
+        appState.setPage("add")
+        appState.setSystemId(null, appState.UPDATE_ADDRESS.NO)
     }
 </script>
 
-{#if import.meta.env.MODE === "development"}
-    <pre class="debug">Выбор системы: {JSON.stringify(current, null, 1)}</pre>
-{/if}
-
 <div class="centered top-central wrapper flex" in:fade out:fly={dialogFlyUp}>
     <TopLogo />
-    <UserMenu {username}/>
 
-    {#if adding}
-        <AddSystem bind:adding on:add={add}/>
+    {#if $appState.page === 'read'}
+        <ProviderReader />
     {:else}
-        <SelectSystem bind:systems={systems} bind:current bind:adding on:remove={remove}/>
+        <UserMenu username={$appState.user_name}/>
+        {#if $appState.page === 'add'}
+            <AddSystem on:add={add}/>
+        {:else}
+            <SelectSystem {systems} on:remove={remove}/>
+            {#if $appState.system_id === null}
+                <button on:click={toAdd} transition:slide>＋ Добавить систему</button>
+            {/if}
+
+        {/if}
     {/if}
+
 </div>

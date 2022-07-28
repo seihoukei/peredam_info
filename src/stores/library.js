@@ -1,6 +1,7 @@
 import {writable} from "svelte/store"
-import Web from "../utility/web.js"
 import Api from "../utility/api.js"
+import status from "./status.js"
+import Serializer from "../utility/serializer.js"
 
 let library = {
     cities : {},
@@ -21,11 +22,13 @@ export const loadLibrary = Api.getLibrary().then(result => {
         for (let [id, provider] of Object.entries(library.providers)) {
             library.cities[provider.city_id].providers[id] = provider
         }
-        localStorage.library = JSON.stringify(library)
+        
+        localStorage.library = Serializer.serialize(library)
+        libraryReady.set(true)
+    } else if (localStorage.library) {
+        library = Serializer.deserialize(localStorage.library)
         libraryReady.set(true)
     } else {
-        if (localStorage.library)
-            library = JSON.parse(localStorage.library)
-        libraryReady.set(true)
+        status.error("Не удалось загрузить основную базу. Попробуйте позже.")
     }
 })

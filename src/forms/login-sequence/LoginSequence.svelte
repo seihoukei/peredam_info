@@ -12,13 +12,10 @@
     import Tokens from "../../utility/tokens.js"
     import Api from "../../utility/api.js"
     import TopLogo from "../common/TopLogo.svelte"
-    import token from "../../stores/token.js"
     import {onMount} from "svelte"
+    import appState from "../../stores/app-state.js"
 
     export let login = localStorage.login ?? ""
-    export let username = localStorage.login ?? ""
-    export let provider_id = localStorage.provider_id ?? null
-    export let anonymous = false
 
     let password = ""
     let code = ""
@@ -29,12 +26,6 @@
     let tokens = Tokens.retrieve()
 
     $: Tokens.store(tokens)
-
-    $: if (provider_id) {
-        localStorage.provider_id = provider_id
-    } else {
-        delete localStorage.provider_id
-    }
 
     const STAGES = {
         NONE : 0,
@@ -143,15 +134,15 @@
     }
 
     function finalize() {
-        if (!anonymous) {
-            username = login
-            token.set(tokens.current)
+        appState.setValue('user_name', login, appState.UPDATE_ADDRESS.NO)
+        appState.setToken(tokens.current)
+        if ($appState.user_provider_id && $appState.page !== 'read') {
+            appState.setPage('read')
         }
-    }
+        if (!$appState.user_provider_id && $appState.page === 'read') {
+            appState.setPage('user')
+        }
 
-    function noLogin() {
-        anonymous = true
-        stage = STAGES.COMPLETE
     }
 
     async function checkLogin() {
@@ -179,7 +170,7 @@
         if (result.success) {
             tokens.current = result.data.token
             localStorage.login = login
-            provider_id = null
+            appState.setUserProviderId(null)
             code = ""
             stage = STAGES.SET_CODE
 
@@ -197,7 +188,7 @@
         if (result.success) {
             tokens.current = result.data.token
             localStorage.login = login
-            provider_id = result.data.provider ?? null
+            appState.setUserProviderId(result.data.provider ?? null)
             code = ""
             stage = STAGES.SET_CODE
 
@@ -209,7 +200,7 @@
 
 </script>
 
-{#if !anonymous && $token === ""}
+{#if $appState.page !== "anon" && $appState.token === ""}
     {#if import.meta.env.MODE === "development"}
         <pre class="debug">{JSON.stringify(tokens,null,1)}</pre>
     {/if}
@@ -220,9 +211,9 @@
 
     {#if stage === STAGES.REQUEST_USERNAME}
         {#if isUsingPhone}
-            <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin} on:nologin={noLogin}/>
+            <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin}/>
         {:else}
-            <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone} on:nologin={noLogin}/>
+            <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone}/>
         {/if}
 
     {:else if stage === STAGES.CONFIRM_NEW_USER}
@@ -230,7 +221,7 @@
     {:else if stage === STAGES.SET_NEW_PASSWORD}
         <SetPassword {login} bind:password on:cancel={restart} on:submit={register}/>
     {:else if stage === STAGES.REQUEST_OLD_PASSWORD}
-        <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in} on:nologin={noLogin}/>
+        <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in}/>
 
     {:else if stage === STAGES.SET_CODE}
         <SetCode {login} bind:code on:cancel={restart} on:submit={setCode}/>

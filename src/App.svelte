@@ -2,7 +2,6 @@
     import UserMain from "./forms/user/UserMain.svelte"
     import LoginSequence from "./forms/login-sequence/LoginSequence.svelte"
     import AnonymousMain from "./forms/anonymous/AnonymousMain.svelte"
-    import ProviderMain from "./forms/provider/ProviderMain.svelte"
     import StatusReporter from "./forms/common/StatusReporter.svelte"
     import KnowledgeBase from "./forms/knowledge/KnowledgeBase.svelte"
 
@@ -11,60 +10,60 @@
 
     import Api from "./utility/api.js"
     import {loadLibrary} from "./stores/library.js"
-    import token from "./stores/token.js"
-    import Address from "./utility/address.js"
+    import appState from "./stores/app-state.js"
+    import {onMount} from "svelte"
 
-    let username = localStorage.login ?? ""
-    let anonymous = Address.getPart(0) === "anon"
-    let provider_id = localStorage.provider_id ?? null
     let attempt = 0
 
-    $: loading = loadUser($token, attempt)
+    $: token = $appState.token
+    $: loading = loadUser(token, attempt)
 
-    async function loadUser(token) {
+    async function loadUser() {
         await loadLibrary
+        appState.restorePageData($appState.page)
         return await Api.getUserSystems(token)
     }
 
     function retry() {
         attempt++
     }
-</script>
 
-<div class="app-container">
-    {#if anonymous}
-        {#await loading}
-            <Welcome />
-        {:then result}
-            <AnonymousMain bind:anonymous/>
-        {/await}
-    {:else if $token === ""}
-        <LoginSequence bind:username bind:anonymous bind:provider_id/>
-    {:else}
-        {#await loading}
-            <Welcome />
-        {:then result}
-            {#if result?.success}
-                {#if provider_id}
-                    <ProviderMain {provider_id} />
-                {:else}
-                    <UserMain {username} user={{systems:result.data}}/>
-                {/if}
-            {:else}
-                <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
-            {/if}
-        {/await}
-    {/if}
-</div>
+    onMount(() => {
+        appState.restorePage()
+    })
+</script>
+{#if import.meta.env.MODE === "development"}
+    <pre class="debug">{JSON.stringify($appState, null, 1)}</pre>
+{/if}
+
+{#if $appState.page === 'anon'}
+    {#await loading}
+        <Welcome />
+
+    {:then result}
+        <AnonymousMain />
+
+    {/await}
+
+{:else if token === ""}
+    <LoginSequence />
+
+{:else}
+    {#await loading}
+        <Welcome />
+
+    {:then result}
+        {#if result?.success}
+            <UserMain user={{systems:result.data}} />
+
+        {:else}
+            <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
+
+        {/if}
+
+    {/await}
+
+{/if}
 
 <StatusReporter />
 <KnowledgeBase />
-<style>
-    div.app-container {
-        position: relative;
-        display : flex;
-        width : 100vw;
-        height : 100vh;
-        overflow: auto;
-    }
-</style>

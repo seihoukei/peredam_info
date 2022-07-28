@@ -4,6 +4,7 @@
     import {fly} from "svelte/transition"
     import {loginFlyLeft} from "../../../utility/transitions.js"
     import {failure, success} from "../../../utility/messages.js"
+    import appState from "../../../stores/app-state.js"
 
     export let phone
 
@@ -16,7 +17,7 @@
     }
 
     function nologin() {
-        dispatch("nologin")
+        appState.setPage("anon")
     }
 
     $: phone = `📞${raw.replace(/[^0-9]*/g,"").slice(-10)}`

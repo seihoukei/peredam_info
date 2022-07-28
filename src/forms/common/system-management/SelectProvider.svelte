@@ -1,15 +1,16 @@
 <script>
     import {slide} from "svelte/transition"
     import library from "../../../stores/library.js"
+    import appState from "../../../stores/app-state.js"
 
-    export let city_id = null
-    export let current = null
+    $: city_id = $appState.city_id
+    $: provider_id = $appState.provider_id
 
     function switchCurrent(value)  {
-        if (current === +value)
-            current = null
+        if (provider_id === +value)
+            appState.setProviderId(null)
         else
-            current = +value
+            appState.setProviderId(+value)
     }
 
 </script>
@@ -17,16 +18,16 @@
 {#if city_id !== null}
     {#if Object.keys(library.cities[city_id].providers).length}
         <div class="centered flex">
-            {#if current === null}
+            {#if provider_id === null}
                 <span class="large spacy-below important" transition:slide>Выберите поставщика услуг:</span>
             {:else}
                 <span transition:slide>Поставщик услуг:</span>
             {/if}
             {#each Object.entries(library.cities[city_id].providers) as [id, provider](id)}
-                {#if !current || current === +id}
+                {#if !provider_id || provider_id === +id}
                     <div class="spacy-below centered flex" transition:slide>
                         <button class="large" on:click={()=>switchCurrent(id)}>
-                            {current === +id ? "◀" : ""} {provider.name}
+                            {provider_id === +id ? "◀" : ""} {provider.name}
                         </button>
                         <span class="spacy-below">{provider.type}</span>
                     </div>

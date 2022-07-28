@@ -104,7 +104,7 @@ export default class Api {
                 const template = library.providers[result.data.provider_id].providerData.viewTemplate
                 result.data.records = result.data.records.map(record => ({
                     date: record.date,
-                    status : record.status,
+                    type : record.type,
                     record: fillTemplate(template, JSON.parse(record.values)),
                 }))
             } catch (e) {

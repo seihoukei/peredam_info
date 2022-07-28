@@ -6,46 +6,37 @@
     import SelectMethod from "../../common/select-method/methods/SelectMethod.svelte"
     import Period from "../../../utility/period.js"
     import Api from "../../../utility/api.js"
-    import token from "../../../stores/token.js"
     import {createEventDispatcher} from "svelte"
     import status from "../../../stores/status.js"
-    import Address from "../../../utility/address.js"
     import Values from "../../../utility/values.js"
+    import Address from "../../../utility/address.js"
+    import appState from "../../../stores/app-state.js"
 
     const DEFAULT_MANUAL = true
 
     export let system = {}
-    export let offline = false
 
     let input = inputTemplate()
     let editorValues = {}
-    let mode = Address.getPart(3,`user`, `system`)
     let removing = false
     let manual = DEFAULT_MANUAL
-
-    $: Address.set(`user`,
-        system?.id ? `system` : null,
-        system?.id ?? null,
-        mode,
-        Address.stringify(input)
-    )
 
     $: provider = getProvider(system)
     $: period = new Period(provider?.period)
     $: ready = validate(input)
     $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual
 
-
     $: values = Values.formatValues(provider?.values, {
         ...system?.values,
         ...input,
     })
 
+    $: appState.setData(Address.stringify(input))
+
     const dispatch = createEventDispatcher()
 
     function getProvider(system) {
         input = {}
-        mode = Address.getPart(3,`user`, `system`)
         manual = DEFAULT_MANUAL
 
         if (system === null)
@@ -60,7 +51,7 @@
     }
 
     function inputTemplate() {
-        const template = Address.getPart(4, `user`, `system`)
+        const template = $appState.data
         if (template) {
             return Address.parse(template)
         }
@@ -81,20 +72,20 @@
     }
 
     function startSending()  {
-        mode = `send`
+        appState.setMode(`send`)
     }
 
     function startEditing() {
         editorValues = {...system.values}
-        mode = `edit`
+        appState.setMode(`edit`)
     }
 
     function stopSending() {
-        mode = ``
+        appState.setMode(``)
     }
 
     function stopEditing() {
-        mode = ``
+        appState.setMode(``)
     }
 
     function startRemoving() {
@@ -104,13 +95,13 @@
 
     async function remove() {
         status.startWaiting("Удаление данных...")
-        const result = await Api.removeSystem($token, system.id)
+        const result = await Api.removeSystem($appState.token, system.id)
 
         if (result.success) {
             dispatch("remove", system.id)
             input = {}
             system = null
-            mode = ``
+            appState.setMode(``)
             removing = false
 
         } else {
@@ -126,11 +117,11 @@
 
         editorValues = Values.formatValues(provider.values,editorValues)
 
-        const result = await Api.updateSystem($token, system.id, editorValues)
+        const result = await Api.updateSystem($appState.token, system.id, editorValues)
 
         if (result.success) {
             system.values = editorValues
-            mode = ``
+            appState.setMode(``)
 
         } else {
             status.error(result.error)
@@ -156,13 +147,13 @@
 
         input = {}
         system = null
-        mode = ``
+        appState.setMode(``)
     }
 
     async function submitOnline() {
         status.startWaiting("Передача показаний...")
 
-        const result = await Api.submitUserValues($token, system, values, true)
+        const result = await Api.submitUserValues($appState.token, system, values, true)
 
         if (result.success) {
             finalize()
@@ -178,7 +169,7 @@
     async function reportSubmission() {
         status.startWaiting("Сохранение данных...")
 
-        const result = await Api.submitUserValues($token, system, values)
+        const result = await Api.submitUserValues($appState.token, system, values)
 
         if (result.success) {
             finalize()
@@ -192,61 +183,66 @@
 
 </script>
 
-{#if system !== null}
-    {#if provider !== null}
-        <div class="system">
-            {#if mode !== `send`}
-                <StaticDetail name="Поставщик" value={provider.name} />
-                <StaticDetail name="Период" value={period?.toString()} />
-            {/if}
-            {#each Object.entries(provider.values) as [id, value] (id)}
-                {#if value.constant}
-                    {#if mode === `edit`}
-                        <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type} />
-                    {:else}
-                        <StaticDetail name={value.name} value={system.values[id]} />
-                    {/if}
-                {:else if mode === `send`}
-                    <VariableDetail name={value.name} bind:value={input[id]} old={system.last?.values[id]} type={value.type}/>
+{#if (system?.id === $appState.system_id)}
+    {#if system !== null}
+        {#if provider !== null}
+            <div class="flex">
+                {#if $appState.mode !== `send`}
+                    <StaticDetail name="Поставщик" value={provider?.name} />
+                    <StaticDetail name="Период" value={period?.toString()} />
                 {/if}
-            {/each}
-        </div>
-        {#if mode === `edit`}
-            <div class="row-flex spacy-below" transition:slide>
-                <button on:click={saveEdit} disabled={$status.waiting}>Сохранить</button>
-                <button on:click={startRemoving} disabled={$status.waiting}>Удалить</button>
-                <button on:click={stopEditing}>Отмена</button>
+                {#each Object.entries(provider.values) as [id, value] (id)}
+                    {#if value.constant}
+                        {#if $appState.mode === `edit`}
+                            <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type} />
+                        {:else}
+                            <StaticDetail name={value.name} value={system.values[id]} />
+                        {/if}
+                    {:else if $appState.mode === `send`}
+                        <VariableDetail name={value.name} bind:value={input[id]} old={system.last?.values[id]} type={value.type}/>
+                    {/if}
+                {/each}
             </div>
-        {:else if mode === `send`}
-            {#if !ready}
-                <div class="large important center-text spacy-below" transition:slide>
-                    Заполните поля для показаний выше
+            {#if $appState.mode === `edit`}
+                <div class="row-flex spacy-below" transition:slide>
+                    <button on:click={saveEdit} disabled={$status.waiting}>Сохранить</button>
+                    <button on:click={startRemoving} disabled={$status.waiting}>Удалить</button>
+                    <button on:click={stopEditing}>Отмена</button>
+                </div>
+            {:else if $appState.mode === `send`}
+                {#if !ready}
+                    <div class="large important center-text spacy-below" transition:slide>
+                        Заполните поля для показаний выше
+                    </div>
+                {/if}
+                {#if ready && offline}
+                    {#if DEFAULT_MANUAL}
+                        <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
+                    {/if}
+                    <SelectMethod {values} methods={provider.methods}/>
+                    <span class="spacy-below" transition:slide>После успешной передачи показаний нажмите "Сохранить".</span>
+                {/if}
+                <div class="row-flex spacy-below" transition:slide>
+                    {#if !offline}
+                        <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
+                        <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
+                    {:else}
+                        <button on:click={reportSubmission} disabled={!ready || $status.waiting}>Сохранить</button>
+                    {/if}
+                    <button on:click={stopSending}>Отмена</button>
+                </div>
+            {:else}
+                <div class="row-flex spacy-below" transition:slide>
+                    <button on:click={startEditing}>Изменить</button>
+                    <button on:click={startSending}>Передать</button>
                 </div>
             {/if}
-            {#if ready && offline}
-                {#if DEFAULT_MANUAL}
-                    <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
-                {/if}
-                <SelectMethod {values} methods={provider.methods}/>
-                <span class="spacy-below" transition:slide>После успешной передачи показаний нажмите "Сохранить".</span>
-            {/if}
-            <div class="row-flex spacy-below" transition:slide>
-                {#if !offline}
-                    <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
-                    <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
-                {:else}
-                    <button on:click={reportSubmission} disabled={!ready || $status.waiting}>Сохранить</button>
-                {/if}
-                <button on:click={stopSending}>Отмена</button>
-            </div>
+
         {:else}
-            <div class="row-flex spacy-below" transition:slide>
-                <button on:click={startEditing}>Изменить</button>
-                <button on:click={startSending}>Передать</button>
-            </div>
+            <span class="error" transition:slide>Неизвестный поставщик услуг</span>
+
         {/if}
-    {:else}
-        <span class="error" transition:slide>Неизвестный поставщик услуг</span>
+
     {/if}
 
 {/if}

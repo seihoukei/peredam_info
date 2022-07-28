@@ -1,12 +1,10 @@
 <script>
     import Tokens from "../../../utility/tokens.js"
-    import token from "../../../stores/token.js"
-    import Address from "../../../utility/address.js"
+    import appState from "../../../stores/app-state.js"
 
     function logOut() {
         Tokens.clear()
-        token.set("")
-        Address.set()
+        appState.reset()
     }
 
 </script>

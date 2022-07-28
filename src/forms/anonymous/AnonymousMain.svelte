@@ -9,15 +9,14 @@
     import SelectMethod from "../common/select-method/methods/SelectMethod.svelte"
     import library from "../../stores/library.js"
     import status from "../../stores/status.js"
-    import Address from "../../utility/address.js"
     import Values from "../../utility/values.js"
+    import Address from "../../utility/address.js"
+    import appState from "../../stores/app-state.js"
 
     const DEFAULT_MANUAL = true
 
-    export let anonymous = true
-
-    let city_id = localStorage.defaultCity ?? (+Address.getPart(1) || null)
-    let provider_id = +Address.getPart(2) || null
+    let city_id = null
+    let provider_id = null
     let values = inputTemplate()
 
     let ready = false
@@ -26,17 +25,17 @@
     $: if (city_id === null)
         provider_id = null
 
-    $: Address.set(`anon`, city_id, provider_id, Address.stringify(values))
-
     $: provider = getProvider(provider_id)
     $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual
+
+    $: appState.setData(Address.stringify(values))
 
     function setManual() {
         manual = true
     }
 
     function inputTemplate() {
-        const template = Address.getPart(3, `anon`)
+        const template = $appState.data
         if (template) {
             return Address.parse(template)
         }
@@ -82,20 +81,19 @@
     }
 
     function finalize() {
-        provider_id = null
+        appState.setProviderId(null)
     }
 
     function leave() {
-        anonymous = false
-        Address.set()
+        appState.reset()
     }
 </script>
 
 <div class="top-central centered wrapper flex" in:fade out:fly={dialogFlyUp}>
     <TopLogo />
-    <SelectCity bind:current={city_id} />
-    <SelectProvider {city_id} bind:current={provider_id}/>
-    <SetValues {provider_id} bind:values bind:ready all="true" />
+    <SelectCity />
+    <SelectProvider/>
+    <SetValues bind:values bind:ready all="true" />
 
     {#if !ready && provider !== null}
         <div class="large important center-text spacy-below" transition:slide>

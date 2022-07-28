@@ -3,6 +3,7 @@
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
     import {loginFlyLeft} from "../../../utility/transitions.js"
+    import appState from "../../../stores/app-state.js"
 
     export let username
 
@@ -13,7 +14,7 @@
     }
 
     function nologin() {
-        dispatch("nologin")
+        appState.setPage("anon")
     }
 
     $: username = username.replace(/[^0-9a-zA-Zа-яА-Я_\- ]*/g,"")

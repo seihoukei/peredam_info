@@ -4,39 +4,37 @@
     import SetValues from "../../common/system-management/SetValues.svelte"
     import {slide} from "svelte/transition"
     import Api from "../../../utility/api.js"
-    import token from "../../../stores/token.js"
     import {createEventDispatcher} from "svelte"
     import status from "../../../stores/status.js"
-    import Address from "../../../utility/address.js"
     import Values from "../../../utility/values.js"
     import library from "../../../stores/library.js"
+    import appState from "../../../stores/app-state.js"
+    import Address from "../../../utility/address.js"
 
     export let adding = true
 
-    let city_id = localStorage.defaultCity ?? null
-    let provider_id = null
-    let values = {}
-
     let ready = false
 
-    $: Address.set(`user`, `add`, city_id, provider_id)
+    $: provider_id = $appState.provider_id
 
-    $: if (city_id === null)
-        provider_id = null
+    $: values = inputTemplate(provider_id)
+    $: appState.setData(Address.stringify(values))
 
     $: newSystem = {
         provider_id, values
     }
 
-    $: values = empty(provider_id)
-
     const dispatch = createEventDispatcher()
 
     const back = () => {
-        adding = false
+        appState.setPage("user")
     }
 
-    function empty() {
+    function inputTemplate() {
+        const template = $appState.data
+        if (template) {
+            return Address.parse(template)
+        }
         return {}
     }
 
@@ -44,7 +42,7 @@
         status.startWaiting("Добавление данных")
 
         newSystem.values = Values.formatValues(library.providers[provider_id].values, newSystem.values)
-        const result = await Api.addSystem($token, newSystem)
+        const result = await Api.addSystem($appState.token, newSystem)
 
         if (!result.success) {
             status.error(result.error)
@@ -60,19 +58,20 @@
 
 </script>
 
-{#if import.meta.env.MODE === "development"}
-    <pre class="debug">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
+{#if $appState.page === 'add'}
+    {#if import.meta.env.MODE === "development"}
+        <pre class="debug">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
+    {/if}
+
+    <SelectCity />
+    <SelectProvider />
+    <SetValues bind:values bind:ready/>
+
+    <div class="row-flex" transition:slide>
+        <button on:click={finalize} disabled={!ready || $status.waiting}>Добавить</button>
+        <button on:click={back}>Отмена</button>
+    </div>
 {/if}
-
-<SelectCity bind:current={city_id} />
-<SelectProvider {city_id} bind:current={provider_id}/>
-<SetValues {provider_id} bind:values bind:ready/>
-
-<div class="row-flex" transition:slide>
-    <button on:click={finalize} disabled={!ready || $status.waiting}>Добавить</button>
-    <button on:click={back}>Отмена</button>
-</div>
-
 
 <style>
     .debug {

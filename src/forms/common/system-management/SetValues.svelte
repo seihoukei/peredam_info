@@ -3,8 +3,11 @@
     import VariableDetail from "./VariableDetail.svelte"
     import { slide } from "svelte/transition"
     import Values from "../../../utility/values.js"
+    import appState from "../../../stores/app-state.js"
+    import Address from "../../../utility/address.js"
 
-    export let provider_id = null
+    $: provider_id = $appState.provider_id
+
     export let values = {}
     export let ready
     export let all = false

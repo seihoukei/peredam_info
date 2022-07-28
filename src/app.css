@@ -60,7 +60,7 @@ html, body {
     font: var(--font-size) Exo2, sans-serif;
     background-color : var(--background);
     color : var(--text-color);
-    overflow : hidden;
+    overflow : hidden auto;
 }
 
 div#app {
@@ -105,7 +105,7 @@ div.top-central {
 
 div.fullscreen-container {
     background-color: #00000088;
-    position: absolute;
+    position: fixed;
     left :0;
     top : 0;
     width : 100vw;

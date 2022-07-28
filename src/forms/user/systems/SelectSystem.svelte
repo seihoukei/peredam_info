@@ -1,34 +1,22 @@
 <script>
     import SystemShortInfo from "./SystemShortInfo.svelte"
     import SystemMain from "./SystemMain.svelte"
-    import {slide} from "svelte/transition"
-    import {createEventDispatcher} from "svelte"
-    import Address from "../../../utility/address.js"
+    import appState from "../../../stores/app-state.js"
 
     export let systems = []
-    export let current = null
-    export let adding = false
 
-    $: if (!current) Address.set(`user`)
+    $: system_id = $appState.system_id
 
-    function setSystem(system) {
-        if (current === system)
-            current = null
-        else
-            current = system
-    }
+    $: if (system_id !== null && !systems.find(item => +item.id === system_id))
+        appState.setSystemId(null, appState.UPDATE_ADDRESS.REPLACE)
 
-    function addSystem() {
-        adding = true
-    }
 </script>
 
-{#each systems as system (system)}
-    {#if !current || system === current}
-        <SystemShortInfo bind:system current={current === system} on:click={()=>setSystem(system)}/>
+{#each systems as system (system.id)}
+    {#if system_id === null || system_id === +system.id}
+        <SystemShortInfo {system}/>
+    {/if}
+    {#if system_id === +system.id}
+        <SystemMain on:remove {system}/>
     {/if}
 {/each}
-<SystemMain bind:system={current} on:remove />
-{#if !current}
-    <button on:click={addSystem} transition:slide>＋ Добавить систему</button>
-{/if}
