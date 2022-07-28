@@ -13,7 +13,7 @@
     import Address from "../../utility/address.js"
     import appState from "../../stores/app-state.js"
 
-    const DEFAULT_MANUAL = true
+    const DEFAULT_MANUAL = Api.server === "https://api.peredam.info/"
 
     $: provider_id = $appState.provider_id
     let values = inputTemplate()

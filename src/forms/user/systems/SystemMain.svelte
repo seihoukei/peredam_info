@@ -12,7 +12,7 @@
     import Address from "../../../utility/address.js"
     import appState from "../../../stores/app-state.js"
 
-    const DEFAULT_MANUAL = true
+    const DEFAULT_MANUAL = Api.server === "https://api.peredam.info/"
 
     export let system = {}
 
@@ -146,8 +146,7 @@
         }
 
         input = {}
-        system = null
-        appState.setMode(``)
+        appState.setSystemId(null)
     }
 
     async function submitOnline() {
