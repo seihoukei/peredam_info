@@ -1,237 +1,82 @@
 <script>
-    import RequestPhone from "./stages/RequestPhone.svelte"
-    import RequestUsername from "./stages/RequestUsername.svelte"
-    import RequestPassword from "./stages/RequestPassword.svelte"
-    import ConfirmNewUser from "./stages/ConfirmNewUser.svelte"
-    import SetPassword from "./stages/SetPassword.svelte"
-    import SetCode from "./stages/SetCode.svelte"
-    import RequestCode from "./stages/RequestCode.svelte"
-    import Error from "./elements/Error.svelte"
-    import Waiting from "./elements/Waiting.svelte"
+    import TopLogo from "../common/TopLogo.svelte"
+    import LoginStage from "./stages/LoginStage.svelte"
+    import PasswordStage from "./stages/PasswordStage.svelte"
+    import CodeStage from "./stages/CodeStage.svelte"
 
     import Tokens from "../../utility/tokens.js"
-    import Api from "../../utility/api.js"
-    import TopLogo from "../common/TopLogo.svelte"
     import {onMount} from "svelte"
     import appState from "../../stores/app-state.js"
 
-    export let login = localStorage.login ?? ""
+    let state = {
+        stage : "",
+        login : localStorage.login ?? "",
+        isNewUser : false,
+        tokens : Tokens.retrieve(),
+        user_provider_id : localStorage.user_provider_id ?? "",
+    }
 
-    let password = ""
-    let code = ""
-    let status = ""
-    let isUsingPhone = true
-    let errorRetryStage = null
+    //decoupling updates from storages
+    $: page = $appState.page
+    $: isAnonymousPage = $appState.isAnonymousPage
+    $: token = $appState.token
 
-    let tokens = Tokens.retrieve()
+    $: user_provider_id = state.user_provider_id
+    $: stage = state.stage
+    $: tokens = state.tokens
 
     $: Tokens.store(tokens)
 
-    const STAGES = {
-        NONE : 0,
-        REQUEST_USERNAME : 11,
-        CONFIRM_NEW_USER : 12,
-        SET_NEW_PASSWORD : 20,
-        REQUEST_OLD_PASSWORD : 30,
-        SET_CODE : 40,
-        REQUEST_CODE : 50,
-
-        WAITING : 100,
-        COMPLETE : 101,
-        ERROR : 102,
-    }
-
-    let stage = STAGES.NONE
-
-    $: if (stage === STAGES.COMPLETE)
+    $: if (stage === "complete")
         finalize()
 
     onMount(() => {
         if (tokens.current !== "") {
-            stage = STAGES.COMPLETE
+            state.stage = "complete"
         } else if (tokens.encrypted !== "") {
-            stage = STAGES.REQUEST_CODE
-        } else if (login !== "") {
-            stage = STAGES.REQUEST_OLD_PASSWORD
+            state.stage = "code"
+        } else if (state.login !== "") {
+            state.stage = "password"
         } else {
-            stage = STAGES.REQUEST_USERNAME
+            state.stage = "login"
         }
     })
 
-    function error(message, retryStage = STAGES.REQUEST_USERNAME) {
-        stage = STAGES.ERROR
-        status = message
-        errorRetryStage = retryStage
-    }
-
-    function retry() {
-        stage = errorRetryStage
-    }
-
-    function restart() {
-        stage = STAGES.REQUEST_USERNAME
-        login = ""
-        password = ""
-        code = ""
-        tokens = {
-            current: "",
-            encrypted: "",
-            open: "",
-        }
-    }
-
-    function useLogin() {
-        isUsingPhone = false
-        login = ""
-    }
-
-    function usePhone() {
-        isUsingPhone = true
-        login = ""
-    }
-
-    function usePassword() {
-        Tokens.clear()
-        stage = STAGES.REQUEST_OLD_PASSWORD
-    }
-
-    function newUser() {
-        stage = STAGES.SET_NEW_PASSWORD
-        password = ""
-    }
-
-    function setCode() {
-        if (code === "") {
-            tokens.open = tokens.current
-            tokens.encrypted = ""
-            stage = STAGES.COMPLETE
-        } else {
-            const result = Tokens.encrypt(tokens.current, code)
-
-            if (result.success) {
-                tokens.encrypted = result.data
-                tokens.open = ""
-                stage = STAGES.COMPLETE
-
-            } else {
-                error("Ошибка шифрования", STAGES.SET_CODE)
-            }
-        }
-
-    }
-
-    function checkCode() {
-        const result = Tokens.decrypt(tokens.encrypted, code)
-
-        if (result.success) {
-            tokens.current = result.data
-            stage = STAGES.COMPLETE
-
-        } else {
-            error("Неправильный код", STAGES.REQUEST_CODE)
-            code = ""
-        }
-    }
-
     function finalize() {
-        appState.setValue('user_name', login, appState.UPDATE_ADDRESS.NO)
+        localStorage.login = state.login
+        appState.setUserProviderId(user_provider_id)
+        appState.setValue('username', state.login, appState.UPDATE_ADDRESS.NO)
         appState.setToken(tokens.current)
-        if ($appState.user_provider_id && $appState.page !== 'read') {
+
+        if (user_provider_id && page !== 'read') {
             appState.setPage('read')
         }
-        if (!$appState.user_provider_id && $appState.page === 'read') {
+
+        if (!user_provider_id && page === 'read') {
             appState.setPage('user')
         }
 
     }
 
-    async function checkLogin() {
-        stage = STAGES.WAITING
-        status = "Поиск пользователя"
-        const result = await Api.loginExists(login)
-
-        if (result.success) {
-            if (result.data.exists) {
-                password = ""
-                stage = STAGES.REQUEST_OLD_PASSWORD
-            } else {
-                stage = STAGES.CONFIRM_NEW_USER
-            }
-        } else {
-            error(result.error)
-        }
-    }
-
-    async function register() {
-        stage = STAGES.WAITING
-        status = "Регистрация пользователя"
-        const result = await Api.register(login, password)
-
-        if (result.success) {
-            tokens.current = result.data.token
-            localStorage.login = login
-            appState.setUserProviderId(null)
-            code = ""
-            stage = STAGES.SET_CODE
-
-        } else {
-            login = ""
-            error(result.error)
-        }
-    }
-
-    async function log_in() {
-        stage = STAGES.WAITING
-        status = "Попытка входа"
-        const result = await Api.logIn(login, password)
-
-        if (result.success) {
-            tokens.current = result.data.token
-            localStorage.login = login
-            appState.setUserProviderId(result.data.provider ?? null)
-            code = ""
-            stage = STAGES.SET_CODE
-
-        } else {
-            password = ""
-            error(result.error, STAGES.REQUEST_OLD_PASSWORD)
-        }
-    }
-
 </script>
 
-{#if $appState.page !== "anon" && $appState.token === ""}
+{#if !isAnonymousPage && token === ""}
     {#if import.meta.env.MODE === "development"}
-        <pre class="debug">{JSON.stringify(tokens,null,1)}</pre>
+        <pre class="bottom debug">{JSON.stringify(state,null,1)}</pre>
     {/if}
 
     <div class="top-central">
         <TopLogo />
     </div>
 
-    {#if stage === STAGES.REQUEST_USERNAME}
-        {#if isUsingPhone}
-            <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin}/>
-        {:else}
-            <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone}/>
-        {/if}
+    {#if stage === "login"}
+        <LoginStage bind:state/>
 
-    {:else if stage === STAGES.CONFIRM_NEW_USER}
-        <ConfirmNewUser {login} on:cancel={restart} on:confirm={newUser}/>
-    {:else if stage === STAGES.SET_NEW_PASSWORD}
-        <SetPassword {login} bind:password on:cancel={restart} on:submit={register}/>
-    {:else if stage === STAGES.REQUEST_OLD_PASSWORD}
-        <RequestPassword {login} bind:password on:cancel={restart} on:submit={log_in}/>
+    {:else if stage === "password"}
+        <PasswordStage bind:state/>
 
-    {:else if stage === STAGES.SET_CODE}
-        <SetCode {login} bind:code on:cancel={restart} on:submit={setCode}/>
-    {:else if stage === STAGES.REQUEST_CODE}
-        <RequestCode {login} bind:code on:cancel={usePassword} on:submit={checkCode}/>
-
-    {:else if stage === STAGES.WAITING}
-        <Waiting message={status} />
-    {:else if stage === STAGES.ERROR}
-        <Error message={status} on:click={retry} />
+    {:else if stage === "code"}
+        <CodeStage bind:state/>
 
     {/if}
 {/if}

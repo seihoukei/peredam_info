@@ -1,37 +1,51 @@
 import {writable} from "svelte/store"
 
+const DEFAULT_BUTTONS = [{
+    text: "Закрыть",
+    keyCodes: [13, 27, 32], //enter, esc, space
+    callback : null,
+}]
+
 const {subscribe, update} = writable({
     error : false,
     errorMessage : "",
     
     waiting : false,
     waitingMessage : "",
+    
+    buttons : []
 })
 
-const status = {
+const modal = {
     subscribe,
     
-    callback : null,
-    
-    error (message = "", callback = null) {
+    error (message = "", buttons = DEFAULT_BUTTONS) {
         update(state => ({
             ...state,
             error : true,
             errorMessage : message,
+            buttons
         }))
-        
-        this.callback = callback
     },
     
-    recover() {
+    notify (message = "", buttons = DEFAULT_BUTTONS){
+        update(state => ({
+            ...state,
+            asking : true,
+            askingMessage : message,
+            buttons
+        }))
+        
+    },
+    
+    close(callback) {
         update(state => ({
             ...state,
             error : false,
+            asking : false,
         }))
         
-        if (this.callback) {
-            this.callback()
-        }
+        callback?.()
     },
     
     startWaiting (message = "") {
@@ -49,6 +63,13 @@ const status = {
         }))
     },
     
+    async await(promise, message= "Ожидание...") {
+        this.startWaiting(message)
+        const result = await promise
+        this.stopWaiting()
+        
+        return result
+    },
 }
 
-export default status
+export default modal

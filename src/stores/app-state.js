@@ -2,13 +2,16 @@ import {writable} from "svelte/store"
 import Address from "../utility/address.js"
 import library from "./library.js"
 
+const ANONYMOUS_PAGES = ['anon', 'info']
+
 const DEFAULT_STATE = {
     page : "",
+    isAnonymousPage : false,
     city_id : null,
     provider_id : null,
     system_id : null,
     user_provider_id : null,
-    user_name : "",
+    username : "",
     mode : ``,
     data : ``,
     token : ``
@@ -41,6 +44,7 @@ const appState = {
         this.setSystemId(null, appState.UPDATE_ADDRESS.NO)
         this.setMode(``, appState.UPDATE_ADDRESS.NO)
 
+        this.setValue('isAnonymousPage', ANONYMOUS_PAGES.includes(value), appState.UPDATE_ADDRESS.NO)
         this.setValue('page', value, updateAddress)
     },
     
@@ -88,9 +92,9 @@ const appState = {
     setUserProviderId(value = null) {
         this.setValue('user_provider_id', value, appState.UPDATE_ADDRESS.NO)
         if (value)
-            localStorage.provider_id = value
+            localStorage.user_provider_id = value
         else
-            delete localStorage.provider_id
+            delete localStorage.user_provider_id
     },
     
     reset(updateAddress = appState.UPDATE_ADDRESS.PUSH) {
@@ -105,7 +109,7 @@ const appState = {
         
         this.setPage(Address.getPart(0), appState.UPDATE_ADDRESS.NO)
         
-        this.setValue('user_name', localStorage.login ?? "", appState.UPDATE_ADDRESS.NO)
+        this.setValue('username', localStorage.login ?? "", appState.UPDATE_ADDRESS.NO)
         this.setValue('user_provider_id', localStorage.provider_id ?? null, appState.UPDATE_ADDRESS.NO)
 
     },

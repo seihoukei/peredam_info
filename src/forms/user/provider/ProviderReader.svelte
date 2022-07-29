@@ -4,15 +4,17 @@
     import Api from "../../../utility/api.js"
     import appState from "../../../stores/app-state.js"
 
-    $: provider = library.providers[$appState.user_provider_id] ?? null
+    $: user_provider_id = $appState.user_provider_id
+    $: provider = library.providers[user_provider_id] ?? null
+    $: token = $appState.token
 
     let end = new Date()
     let start = new Date()
     start.setDate(end.getDate() - 1)
 
-    const page = 0
+    const listPage = 0
 
-    $: listRequest = Api.getProviderRecords($appState.token, page)
+    $: listRequest = Api.getProviderRecords(token, listPage)
 
     function update() {
 

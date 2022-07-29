@@ -2,7 +2,7 @@
     import Rules from "./Rules.svelte"
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
-    import {loginFlyLeft} from "../../../utility/transitions.js"
+    import {loginFlyLeft} from "../../../../utility/transitions.js"
 
     export let login
 

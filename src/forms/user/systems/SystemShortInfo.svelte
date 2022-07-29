@@ -6,7 +6,8 @@
 
     export let system = {}
 
-    $: current = ($appState.system_id === +system.id)
+    $: system_id = $appState.system_id
+    $: current = (system_id === +system.id)
 
     $: provider = system ? library.providers[system.provider_id] ?? null : null
     $: displayName = `${current ? "◀" : ""} ${provider?.type} (${system?.values?.ACCOUNT ?? ""})`

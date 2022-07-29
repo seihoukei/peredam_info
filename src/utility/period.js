@@ -13,13 +13,19 @@ const MONTHS = [
     "декабря",
 ]
 
-function dayMonthString(date) {
-    return `${date.getDate()} ${MONTHS[date.getMonth()]}`
-}
-
 export default class Period {
     static TYPES = {
         MONTHLY : 0,
+    }
+    
+    static dayMonthString(date) {
+        const then = new Date(date)
+        return `${then.getDate()} ${MONTHS[then.getMonth()]}`
+    }
+    
+    static dayString(date) {
+        const then = new Date(date)
+        return `${then.getDate()}`
     }
     
     constructor(description = "MONTHLY:1,31") {
@@ -38,36 +44,61 @@ export default class Period {
         return "Неизвестно"
     }
     
-    next(from = 0) {
+    getPeriodForDate(date = Date.now(), breakByLast = false) {
         if (this.type === Period.TYPES.MONTHLY) {
-            const past = new Date(+from)
-            const now = new Date()
+            const then = new Date(+date)
         
-            const first = new Date()
+            const first = new Date(date)
             first.setDate(this.first)
+            first.setHours(0, 0, 0, 0)
         
-            const last = new Date()
-            last.setDate(this.last)
+            const last = new Date(date)
+            last.setDate(this.last + 1)
+            last.setHours(0, 0, 0, 0)
             
             if (this.reverse)
                 first.setMonth(first.getMonth() - 1)
         
-            while (past >= first || now > last) {
+            while (breakByLast && last < then || !breakByLast && first < then) {
                 first.setMonth(first.getMonth() + 1)
                 last.setMonth(last.getMonth() + 1)
             }
         
             return {first, last}
         }
+    
     }
     
-    nextString(from) {
-        const {first, last} = this.next(from)
+    analyze(then = new Date().setMonth(new Date().getMonth() - 2)) {
+        if (this.type === Period.TYPES.MONTHLY) {
+            const now = Date.now()
+            
+            const pastPeriodByFirst = this.getPeriodForDate(then)
+            const currentPeriodByFirst = this.getPeriodForDate(now)
+            const currentPeriodByLast = this.getPeriodForDate(now, true)
+            
+            const recent = currentPeriodByFirst.first.getMonth() === pastPeriodByFirst.first.getMonth()
+            const inside = currentPeriodByFirst.first > currentPeriodByLast.first
+            
+            const {first, last} = currentPeriodByLast
+            if (then > first) {
+                first.setMonth(first.getMonth() + 1)
+                last.setMonth(last.getMonth() + 1)
+            }
+            
+            return {first, last, inside, recent}
+        }
+    }
+    
+    nextString(then = new Date().setMonth(new Date().getMonth() - 2)) {
+        const {first, last} = this.analyze(then)
         const now = new Date()
         
         if (now > first)
-            return `до ${dayMonthString(last)}`
+            return `до ${Period.dayMonthString(last)}`
+        else if (first.getMonth() !== last.getMonth())
+            return `с ${Period.dayMonthString(first)} до ${Period.dayMonthString(last)}`
         else
-            return `с ${dayMonthString(first)} до ${dayMonthString(last)}`
+            return `с ${Period.dayString(first)} до ${Period.dayMonthString(last)}`
     }
 }

@@ -1,8 +1,8 @@
 <script>
-    import LoginPrompt from "../elements/LoginPrompt.svelte"
+    import LoginPrompt from "../../elements/LoginPrompt.svelte"
     import {createEventDispatcher} from "svelte"
     import {fly, slide} from "svelte/transition"
-    import {loginFlyRight} from "../../../utility/transitions.js"
+    import {loginFlyRight} from "../../../../utility/transitions.js"
 
     export let login
     export let password

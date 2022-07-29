@@ -2,50 +2,48 @@
     import UserMain from "./forms/user/UserMain.svelte"
     import LoginSequence from "./forms/login-sequence/LoginSequence.svelte"
     import AnonymousMain from "./forms/anonymous/AnonymousMain.svelte"
-    import StatusReporter from "./forms/common/StatusReporter.svelte"
+    import ModalDialog from "./forms/common/ModalDialog.svelte"
     import KnowledgeBase from "./forms/knowledge/KnowledgeBase.svelte"
-
     import Welcome from "./forms/welcome/Welcome.svelte"
     import Error from "./forms/login-sequence/elements/Error.svelte"
 
     import Api from "./utility/api.js"
-    import {loadLibrary} from "./stores/library.js"
+    import {libraryReady, loadLibrary} from "./stores/library.js"
     import appState from "./stores/app-state.js"
     import {onMount} from "svelte"
 
     let attempt = 0
 
     $: token = $appState.token
+    $: page = $appState.page
+    $: isAnonymousPage = $appState.isAnonymousPage
+
     $: loading = loadUser(token, attempt)
 
-    async function loadUser() {
-        await loadLibrary
-        appState.restorePageData($appState.page)
-        return await Api.getUserSystems(token)
-    }
+    onMount(() => {
+        appState.restorePage()
+    })
 
     function retry() {
         attempt++
     }
 
-    onMount(() => {
-        appState.restorePage()
-    })
+    async function loadUser(token) {
+        if (!$libraryReady)
+            await loadLibrary
+
+        appState.restorePageData(page)
+
+        return await Api.getUserSystems(token)
+    }
+
 </script>
+
 {#if import.meta.env.MODE === "development"}
     <pre class="debug">{JSON.stringify($appState, null, 1)}</pre>
 {/if}
 
-{#if $appState.page === 'anon'}
-    {#await loading}
-        <Welcome />
-
-    {:then result}
-        <AnonymousMain />
-
-    {/await}
-
-{:else if token === ""}
+{#if !isAnonymousPage && token === ""}
     <LoginSequence />
 
 {:else}
@@ -53,7 +51,16 @@
         <Welcome />
 
     {:then result}
-        {#if result?.success}
+        {#if isAnonymousPage}
+            {#if page === 'anon'}
+                <AnonymousMain />
+
+            {:else if page === 'info'}
+                info stub
+
+            {/if}
+
+        {:else if result?.success}
             <UserMain user={{systems:result.data}} />
 
         {:else}
@@ -65,5 +72,5 @@
 
 {/if}
 
-<StatusReporter />
 <KnowledgeBase />
+<ModalDialog />

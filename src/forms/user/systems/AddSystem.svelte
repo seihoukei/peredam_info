@@ -5,17 +5,16 @@
     import {slide} from "svelte/transition"
     import Api from "../../../utility/api.js"
     import {createEventDispatcher} from "svelte"
-    import status from "../../../stores/status.js"
+    import modal from "../../../stores/modal.js"
     import Values from "../../../utility/values.js"
     import library from "../../../stores/library.js"
     import appState from "../../../stores/app-state.js"
     import Address from "../../../utility/address.js"
 
-    export let adding = true
-
     let ready = false
 
     $: provider_id = $appState.provider_id
+    $: page = $appState.page
 
     $: values = inputTemplate(provider_id)
     $: appState.setData(Address.stringify(values))
@@ -26,8 +25,11 @@
 
     const dispatch = createEventDispatcher()
 
-    const back = () => {
-        appState.setPage("user")
+    function back() {
+        if (provider_id)
+            appState.setProviderId(null)
+        else
+            appState.setPage("user")
     }
 
     function inputTemplate() {
@@ -39,43 +41,35 @@
     }
 
     async function finalize () {
-        status.startWaiting("Добавление данных")
-
         newSystem.values = Values.formatValues(library.providers[provider_id].values, newSystem.values)
-        const result = await Api.addSystem($appState.token, newSystem)
+
+        const result = await modal.await(
+            Api.addSystem($appState.token, newSystem),
+            "Добавление данных",
+        )
 
         if (!result.success) {
-            status.error(result.error)
+            modal.error(result.error)
 
         } else {
             newSystem.id = result.data.id
             dispatch("add", newSystem)
-            adding = false
         }
-
-        status.stopWaiting()
     }
 
 </script>
 
-{#if $appState.page === 'add'}
-    {#if import.meta.env.MODE === "development"}
-        <pre class="debug">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
-    {/if}
+{#if import.meta.env.MODE === "development"}
+    <pre class="debug bottom">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
+{/if}
 
+{#if page === 'add'}
     <SelectCity />
     <SelectProvider />
     <SetValues bind:values bind:ready/>
 
     <div class="spacy-below row-flex" transition:slide>
-        <button on:click={finalize} disabled={!ready || $status.waiting}>Добавить</button>
-        <button on:click={back}>Отмена</button>
+        <button on:click={finalize} disabled={!ready || $modal.waiting}>Добавить</button>
+        <button on:click={back}>◀ Назад</button>
     </div>
 {/if}
-
-<style>
-    .debug {
-        bottom : 0;
-        left : 0;
-    }
-</style>

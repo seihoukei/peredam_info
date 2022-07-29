@@ -9,6 +9,8 @@
     import Systems from "../../utility/systems.js"
     import appState from "../../stores/app-state.js"
     import ProviderReader from "./provider/ProviderReader.svelte"
+    import UserSettings from "./settings/UserSettings.svelte"
+    import SystemMain from "./systems/SystemMain.svelte"
 
     export let user = {
         systems : []
@@ -16,12 +18,20 @@
 
     let systems = Systems.sortByDate(user.systems)
     $: user.systems = Systems.sortByDate(systems)
-    $: if ($appState.page === "") {
-        if ($appState.user_provider_id)
+
+    $: username = $appState.username
+    $: page = $appState.page
+    $: user_provider_id = $appState.user_provider_id
+    $: system_id = $appState.system_id
+    $: system = user.systems.find(system => +system.id === system_id)
+
+    $: if (page === "") {
+        if (user_provider_id)
             appState.setPage("read")
         else
             appState.setPage("user")
     }
+
 
     function add({detail:system}) {
         systems = [
@@ -45,15 +55,22 @@
 <div class="centered top-central wrapper flex" in:fade out:fly={dialogFlyUp}>
     <TopLogo />
 
-    {#if $appState.page === 'read'}
+    {#if page === 'read'}
         <ProviderReader />
     {:else}
-        <UserMenu username={$appState.user_name}/>
-        {#if $appState.page === 'add'}
+        <UserMenu {username}/>
+        {#if page === 'add'}
             <AddSystem on:add={add}/>
+
+        {:else if page === 'conf'}
+            <UserSettings />
+
         {:else}
-            <SelectSystem {systems} on:remove={remove}/>
-            {#if $appState.system_id === null}
+            <SelectSystem {systems}>
+                <SystemMain on:remove={remove} {system}/>
+            </SelectSystem>
+
+            {#if system_id === null}
                 <button on:click={toAdd} transition:slide>＋ Добавить систему</button>
             {/if}
 

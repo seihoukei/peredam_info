@@ -44,7 +44,7 @@
         code = code.slice(0,-1)
     }
 
-    function onKeyDown(event) {
+    function checkKey(event) {
         for (const button of buttons) {
             if (button.keyCodes.includes(event.keyCode)) {
                 button.action()
@@ -55,7 +55,7 @@
 
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window on:keydown={checkKey} />
 
 <div class="keypad-container">
     <div class="code">{maskedCode}</div>
@@ -72,7 +72,7 @@
         flex-direction: column;
         align-items: center;
         width : 320px;
-        row-gap: 50px;
+        row-gap: min(50px, 10vmin);
     }
 
     div.code {
@@ -82,23 +82,23 @@
 
         background: var(--element-background);
         color : var(--element-text-color);
-        font: 50px Nova, monospace;
+        font: min(50px, 10vmin) Nova, monospace;
 
-        border-radius: 30px;
-        padding : 0 30px;
+        border-radius: min(30px, 6vmin);
+        padding : 0 min(30px, 6vmin);
         white-space: nowrap;
     }
 
     div.keypad {
         display:grid;
-        --key-size : 50px;
+        --key-size : min(50px, 10vmin);
         grid-template-columns: var(--key-size) var(--key-size) var(--key-size);
         grid-template-rows: var(--key-size) var(--key-size) var(--key-size) var(--key-size);
-        grid-gap: 25px;
+        grid-gap: min(25px, 3vmin);
     }
 
     div.keypad button {
-        font: 30px Nova, monospace;
+        font: min(25px, 6vmin) Nova, monospace;
         border-radius: 50%;
         border : none;
         cursor : pointer;

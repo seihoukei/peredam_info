@@ -4,7 +4,7 @@ import library from "../stores/library.js"
 export default class Systems {
     static createDateMap(systems) {
         const dateMap = new Map()
-        systems.map(system => dateMap.set(system, new Period(library.providers[system.provider_id].period).next(system.last?.date)))
+        systems.map(system => dateMap.set(system, new Period(library.providers[system.provider_id].period).analyze(system.last?.date)))
         return dateMap
     }
     

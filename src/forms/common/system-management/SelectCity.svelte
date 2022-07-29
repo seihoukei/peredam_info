@@ -5,6 +5,7 @@
     import {onMount} from "svelte"
 
     $: city_id = $appState.city_id
+    $: provider_id = $appState.provider_id
 
     function switchCurrent(value) {
         if (city_id === value)
@@ -24,18 +25,20 @@
 
 </script>
 
-<div class="centered flex" transition:slide>
-    {#if city_id === null}
-        <span class="large spacy-below important" transition:slide|local>Выберите город:</span>
-    {:else}
-        <span transition:slide|local>Город:</span>
-    {/if}
-
-    {#each Object.entries(library.cities) as [id, city] (id)}
-        {#if city_id === null || city_id === +id}
-            <button class="large spacy-below" on:click={()=>switchCurrent(+id)} transition:slide|local>
-                {city_id === +id ? "◀" : ""} {city.name}
-            </button>
+{#if provider_id === null}
+    <div class="centered flex" transition:slide>
+        {#if city_id === null}
+            <span class="large spacy-below important" transition:slide|local>Выберите город:</span>
+        {:else}
+            <span transition:slide|local>Город:</span>
         {/if}
-    {/each}
-</div>
+
+        {#each Object.entries(library.cities) as [id, city] (id)}
+            {#if city_id === null || city_id === +id}
+                <button class="large spacy-below" on:click={()=>switchCurrent(+id)} transition:slide|local>
+                    {city_id === +id ? "◀" : ""} {city.name}
+                </button>
+            {/if}
+        {/each}
+    </div>
+{/if}

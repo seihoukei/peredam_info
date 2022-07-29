@@ -1,6 +1,6 @@
 import {writable} from "svelte/store"
 import Api from "../utility/api.js"
-import status from "./status.js"
+import modal from "./modal.js"
 import Serializer from "../utility/serializer.js"
 
 let library = {
@@ -29,6 +29,6 @@ export const loadLibrary = Api.getLibrary().then(result => {
         library = Serializer.deserialize(localStorage.library)
         libraryReady.set(true)
     } else {
-        status.error("Не удалось загрузить основную базу. Попробуйте позже.")
+        modal.error("Не удалось загрузить основную базу. Попробуйте позже.")
     }
 })

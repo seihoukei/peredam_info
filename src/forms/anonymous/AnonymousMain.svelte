@@ -8,7 +8,7 @@
     import {dialogFlyUp} from "../../utility/transitions.js"
     import SelectMethod from "../common/select-method/methods/SelectMethod.svelte"
     import library from "../../stores/library.js"
-    import status from "../../stores/status.js"
+    import modal from "../../stores/modal.js"
     import Values from "../../utility/values.js"
     import Address from "../../utility/address.js"
     import appState from "../../stores/app-state.js"
@@ -61,30 +61,32 @@
     async function submitOnline() {
         const submitValues = Values.formatValues(provider.values, values)
 
-        status.startWaiting("Передача показаний...")
-
-        const result = await Api.submitAnonymousValues(provider_id, submitValues, true)
+        const result = await modal.await(
+            Api.submitAnonymousValues(provider_id, submitValues, true),
+            "Передача показаний...",
+        )
 
         if (result.success) {
             finalize()
 
         } else {
-            status.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
+            modal.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
             manual = true
 
         }
-        status.stopWaiting()
     }
 
     function finalize() {
         appState.setProviderId(null)
     }
 
-    function leave() {
-        appState.reset()
+    function back() {
+        if (provider_id)
+            appState.setProviderId(null)
+        else
+            appState.reset()
     }
 </script>
-
 <div class="top-central centered wrapper flex" in:fade out:fly={dialogFlyUp}>
     <TopLogo />
     <SelectCity />
@@ -105,11 +107,11 @@
     {/if}
     <div class="row-flex spacy-below" transition:slide>
         {#if !offline}
-            <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
-            <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
+            <button on:click={submitOnline} disabled={!ready || $modal.waiting}>Отправить</button>
+            <button on:click={setManual} disabled={!ready || $modal.waiting}>Вручную</button>
         {:else if provider !== null}
-            <button on:click={finalize} disabled={!ready || $status.waiting}>Готово</button>
+            <button on:click={finalize} disabled={!ready || $modal.waiting}>Готово</button>
         {/if}
-        <button on:click={leave}>◀ Выход</button>
+        <button on:click={back}>◀ Назад</button>
     </div>
 </div>

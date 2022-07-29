@@ -44,8 +44,8 @@
 {#if provider !== null}
     <div class="centered flex">
         <div class="important large spacy-below" transition:slide>Заполните обязательные поля:</div>
-        {#each valuesToFill as value}
-            <VariableDetail name={value.name} type={value.type} bind:value={values[value.id]} />
+        {#each valuesToFill as value, index}
+            <VariableDetail name={value.name} type={value.type} bind:value={values[value.id]} priority={index} />
         {/each}
     </div>
 {/if}

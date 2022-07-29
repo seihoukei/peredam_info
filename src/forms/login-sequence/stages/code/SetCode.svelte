@@ -1,8 +1,8 @@
 <script>
-    import CodeInput from "../elements/CodeInput.svelte"
+    import CodeInput from "../../elements/CodeInput.svelte"
     import {slide, fly} from "svelte/transition"
     import {createEventDispatcher} from "svelte"
-    import {loginFlyLeft} from "../../../utility/transitions.js"
+    import {loginFlyLeft} from "../../../../utility/transitions.js"
 
     export let code
     export let login

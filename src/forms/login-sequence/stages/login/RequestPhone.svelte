@@ -1,10 +1,10 @@
 <script>
-    import LoginPrompt from "../elements/LoginPrompt.svelte"
+    import LoginPrompt from "../../elements/LoginPrompt.svelte"
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
-    import {loginFlyLeft} from "../../../utility/transitions.js"
-    import {failure, success} from "../../../utility/messages.js"
-    import appState from "../../../stores/app-state.js"
+    import {loginFlyLeft} from "../../../../utility/transitions.js"
+    import {failure, success} from "../../../../utility/messages.js"
+    import appState from "../../../../stores/app-state.js"
 
     export let phone
 

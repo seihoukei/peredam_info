@@ -7,7 +7,7 @@
     import Period from "../../../utility/period.js"
     import Api from "../../../utility/api.js"
     import {createEventDispatcher} from "svelte"
-    import status from "../../../stores/status.js"
+    import modal from "../../../stores/modal.js"
     import Values from "../../../utility/values.js"
     import Address from "../../../utility/address.js"
     import appState from "../../../stores/app-state.js"
@@ -18,12 +18,15 @@
 
     let input = inputTemplate()
     let editorValues = {}
-    let removing = false
     let manual = DEFAULT_MANUAL
+    let container
+
+    $: system_id = $appState.system_id
+    $: mode = $appState.mode
 
     $: provider = getProvider(system)
     $: period = new Period(provider?.period)
-    $: ready = validate(input)
+    $: ready = validate(values, editorValues)
     $: offline = !provider?.providerData?.onlineMethod && !provider?.providerData?.store || manual
 
     $: values = Values.formatValues(provider?.values, {
@@ -42,7 +45,7 @@
         if (system === null)
             return null
 
-        const provider = library.providers[system.provider_id] ?? null
+        const provider = library.providers[system?.provider_id] ?? null
 
         resetInput()
         Object.assign(input, inputTemplate())
@@ -72,7 +75,32 @@
     }
 
     function startSending()  {
-        appState.setMode(`send`)
+        const data = period.analyze(system.last?.date)
+        const outsidePeriod = !data.inside
+        const alreadySubmitted = data.recent
+
+        let confirmation = null
+
+        if (outsidePeriod)
+            confirmation = `Поставщик рекомендует отправлять показания в период ${period.toString()}. Показания, отправленные сейчас, могут быть не приняты!`
+
+        if (alreadySubmitted)
+            confirmation = `Вы уже передавали показания в этом периоде (${Period.dayMonthString(system.last.date)}).`
+
+        if (confirmation !== null) {
+            modal.notify(confirmation,
+                [{
+                    text: "Всё равно передать",
+                    callback: () => appState.setMode(`send`),
+                },{
+                    text: "Отмена",
+                    callback: null
+                }])
+        } else {
+            appState.setMode(`send`)
+        }
+
+        (() => appState.setMode(`send`))
     }
 
     function startEditing() {
@@ -89,53 +117,67 @@
     }
 
     function startRemoving() {
-        removing = true
-        remove() //TODO: confirmation instead
+        modal.notify("После удаления систему невозможно восстановить!", [{
+            text: "Всё равно удалить",
+            callback: () => remove(),
+        },{
+            text: "Отмена",
+            callback: null,
+        }])
     }
 
     async function remove() {
-        status.startWaiting("Удаление данных...")
-        const result = await Api.removeSystem($appState.token, system.id)
+        const result = await modal.await(
+            Api.removeSystem($appState.token, system.id),
+            "Удаление данных...",
+        )
 
         if (result.success) {
             dispatch("remove", system.id)
             input = {}
             system = null
             appState.setMode(``)
-            removing = false
 
         } else {
-            status.error(result.error)
+            modal.error(result.error)
 
         }
-
-        status.stopWaiting()
     }
 
     async function saveEdit() {
-        status.startWaiting("Обновление данных...")
-
         editorValues = Values.formatValues(provider.values,editorValues)
 
-        const result = await Api.updateSystem($appState.token, system.id, editorValues)
+        const result = await modal.await(
+            Api.updateSystem($appState.token, system.id, editorValues),
+            "Обновление данных...",
+        )
 
         if (result.success) {
             system.values = editorValues
             appState.setMode(``)
 
         } else {
-            status.error(result.error)
+            modal.error(result.error)
 
         }
 
-        status.stopWaiting()
     }
 
     function validate() {
-        if (!values || !provider?.values)
+        let valuesToValidate = values
+        let valuesToCheckAgainst = Object.entries(provider?.values ?? [])
+
+        if (mode === `edit`) {
+            valuesToValidate = Values.formatValues(provider?.values, editorValues)
+            valuesToCheckAgainst = valuesToCheckAgainst.filter(x => x[1].constant)
+        }
+
+        if (!valuesToValidate || !valuesToCheckAgainst)
             return false
-        return Object.entries(provider.values).every(([id,value]) => {
-            return Values.formatValue(value.type, values[id]) !== null || !value.mandatory && values[id] === ""
+
+        return valuesToCheckAgainst.every(([id,value]) => {
+            return valuesToValidate[id] !== null ||
+                !value.mandatory && valuesToValidate[id] === ""
         })
     }
 
@@ -150,97 +192,98 @@
     }
 
     async function submitOnline() {
-        status.startWaiting("Передача показаний...")
-
-        const result = await Api.submitUserValues($appState.token, system, values, true)
+        const result = await modal.await(
+            Api.submitUserValues($appState.token, system, values, true),
+            "Передача показаний...",
+        )
 
         if (result.success) {
             finalize()
 
         } else {
-            status.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
+            modal.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
             manual = true
 
         }
-        status.stopWaiting()
     }
 
     async function reportSubmission() {
-        status.startWaiting("Сохранение данных...")
-
-        const result = await Api.submitUserValues($appState.token, system, values)
+        const result = await modal.await(
+            Api.submitUserValues($appState.token, system, values),
+            "Сохранение данных...",
+        )
 
         if (result.success) {
             finalize()
 
         } else {
-            status.error("Не удалось сохранить данные. Это не страшно, если вы передали данные вручную.")
+            modal.error("Не удалось сохранить данные. Это не страшно, если вы передали данные вручную.")
 
         }
-        status.stopWaiting()
+    }
+
+    function back () {
+        appState.setSystemId(null)
     }
 
 </script>
 
-{#if (system?.id === $appState.system_id)}
-    {#if system !== null}
-        {#if provider !== null}
-            <div class="flex">
-                {#if $appState.mode !== `send`}
-                    <StaticDetail name="Поставщик" value={provider?.name} />
-                    <StaticDetail name="Период" value={period?.toString()} />
-                {/if}
-                {#each Object.entries(provider.values) as [id, value] (id)}
-                    {#if value.constant}
-                        {#if $appState.mode === `edit`}
-                            <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type} />
-                        {:else}
-                            <StaticDetail name={value.name} value={system.values[id]} />
-                        {/if}
-                    {:else if $appState.mode === `send`}
-                        <VariableDetail name={value.name} bind:value={input[id]} old={system.last?.values[id]} type={value.type}/>
-                    {/if}
-                {/each}
-            </div>
-            {#if $appState.mode === `edit`}
-                <div class="row-flex spacy-below" transition:slide>
-                    <button on:click={saveEdit} disabled={$status.waiting}>Сохранить</button>
-                    <button on:click={startRemoving} disabled={$status.waiting}>Удалить</button>
-                    <button on:click={stopEditing}>Отмена</button>
-                </div>
-            {:else if $appState.mode === `send`}
-                {#if !ready}
-                    <div class="large important center-text spacy-below" transition:slide>
-                        Заполните поля для показаний выше
-                    </div>
-                {/if}
-                {#if ready && offline}
-                    {#if DEFAULT_MANUAL}
-                        <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
-                    {/if}
-                    <SelectMethod {values} methods={provider.methods}/>
-                    <span class="spacy-below" transition:slide>После успешной передачи показаний нажмите "Сохранить".</span>
-                {/if}
-                <div class="row-flex spacy-below" transition:slide>
-                    {#if !offline}
-                        <button on:click={submitOnline} disabled={!ready || $status.waiting}>Отправить</button>
-                        <button on:click={setManual} disabled={!ready || $status.waiting}>Вручную</button>
+{#if system_id !== null && system !== null}
+    {#if provider !== null}
+        <div class="flex" bind:this={container}>
+            {#if mode !== `send`}
+                <StaticDetail name="Поставщик" value={provider?.name} />
+            {/if}
+            {#each Object.entries(provider.values) as [id, value], index (id)}
+                {#if value.constant}
+                    {#if mode === `edit`}
+                        <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type} priority={index}/>
                     {:else}
-                        <button on:click={reportSubmission} disabled={!ready || $status.waiting}>Сохранить</button>
+                        <StaticDetail name={value.name} value={system.values[id]} />
                     {/if}
-                    <button on:click={stopSending}>Отмена</button>
-                </div>
-            {:else}
-                <div class="row-flex spacy-below" transition:slide>
-                    <button on:click={startEditing}>Изменить</button>
-                    <button on:click={startSending}>Передать</button>
+                {:else if mode === `send`}
+                    <VariableDetail name={value.name} bind:value={input[id]} old={system.last?.values[id]} type={value.type} priority={index}/>
+                {/if}
+            {/each}
+        </div>
+        {#if mode === `edit`}
+            <div class="row-flex spacy-below" transition:slide>
+                <button on:click={saveEdit} disabled={$modal.waiting || !ready}>Сохранить</button>
+                <button on:click={startRemoving} disabled={$modal.waiting}>Удалить</button>
+                <button on:click={stopEditing}>◀ Отмена</button>
+            </div>
+        {:else if mode === `send`}
+            {#if !ready}
+                <div class="large important center-text spacy-below" transition:slide>
+                    Заполните поля для показаний выше
                 </div>
             {/if}
-
+            {#if ready && offline}
+                {#if DEFAULT_MANUAL}
+                    <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
+                {/if}
+                <SelectMethod {values} methods={provider.methods}/>
+                <span class="spacy-below" transition:slide>После успешной передачи показаний нажмите "Сохранить".</span>
+            {/if}
+            <div class="row-flex spacy-below" transition:slide>
+                {#if !offline}
+                    <button on:click={submitOnline} disabled={!ready || $modal.waiting}>Отправить</button>
+                    <button on:click={setManual} disabled={!ready || $modal.waiting}>Вручную</button>
+                {:else}
+                    <button on:click={reportSubmission} disabled={!ready || $modal.waiting}>Сохранить</button>
+                {/if}
+                <button on:click={stopSending}>◀ Отмена</button>
+            </div>
         {:else}
-            <span class="error" transition:slide>Неизвестный поставщик услуг</span>
-
+            <div class="row-flex spacy-below" transition:slide>
+                <button on:click={startSending}>Передать</button>
+                <button on:click={startEditing}>Изменить</button>
+                <button on:click={back}>◀ Назад</button>
+            </div>
         {/if}
+
+    {:else}
+        <span class="error" transition:slide>Неизвестный поставщик услуг</span>
 
     {/if}
 
