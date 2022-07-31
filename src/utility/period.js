@@ -15,7 +15,16 @@ const MONTHS = [
 
 export default class Period {
     static TYPES = {
-        MONTHLY : 0,
+        MONTHLY: 0,
+    }
+    
+    constructor(description = "MONTHLY:1,31") {
+        const [type, parameters] = description.split(":")
+        const [first, last] = parameters.split(",")
+        this.type = Period.TYPES[type]
+        this.reverse = this.first > this.last
+        this.first = +first
+        this.last = +last
     }
     
     static dayMonthString(date) {
@@ -28,15 +37,6 @@ export default class Period {
         return `${then.getDate()}`
     }
     
-    constructor(description = "MONTHLY:1,31") {
-        const [type, parameters] = description.split(":")
-        const [first, last] = parameters.split(",")
-        this.type = Period.TYPES[type]
-        this.reverse = this.first > this.last
-        this.first = +first
-        this.last = +last
-    }
-    
     toString() {
         if (this.type === Period.TYPES.MONTHLY) {
             return `С ${this.first} по ${this.last} число каждого месяца`
@@ -47,26 +47,27 @@ export default class Period {
     getPeriodForDate(date = Date.now(), breakByLast = false) {
         if (this.type === Period.TYPES.MONTHLY) {
             const then = new Date(+date)
-        
+            
             const first = new Date(date)
             first.setDate(this.first)
             first.setHours(0, 0, 0, 0)
-        
+            
             const last = new Date(date)
             last.setDate(this.last + 1)
             last.setHours(0, 0, 0, 0)
             
-            if (this.reverse)
+            if (this.reverse) {
                 first.setMonth(first.getMonth() - 1)
-        
+            }
+            
             while (breakByLast && last < then || !breakByLast && first < then) {
                 first.setMonth(first.getMonth() + 1)
                 last.setMonth(last.getMonth() + 1)
             }
-        
+            
             return {first, last}
         }
-    
+        
     }
     
     analyze(then = new Date().setMonth(new Date().getMonth() - 2)) {
@@ -94,11 +95,12 @@ export default class Period {
         const {first, last} = this.analyze(then)
         const now = new Date()
         
-        if (now > first)
+        if (now > first) {
             return `до ${Period.dayMonthString(last)}`
-        else if (first.getMonth() !== last.getMonth())
+        } else if (first.getMonth() !== last.getMonth()) {
             return `с ${Period.dayMonthString(first)} до ${Period.dayMonthString(last)}`
-        else
+        } else {
             return `с ${Period.dayString(first)} до ${Period.dayMonthString(last)}`
+        }
     }
 }

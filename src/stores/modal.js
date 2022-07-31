@@ -1,39 +1,41 @@
 import {writable} from "svelte/store"
 
-const DEFAULT_BUTTONS = [{
-    text: "Закрыть",
-    keyCodes: [13, 27, 32], //enter, esc, space
-    callback : null,
-}]
+const DEFAULT_BUTTONS = [
+    {
+        text: "Закрыть",
+        keyCodes: [13, 27, 32], //enter, esc, space
+        callback: null,
+    },
+]
 
 const {subscribe, update} = writable({
-    error : false,
-    errorMessage : "",
+    error: false,
+    errorMessage: "",
     
-    waiting : false,
-    waitingMessage : "",
+    waiting: false,
+    waitingMessage: "",
     
-    buttons : []
+    buttons: [],
 })
 
 const modal = {
     subscribe,
     
-    error (message = "", buttons = DEFAULT_BUTTONS) {
+    error(message = "", buttons = DEFAULT_BUTTONS) {
         update(state => ({
             ...state,
-            error : true,
-            errorMessage : message,
-            buttons
+            error: true,
+            errorMessage: message,
+            buttons,
         }))
     },
     
-    notify (message = "", buttons = DEFAULT_BUTTONS){
+    notify(message = "", buttons = DEFAULT_BUTTONS) {
         update(state => ({
             ...state,
-            asking : true,
-            askingMessage : message,
-            buttons
+            asking: true,
+            askingMessage: message,
+            buttons,
         }))
         
     },
@@ -41,29 +43,29 @@ const modal = {
     close(callback) {
         update(state => ({
             ...state,
-            error : false,
-            asking : false,
+            error: false,
+            asking: false,
         }))
         
         callback?.()
     },
     
-    startWaiting (message = "") {
+    startWaiting(message = "") {
         update(state => ({
             ...state,
-            waiting : true,
-            waitingMessage : message,
+            waiting: true,
+            waitingMessage: message,
         }))
     },
     
-    stopWaiting () {
+    stopWaiting() {
         update(state => ({
             ...state,
-            waiting : false,
+            waiting: false,
         }))
     },
     
-    async await(promise, message= "Ожидание...") {
+    async await(promise, message = "Ожидание...") {
         this.startWaiting(message)
         const result = await promise
         this.stopWaiting()

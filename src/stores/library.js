@@ -4,8 +4,8 @@ import modal from "./modal.js"
 import Serializer from "../utility/serializer.js"
 
 let library = {
-    cities : {},
-    providers : {},
+    cities: {},
+    providers: {},
 }
 
 export default library

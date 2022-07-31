@@ -13,38 +13,35 @@
 }
 
 :root {
-    --background : #CCEEFF;
-    --text-color : #000000;
-    --link-color : #003366;
+    --background: #C0C2C4;
+    --text-color: #000000;
+    --link-color: #003366;
 
-    /*--login-background : url("../resources/login_bg_wip.jpg");*/
-
-    --element-background : #00000066;
-    --element-text-color : #FFFFFF;
-    --disabled-element-background : #00000033;
-    --disabled-element-text-color : #777777;
-    --input-placeholder-color : #FFFFFF99;
+    --element-background: #737476;
+    --element-text-color: #FFFFFF;
+    --disabled-element-background: #9A9B9D;
+    --disabled-element-text-color: #777777;
+    --input-placeholder-color: #C7C7C8;
 
     --status-ok-color: #008800;
     --status-error-color: #880000;
 
-    --font-size : 18px;
+    --font-size: 18px;
 
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background : #0E303D;
-        /*--login-background : url("../resources/login_bg.jpg");*/
+        --background: #0E303D;
 
-        --text-color : #FFFFFF;
-        --link-color : #99CCFF;
-        --element-background : #00000066;
-        --element-text-color : #FFFFFF;
+        --text-color: #FFFFFF;
+        --link-color: #99CCFF;
+        --element-background: #081D25;
+        --element-text-color: #FFFFFF;
 
-        --disabled-element-background : #00000033;
-        --disabled-element-text-color : #777777;
-        --input-placeholder-color : #FFFFFF99;
+        --disabled-element-background: #0B2631;
+        --disabled-element-text-color: #777777;
+        --input-placeholder-color: #6B7777;
 
         --status-ok-color: #44CC44;
         --status-error-color: #CC4444;
@@ -52,15 +49,15 @@
 }
 
 html, body {
-    padding : 0;
-    margin : 0;
-    width : 100vw;
-    height : 100vh;
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
 
     font: var(--font-size) Exo2, sans-serif;
-    background-color : var(--background);
-    color : var(--text-color);
-    overflow : hidden auto;
+    background-color: var(--background);
+    color: var(--text-color);
+    overflow: hidden auto;
 }
 
 div#app {
@@ -71,12 +68,12 @@ div.wrapper {
 }
 
 div.flex {
-    display : flex;
+    display: flex;
     flex-direction: column;
 }
 
 div.row-flex {
-    display : flex;
+    display: flex;
     flex-direction: row;
     column-gap: 10px;
 }
@@ -86,7 +83,7 @@ div.flex.centered {
 }
 
 div.flex.spaced {
-    row-gap : 20px;
+    row-gap: 20px;
 }
 
 div.central {
@@ -106,10 +103,10 @@ div.top-central {
 div.fullscreen-container {
     background-color: #00000088;
     position: fixed;
-    left :0;
-    top : 0;
-    width : 100vw;
-    height : 100vh;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
 
     display: flex;
     align-items: center;
@@ -117,13 +114,13 @@ div.fullscreen-container {
 }
 
 div.dialog {
-    display : flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     row-gap: 20px;
-    min-width : 300px;
-    min-height : 200px;
-    padding : 20px;
+    min-width: 300px;
+    min-height: 200px;
+    padding: 20px;
     justify-content: space-around;
     background-color: var(--background);
 }
@@ -145,11 +142,11 @@ div.dialog {
 }
 
 .large {
-    font-size : x-large;
+    font-size: x-large;
 }
 
 .font-high {
-    height : var(--font-size);
+    height: var(--font-size);
 }
 
 .nowrap {
@@ -160,28 +157,32 @@ button, input {
     font: var(--font-size) Exo2, sans-serif;
     background-color: var(--element-background);
     color: var(--element-text-color);
-    border : 0;
-    padding : 5px 10px 8px;
-    border-radius : 30px;
+    border: 0;
+    padding: 5px 10px 8px;
+    border-radius: 30px;
+}
+
+input::placeholder {
+    color: var(--input-placeholder-color);
 }
 
 a {
-    color : var(--link-color);
-    cursor : pointer;
+    color: var(--link-color);
+    cursor: pointer;
 }
 
 button {
-    cursor : pointer;
+    cursor: pointer;
 }
 
 button.large input.large {
-    padding : 9px 14px 12px;
+    padding: 9px 14px 12px;
 }
 
 button:disabled {
     background-color: var(--disabled-element-background);
     color: var(--disabled-element-text-color);
-    cursor : default;
+    cursor: default;
 }
 
 .debug {
@@ -190,9 +191,9 @@ button:disabled {
     opacity: 0.2;
     font-size: 20px;
     pointer-events: none;
-    z-index:100;
+    z-index: 100;
 }
 
 .debug.bottom {
-    bottom : 0;
+    bottom: 0;
 }

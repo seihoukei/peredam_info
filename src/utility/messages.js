@@ -1,13 +1,13 @@
-export function success (data) {
+export function success(data) {
     return {
         data,
-        success : true
+        success: true,
     }
 }
 
-export function failure (error) {
+export function failure(error) {
     return {
         error,
-        success : false,
+        success: false,
     }
 }

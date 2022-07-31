@@ -1,0 +1,56 @@
+<script>
+    import LoginPrompt from "../../elements/LoginPrompt.svelte"
+    import {createEventDispatcher} from "svelte"
+    import {fly, slide} from "svelte/transition"
+    import Transitions from "../../../../utility/transitions.js"
+
+    export let login
+    export let password
+
+    let first = ""
+    let repeat = false
+
+    let hint = "Новый пароль"
+
+    const dispatch = createEventDispatcher()
+
+    function proceed() {
+        if (first === "") {
+            first = password
+            hint = "Повторите пароль"
+            password = ""
+        } else {
+            if (first === password) {
+                dispatch("submit")
+            } else {
+                repeat = true
+                first = ""
+                password = ""
+                hint = "Новый пароль"
+            }
+        }
+    }
+
+    function cancel() {
+        dispatch("cancel")
+    }
+
+</script>
+
+<div class="central centered spaced flex container" transition:fly={Transitions.loginFlyRight}>
+    {#key first}
+        <LoginPrompt type="password" on:submit={proceed} bind:value={password} {login} autocomplete="new-password"
+                     hint={hint} minLength=6>
+            {#if first === "" && !repeat}
+                <div class="center-text" transition:slide|local>
+                    Введите новый пароль для пользователя <span class="nowrap">{login}</span>:
+                </div>
+            {:else if first === ""}
+                <div class="center-text" transition:slide|local>Введеные пароли не совпали, попробуйте ещё раз:</div>
+            {:else}
+                <div class="center-text" transition:slide|local>Введите тот же самый пароль ещё раз для проверки:</div>
+            {/if}
+        </LoginPrompt>
+    {/key}
+    <button on:click={cancel}>◀ Другой пользователь</button>
+</div>

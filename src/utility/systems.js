@@ -13,14 +13,15 @@ export default class Systems {
             const aDate = dateMap.get(a)
             const bDate = dateMap.get(b)
             
-            if (aDate.first < now && bDate.first < now)
+            if (aDate.first < now && bDate.first < now) {
                 return aDate.last - bDate.last
-            else if (aDate.first < now)
+            } else if (aDate.first < now) {
                 return -1
-            else if (bDate.first < now)
+            } else if (bDate.first < now) {
                 return 1
-            else
+            } else {
                 return aDate.first - bDate.first || aDate.last - bDate.last
+            }
         }
     }
     

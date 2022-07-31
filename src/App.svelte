@@ -1,16 +1,18 @@
 <script>
-    import UserMain from "./forms/user/UserMain.svelte"
-    import LoginSequence from "./forms/login-sequence/LoginSequence.svelte"
-    import AnonymousMain from "./forms/anonymous/AnonymousMain.svelte"
-    import ModalDialog from "./forms/common/ModalDialog.svelte"
-    import KnowledgeBase from "./forms/knowledge/KnowledgeBase.svelte"
-    import Welcome from "./forms/welcome/Welcome.svelte"
-    import Error from "./forms/login-sequence/elements/Error.svelte"
+    import UserMain from "components/user/UserMain.svelte"
+    import LoginSequence from "components/login-sequence/LoginSequence.svelte"
+    import AnonymousMain from "components/anonymous/AnonymousMain.svelte"
+    import ModalDialog from "components/common/ModalDialog.svelte"
+    import KnowledgeBase from "components/knowledge/KnowledgeBase.svelte"
+    import Welcome from "components/welcome/Welcome.svelte"
+    import Error from "components/login-sequence/elements/Error.svelte"
 
-    import Api from "./utility/api.js"
-    import {libraryReady, loadLibrary} from "./stores/library.js"
-    import appState from "./stores/app-state.js"
     import {onMount} from "svelte"
+
+    import {libraryReady, loadLibrary} from "stores/library.js"
+    import appState from "stores/app-state.js"
+
+    import Api from "utility/api.js"
 
     let attempt = 0
 
@@ -29,8 +31,9 @@
     }
 
     async function loadUser(token) {
-        if (!$libraryReady)
+        if (!$libraryReady) {
             await loadLibrary
+        }
 
         appState.restorePageData(page)
 
@@ -44,16 +47,16 @@
 {/if}
 
 {#if !isAnonymousPage && token === ""}
-    <LoginSequence />
+    <LoginSequence/>
 
 {:else}
     {#await loading}
-        <Welcome />
+        <Welcome/>
 
     {:then result}
         {#if isAnonymousPage}
             {#if page === 'anon'}
-                <AnonymousMain />
+                <AnonymousMain/>
 
             {:else if page === 'info'}
                 info stub
@@ -61,10 +64,10 @@
             {/if}
 
         {:else if result?.success}
-            <UserMain user={{systems:result.data}} />
+            <UserMain user={{systems:result.data}}/>
 
         {:else}
-            <Error message={result?.error ?? "Ошибка связи"} on:click={retry} />
+            <Error message={result?.error ?? "Ошибка связи"} on:click={retry}/>
 
         {/if}
 
@@ -72,5 +75,5 @@
 
 {/if}
 
-<KnowledgeBase />
-<ModalDialog />
+<KnowledgeBase/>
+<ModalDialog/>

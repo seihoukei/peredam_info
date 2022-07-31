@@ -7,47 +7,49 @@ export default class Serializer {
     static DATA_TYPES = {
         NULL: 0x00,
         EMPTY: 0x0F,
-
+        
         ARRAY: 0x10,
         ARRAY_EMPTY: 0x1F,
-
+        
         OBJECT: 0x20,
         OBJECT_EMPTY: 0x2F,
-
+        
         NUMBER: 0x30,
         NUMBER_INTEGER: 0x38,
         NUMBER_ZERO: 0x3F,
-
+        
         STRING: 0x40,
         STRING_EMPTY: 0x4F,
-
+        
         BOOLEAN_FALSE: 0x50,
         BOOLEAN_TRUE: 0x51,
-
+        
         OBJECT_REFERENCE: 0x60,
         ARRAY_HOLE: 0x70,
     }
-
+    
     static #writeFloat(state, data) {
         floatArray.set([data])
-        for (let char of charFloatArray)
+        for (let char of charFloatArray) {
             state.stream += String.fromCharCode(char)
+        }
     }
-
+    
     static #writeInteger(state, data) {
         do {
             let char = data & 127
             data = data >> 7
-            if (data > 0)
+            if (data > 0) {
                 char += 128
+            }
             state.stream += String.fromCharCode(char)
         } while (data > 0)
     }
-
+    
     static #writeType(state, type) {
         state.stream += String.fromCharCode(type)
     }
-
+    
     static #storeReference(state, data) {
         const reference = state.objectIds.get(data)
         if (reference !== undefined) {
@@ -55,12 +57,12 @@ export default class Serializer {
             this.#writeInteger(state, reference)
             return true
         }
-
+        
         state.objects.push(data)
         state.objectIds.set(data, state.objects.length - 1)
         return false
     }
-
+    
     static #storeName(state, name) {
         const id = state.nameIds[name]
         if (id !== undefined) {
@@ -71,52 +73,52 @@ export default class Serializer {
         state.nameIds[name] = state.names.length - 1
         this.#writeInteger(state, state.names.length - 1)
     }
-
+    
     static #serializeElement(state, data) {
         if (data === null) {
             this.#serializeNull(state, data)
-
+            
         } else if (data === undefined) {
             this.#serializeEmpty(state, data)
-
+            
         } else if (typeof data === "string") {
             this.#serializeString(state, data)
-
+            
         } else if (typeof data === "number") {
             this.#serializeNumber(state, data)
-
+            
         } else if (typeof data === "boolean") {
             this.#serializeBoolean(state, data)
-
+            
         } else if (typeof data === "object" && data instanceof Array) {
             this.#serializeArray(state, data)
-
+            
         } else if (typeof data === "object") {
             this.#serializeObject(state, data)
-
+            
         }
     }
-
+    
     static #serializeNull(state, data) {
         this.#writeType(state, this.DATA_TYPES.NULL)
     }
-
+    
     static #serializeEmpty(state, data) {
         this.#writeType(state, this.DATA_TYPES.EMPTY)
     }
-
+    
     static #serializeString(state, data) {
         if (data.length === 0) {
             this.#writeType(state, this.DATA_TYPES.STRING_EMPTY)
             return
         }
-
+        
         this.#writeType(state, this.DATA_TYPES.STRING)
         this.#writeInteger(state, data.length)
-
+        
         state.stream += data
     }
-
+    
     static #serializeNumber(state, data) {
         if (data === 0) {
             this.#writeType(state, this.DATA_TYPES.NUMBER_ZERO)
@@ -128,26 +130,28 @@ export default class Serializer {
             this.#writeFloat(state, data)
         }
     }
-
+    
     static #serializeBoolean(state, data) {
-        if (data)
+        if (data) {
             this.#writeType(state, this.DATA_TYPES.BOOLEAN_TRUE)
-        else
+        } else {
             this.#writeType(state, this.DATA_TYPES.BOOLEAN_FALSE)
+        }
     }
-
+    
     static #serializeArray(state, data) {
-        if (this.#storeReference(state, data))
+        if (this.#storeReference(state, data)) {
             return
-
+        }
+        
         if (data.length === 0) {
             this.#writeType(state, this.DATA_TYPES.ARRAY_EMPTY)
             return
         }
-
+        
         this.#writeType(state, this.DATA_TYPES.ARRAY)
         this.#writeInteger(state, data.length)
-
+        
         let hole = 0
         for (let i = 0; i < data.length; i++) {
             const element = data[i]
@@ -161,10 +165,11 @@ export default class Serializer {
             }
             this.#serializeElement(state, data[i])
         }
-        if (hole > 0)
+        if (hole > 0) {
             this.#serializeArrayHole(state, hole)
+        }
     }
-
+    
     static #serializeArrayHole(state, data) {
         if (data === 1) {
             this.#serializeEmpty(0, state)
@@ -173,72 +178,74 @@ export default class Serializer {
         this.#writeType(state, this.DATA_TYPES.ARRAY_HOLE)
         this.#writeInteger(state, data)
     }
-
+    
     static #serializeObject(state, data) {
-        if (this.#storeReference(state, data))
+        if (this.#storeReference(state, data)) {
             return
-
+        }
+        
         const entries = Object.entries(data)
         if (entries.length === 0) {
             this.#writeType(state, this.DATA_TYPES.OBJECT_EMPTY)
             return
         }
-
+        
         this.#writeType(state, this.DATA_TYPES.OBJECT)
         this.#writeInteger(state, entries.length)
-
+        
         for (let [name, entry] of entries) {
             this.#storeName(state, name)
             this.#serializeElement(state, entry)
         }
     }
-
+    
     static #readString(state, length) {
         const result = state.stream.slice(state.pointer, state.pointer + length)
         state.pointer += length
         return result
     }
-
+    
     static #readByte(state) {
         const char = state.stream.charCodeAt(state.pointer)
         state.pointer++
         return char
     }
-
+    
     static #checkByte(state) {
         return state.stream.charCodeAt(state.pointer)
     }
-
+    
     static #readInteger(state) {
         let value = 0, char = 255, shift = 0
         while (char > 127) {
             char = this.#readByte(state)
-
+            
             value |= (char & 127) << shift
             shift += 7
         }
         return value
     }
-
+    
     static #readFloat(state) {
         for (let i = 0; i < charFloatArray.length; i++) {
             charFloatArray[i] = this.#readByte(state)
         }
         return floatArray[0]
     }
-
+    
     static #checkVersion(state) {
         const header = this.#readString(state, 4)
-        if (header !== this.HEADER)
+        if (header !== this.HEADER) {
             return false
+        }
         return this.#readInteger(state)
     }
-
+    
     static #storeObject(state, object) {
         state.objects.push(object)
         return object
     }
-
+    
     static #deserializeArray(state) {
         const length = this.#readInteger(state)
         const array = new Array(length)
@@ -252,12 +259,13 @@ export default class Serializer {
                 continue
             }
             const element = this.#deserializeElement(state)
-            if (element !== undefined)
+            if (element !== undefined) {
                 array[i] = element
+            }
         }
         return array
     }
-
+    
     static #deserializeObject(state) {
         const length = this.#readInteger(state)
         const object = {}
@@ -269,20 +277,20 @@ export default class Serializer {
         }
         return object
     }
-
+    
     static #deserializeString(state) {
         const length = this.#readInteger(state)
         return this.#readString(state, length)
     }
-
+    
     static #deserializeObjectReference(state) {
         const id = this.#readInteger(state)
         return state.objects[id]
     }
-
+    
     static #deserializeElement(state) {
         const type = this.#readByte(state)
-
+        
         switch (type) {
             case this.DATA_TYPES.NULL:
                 return null
@@ -314,7 +322,7 @@ export default class Serializer {
                 return this.#deserializeObjectReference(state)
         }
     }
-
+    
     static serialize(data) {
         const state = {
             nameIds: {},
@@ -323,39 +331,39 @@ export default class Serializer {
             objects: [],
             stream: "",
         }
-
+        
         this.#serializeElement(state, data)
         state.data = state.stream
         state.stream = ""
-
+        
         this.#serializeArray(state, state.names)
         state.init = state.stream
         state.stream = ""
-
+        
         this.#writeInteger(state, this.VERSION)
-
+        
         return `${this.HEADER}${state.stream}${state.init}${state.data}`
     }
-
+    
     static deserialize(data) {
         const state = {
-            stream : data,
-            pointer : 0,
-            names : [],
-            objects : [],
+            stream: data,
+            pointer: 0,
+            names: [],
+            objects: [],
         }
-
+        
         const version = this.#checkVersion(state)
         if (version !== this.VERSION) {
             if (version === false) {
-                throw new Error ("Invalid Serializer data")
+                throw new Error("Invalid Serializer data")
             }
             console.warn("Serialized data from different version of Serializer detected")
         }
-
+        
         state.names = this.#deserializeElement(state)
         state.objects = []
-
+        
         return this.#deserializeElement(state)
     }
 }

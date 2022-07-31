@@ -4,37 +4,43 @@ import fillTemplate from "./template.js"
 import library from "../stores/library.js"
 
 let apiServer = "https://dev-api.peredam.info/"
-if (import.meta.env.MODE === "development")
+if (import.meta.env.MODE === "development") {
     apiServer = "http://localhost:5174/"
-if (new URL(window.location).origin === "https://peredam.info" )
+}
+if (new URL(window.location).origin === "https://peredam.info") {
     apiServer = "https://api.peredam.info/"
+}
 
 export default class Api {
     static server = apiServer
     static library = `${apiServer}library/library.json`
+    static isManualByDefault = apiServer === "https://api.peredam.info/"
     
-    static #apiUrl (address) {
+    static #apiUrl(address) {
         return `${this.server}${address}`
     }
     
     static async #call(api, data) {
         const result = await Web.getJSONData(this.#apiUrl(api), data, true)
-
-//        console.log(result)
+        
+        if (import.meta.env.MODE === "development") {
+            console.log(api, data, {...result})
+        }
+        
         if (result?.success !== true) {
             return failure(result?.error ?? "Неизвестная ошибка")
         }
-
+        
         return result
     }
     
     static async #get(api) {
         const result = await Web.getJSONData(this.#apiUrl(api))
-
+        
         if (result.error) {
             return failure(result?.error ?? "Неизвестная ошибка")
         }
-
+        
         return success(result)
     }
     
@@ -51,28 +57,29 @@ export default class Api {
     
     static async loginExists(login) {
         return await this.#call("auth/login_exists", {
-            login
+            login,
         })
     }
     
     static async logIn(login, password) {
         return await this.#call("auth/login", {
-            login, password
+            login, password,
         })
     }
     
     static async register(login, password) {
         return await this.#call("auth/register", {
-            login, password
+            login, password,
         })
     }
     
     static async getUserSystems(token = null) {
-        if (!token)
+        if (!token) {
             return failure()
+        }
         
         const result = await this.#call("systems/list", {
-            token
+            token,
         })
         
         if (result.success) {
@@ -81,34 +88,35 @@ export default class Api {
                     id: +record.id,
                     provider_id: +record.provider_id,
                     values: JSON.parse(record.values),
-                    last : record.last_values ? {
-                        date : record.last_date * 1000,
-                        values : JSON.parse(record.last_values),
-                    } : null
+                    last: record.last_values ? {
+                        date: record.last_date * 1000,
+                        values: JSON.parse(record.last_values),
+                    } : null,
                 }))
             } catch (e) {
                 return failure("Неизвестная ошибка")
             }
         }
-
+        
         return result
     }
     
     static async getProviderRecords(token, page = 0) {
-        if (!token)
+        if (!token) {
             return failure()
-    
+        }
+        
         const result = await this.#call("provider/list", {
             token,
-            page
+            page,
         })
-    
+        
         if (result.success) {
             try {
                 const template = library.providers[result.data.provider_id].providerData.viewTemplate
                 result.data.records = result.data.records.map(record => ({
                     date: record.date,
-                    type : record.type,
+                    type: record.type,
                     record: fillTemplate(template, JSON.parse(record.values)),
                 }))
             } catch (e) {
@@ -117,57 +125,60 @@ export default class Api {
         }
         return result
     }
-
-    static async addSystem(token, system) {
-        if (!token)
-            return failure()
     
+    static async addSystem(token, system) {
+        if (!token) {
+            return failure()
+        }
+        
         return await this.#call("systems/add", {
             token,
-            system : {
-                provider_id : system.provider_id,
-                values : JSON.stringify(system.values)
-            }
+            system: {
+                provider_id: system.provider_id,
+                values: JSON.stringify(system.values),
+            },
         })
     }
     
     static async updateSystem(token, id, values) {
-        if (!token)
+        if (!token) {
             return failure()
-    
+        }
+        
         return await this.#call("systems/update", {
             token,
-            system : {
+            system: {
                 id,
-                values : JSON.stringify(values)
-            }
+                values: JSON.stringify(values),
+            },
         })
     }
     
     static async removeSystem(token, id) {
-        if (!token)
+        if (!token) {
             return failure()
-    
+        }
+        
         return await this.#call("systems/remove", {
-            token, id
+            token, id,
         })
     }
     
     static async submitUserValues(token, system, values, queue = false) {
         return await this.#call("submit/user", {
             token,
-            system_id : system.id,
-            provider_id : system.provider_id,
-            values : JSON.stringify(values),
-            queue
+            system_id: system.id,
+            provider_id: system.provider_id,
+            values: JSON.stringify(values),
+            queue,
         })
     }
     
     static async submitAnonymousValues(provider_id, values, queue = false) {
         return await this.#call("submit/anonymous", {
             provider_id,
-            values : JSON.stringify(values),
-            queue
+            values: JSON.stringify(values),
+            queue,
         })
     }
 }
