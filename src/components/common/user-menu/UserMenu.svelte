@@ -19,15 +19,16 @@
     }
 </script>
 
-<div class="flex spacy-below" use:clickOutside on:click_outside={hideMenu}>
-    <div class="row-flex">
+<div class="centered spacy-below flex" use:clickOutside on:click_outside={hideMenu}>
+    <div class="spacy-below row-flex">
         <button on:click={toggleMenu}>☰</button>
         <span class="large username">{username}</span>
 
     </div>
 
     {#if showMenu}
-        <div class="spaced flex" transition:slide on:click={hideMenu}>
+        <div class="spaced centered flex" transition:slide on:click={hideMenu}>
+<!--
             <PageButton page="user">
                 Управление показаниями
             </PageButton>
@@ -35,6 +36,7 @@
             <PageButton page="conf">
                 Настройки уведомлений
             </PageButton>
+-->
 
             <LogoutButton/>
 

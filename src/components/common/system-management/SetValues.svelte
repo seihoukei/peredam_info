@@ -34,7 +34,7 @@
 {#if provider !== null}
     <div class="centered flex">
         {#if !isInputReady}
-            <div class="important large spacy-below" transition:slide>
+            <div class="important large center-text spacy-below" transition:slide>
                 Заполните обязательные поля:
             </div>
         {/if}

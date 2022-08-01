@@ -39,7 +39,7 @@
 
         --text-color: #FFFFFF;
         --link-color: #99CCFF;
-        --important-color: #FFFF88;
+        --important-color: #EEFF88;
 
         --element-background: #081D25;
         --element-text-color: #FFFFFF;
@@ -129,6 +129,8 @@ div.dialog {
     padding: 20px;
     justify-content: space-around;
     background-color: var(--background);
+    max-height: 90vh;
+    overflow: hidden auto;
 }
 
 .relative {

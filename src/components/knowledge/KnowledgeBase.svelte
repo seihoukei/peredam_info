@@ -3,22 +3,7 @@
 
     import Transitions from "utility/transitions.js"
     import appState from "stores/app-state.js"
-
-    const PAGES = {
-        'anon' : 'Анонимная передача - Выбор города',
-        'anon/city' : 'Анонимная передача - Выбор поставщика',
-        'anon/prov' : 'Анонимная передача - Заполнение данных и передача',
-        'user' : 'Список систем',
-        'user/sys' : 'Просмотр системы',
-        'user/sys/edit' : 'Правка системы',
-        'user/sys/send' : 'Передача показаний',
-        'add' : 'Добавление - Выбор города',
-        'add/city' : 'Добавление - Выбор поставщика',
-        'add/prov' : 'Добавление - Заполнение данных пользователя',
-        'info' : 'Информация',
-        'conf' : 'Настройки',
-        'read' : 'Просмотр показаний для поставщика',
-    }
+    import HelpPages from "help/help-pages.js"
 
     $: helpPage = $appState.helpPage
 
@@ -30,9 +15,9 @@
 {#if helpPage !== ``}
     <div class="fullscreen-container" transition:fade={Transitions.fastFade}>
         <div class="dialog">
-            Здесь будет помощь по текущей странице
+            Помощь по текущей странице
 
-            <div>{PAGES[helpPage] ?? helpPage}</div>
+            <div>{@html HelpPages.get(helpPage)}</div>
 
             <button on:click={close}>Закрыть</button>
 

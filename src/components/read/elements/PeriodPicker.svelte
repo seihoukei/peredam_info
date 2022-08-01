@@ -1,5 +1,5 @@
 <script>
-    import DatePicker from "components/user/provider/elements/DatePicker.svelte"
+    import DatePicker from "components/read/elements/DatePicker.svelte"
 
     export let start = Date()
     export let end = Date()

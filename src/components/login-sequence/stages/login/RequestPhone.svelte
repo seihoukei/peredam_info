@@ -6,7 +6,7 @@
 
     import appState from "stores/app-state.js"
 
-    import {failure, success} from "utility/messages.js"
+    import Messages from "utility/messages.js"
     import Transitions from "utility/transitions.js"
 
     const dispatch = createEventDispatcher()
@@ -29,14 +29,14 @@
 
     function checkPhone() {
         if (phone.slice(2).length < 5) {
-            return failure("Слишком короткий номер")
+            return Messages.failure("Слишком короткий номер")
         }
 
         if (phone.slice(2).length > 11) {
-            return failure("Слишком длинный номер")
+            return Messages.failure("Слишком длинный номер")
         }
 
-        return success()
+        return Messages.success()
     }
 
 </script>

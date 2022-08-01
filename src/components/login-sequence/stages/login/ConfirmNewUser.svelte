@@ -38,7 +38,7 @@
         <a href="/agreement/personal.html"
            rel="noopener noreferrer"
            target="_blank" >обработку персональных данных</a>
-        
+
         и задать пароль.</p>
 
     <label>

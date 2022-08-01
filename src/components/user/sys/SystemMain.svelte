@@ -89,9 +89,11 @@
         if (confirmation !== null) {
             modal.notify(confirmation, [{
                     text: "Всё равно передать",
+                    keyCodes: [13, 32],
                     callback: null,
                 }, {
                     text: "Отмена",
+                    keyCodes: [27],
                     callback: cancel,
                 }])
         }
@@ -105,9 +107,11 @@
         modal.notify("После удаления систему невозможно восстановить!", [
             {
                 text: "Всё равно удалить",
+                keyCodes: [13,32],
                 callback: remove,
             }, {
                 text: "Отмена",
+                keyCodes: [27],
                 callback: null,
             },
         ])
@@ -199,6 +203,16 @@
 </script>
 
 {#if system_id !== null && system !== null}
+    {#if mode === ``}
+        <div class="large important spacy-below center-text" transition:slide>
+            Проверьте данные и выберите действие
+        </div>
+    {:else if mode === `edit`}
+        <div class="large important spacy-below center-text" transition:slide>
+            Уточните данные или удалите систему
+        </div>
+    {/if}
+
     {#if provider !== null}
         <div class="flex">
             {#if mode !== `send`}

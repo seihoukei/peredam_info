@@ -1,7 +1,7 @@
 <script>
     import {createEventDispatcher, onDestroy, onMount} from "svelte"
 
-    import {failure, success} from "utility/messages.js"
+    import Messages from "utility/messages.js"
     import FocusWatcher from "utility/focus-watcher.js"
 
     const dispatch = createEventDispatcher()
@@ -12,7 +12,7 @@
     export let hint = ""
     export let minLength = 5
     export let maxLength = 32
-    export let extraCheck = success()
+    export let extraCheck = Messages.success()
     export let login = ""
     export let autocomplete = ""
 
@@ -27,18 +27,18 @@
 
     function validate(value) {
         if (!extraCheck.success) {
-            return failure(extraCheck.error)
+            return Messages.failure(extraCheck.error)
         }
 
         if (value.length < minLength) {
-            return failure(`Введите хотя бы ${minLength} символов`)
+            return Messages.failure(`Введите хотя бы ${minLength} символов`)
         }
 
         if (value.length > maxLength) {
-            return failure(`Введите не более ${maxLength} символов`)
+            return Messages.failure(`Введите не более ${maxLength} символов`)
         }
 
-        return success()
+        return Messages.success()
     }
 
     function submit() {
@@ -54,7 +54,7 @@
 </script>
 
 <div class="flex centered spaced container">
-    <span class="large center-text prompt"><slot/></span>
+    <span class="large center-text important prompt"><slot/></span>
 
     <form on:submit|preventDefault={submit}>
         <div class="input row-flex centered">

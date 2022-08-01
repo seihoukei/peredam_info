@@ -60,6 +60,7 @@ export default defineConfig({
 		  'components': path.resolve('./src/components'),
 		  'utility': path.resolve('./src/utility'),
 		  'stores': path.resolve('./src/stores'),
+		  'help': path.resolve('./src/help'),
 		  'events': path.resolve('./src/events')
 	  }
 	}

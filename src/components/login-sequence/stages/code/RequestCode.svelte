@@ -19,7 +19,7 @@
 </script>
 
 <div class="centered central spaced flex" transition:fly={Transitions.loginFlyRight}>
-    <div class="large center-text" transition:slide|local>
+    <div class="large important center-text" transition:slide|local>
         Введите код для быстрого входа как
         <span class="nowrap">{login}</span>:
     </div>

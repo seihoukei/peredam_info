@@ -6,12 +6,12 @@
     import {createEventDispatcher} from "svelte"
     import {slide} from "svelte/transition"
 
-    import modal from "stores/modal.js"
-    import library from "stores/library.js"
-    import appState from "stores/app-state.js"
+    import modal from "stores/modal"
+    import library from "stores/library"
+    import appState from "stores/app-state"
 
-    import Api from "utility/api.js"
-    import Values from "utility/values.js"
+    import Api from "utility/api"
+    import Values from "utility/values"
 
     const dispatch = createEventDispatcher()
     // add (newSystem) - to notify userMain that system was succesfully added and should be displayed

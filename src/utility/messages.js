@@ -1,13 +1,15 @@
-export function success(data) {
-    return {
-        data,
-        success: true,
+export default class Messages {
+    static success(data) {
+        return {
+            data,
+            success: true,
+        }
     }
-}
-
-export function failure(error) {
-    return {
-        error,
-        success: false,
+    
+    static failure(error) {
+        return {
+            error,
+            success: false,
+        }
     }
 }

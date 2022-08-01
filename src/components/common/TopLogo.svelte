@@ -1,17 +1,29 @@
 <script>
     import appState from "stores/app-state.js"
 
+    export let loginState = null
+
     function help() {
-        appState.setHelpPage(`${
-            $appState.page
-        }${
-            $appState.system_id !== null ? "/sys" :
-            $appState.provider_id !== null ? "/prov" :
-            $appState.city_id !== null ? "/city" :
-            ""
-        }${
-            $appState.mode ? `/${$appState.mode}` : ""
-        }`)
+        if (loginState) {
+            appState.setHelpPage(`login/${
+                loginState.stage
+            }${
+                loginState.isNewUser && loginState.stage !== `code` ? `/new` : ``
+            }${
+                loginState.tokens.current ? `/set` : ``
+            }`)
+        } else {
+            appState.setHelpPage(`${
+                $appState.page
+            }${
+                $appState.system_id ? "/sys" :
+                $appState.provider_id ? "/prov" :
+                $appState.city_id ? "/city" :
+                ""
+            }${
+                $appState.mode ? `/${$appState.mode}` : ""
+            }`)
+        }
     }
 
 </script>
@@ -27,7 +39,7 @@
 
 <style>
     img.logo {
-        padding: 30px 0;
+        padding: 30px 0 20px;
         height: 70px;
     }
 

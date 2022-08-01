@@ -1,10 +1,10 @@
 <script>
     import {slide} from "svelte/transition"
 
-    import library from "stores/library.js"
-    import appState from "stores/app-state.js"
+    import library from "stores/library"
+    import appState from "stores/app-state"
 
-    import Period from "utility/period.js"
+    import Period from "utility/period"
 
     export let system = {}
 

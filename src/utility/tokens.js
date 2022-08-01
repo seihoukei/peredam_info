@@ -1,7 +1,7 @@
 import CryptoJS from "crypto-js/core.js"
 import AES from "crypto-js/aes.js"
 
-import {failure, success} from "utility/messages.js"
+import Messages from "utility/messages.js"
 
 export default class Tokens {
     static store(tokens) {
@@ -24,7 +24,7 @@ export default class Tokens {
     
     static encrypt(decrypted, code) {
         const string = `encode(${decrypted}, ${code})`
-        return success(AES.encrypt(string, code).toString())
+        return Messages.success(AES.encrypt(string, code).toString())
     }
     
     static decrypt(encrypted, code) {
@@ -33,17 +33,17 @@ export default class Tokens {
             const match = string.match(/^encode\((?<data>.*), (?<code>.*)\)/)
             
             if (!match) {
-                return failure()
+                return Messages.failure()
             }
             
             const data = match.groups
             if (data.code !== code) {
-                return failure()
+                return Messages.failure()
             }
             
-            return success(data.data)
+            return Messages.success(data.data)
         } catch (e) {
-            return failure("Неправильный код")
+            return Messages.failure("Неправильный код")
         }
     }
     

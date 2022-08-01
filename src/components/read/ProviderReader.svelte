@@ -1,10 +1,10 @@
 <script>
     import UserMenu from "components/common/user-menu/UserMenu.svelte"
 
-    import library from "stores/library.js"
-    import appState from "stores/app-state.js"
+    import library from "stores/library"
+    import appState from "stores/app-state"
 
-    import Api from "utility/api.js"
+    import Api from "utility/api"
 
     let listPage = 0
 

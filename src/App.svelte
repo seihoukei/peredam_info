@@ -1,7 +1,7 @@
 <script>
     import UserMain from "components/user/UserMain.svelte"
     import LoginSequence from "components/login-sequence/LoginSequence.svelte"
-    import AnonymousMain from "components/anonymous/AnonymousMain.svelte"
+    import AnonymousMain from "components/anon/AnonymousMain.svelte"
     import ModalDialog from "components/common/ModalDialog.svelte"
     import KnowledgeBase from "components/knowledge/KnowledgeBase.svelte"
     import Welcome from "components/welcome/Welcome.svelte"

@@ -1,9 +1,11 @@
 <script>
-    import SystemShortInfo from "components/user/systems/SystemShortInfo.svelte"
+    import SystemShortInfo from "components/user/SystemShortInfo.svelte"
 
-    import appState from "stores/app-state.js"
+    import { slide} from "svelte/transition"
 
-    import ScrollWindow from "utility/scroll-window.js"
+    import appState from "stores/app-state"
+
+    import ScrollWindow from "utility/scroll-window"
 
     export let systems = []
 
@@ -18,6 +20,12 @@
     }
 
 </script>
+
+{#if system_id === null}
+    <div class="large important spacy-below center-text" transition:slide>
+        Выберите систему
+    </div>
+{/if}
 
 {#each systems as system (system.id)}
     {#if system_id === null || system_id === +system.id}

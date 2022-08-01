@@ -1,11 +1,11 @@
 <script>
     import TopLogo from "components/common/TopLogo.svelte"
     import UserMenu from "components/common/user-menu/UserMenu.svelte"
-    import SelectSystem from "components/user/systems/SelectSystem.svelte"
-    import AddSystem from "components/user/systems/AddSystem.svelte"
-    import ProviderReader from "components/user/provider/ProviderReader.svelte"
+    import SelectSystem from "components/user/SelectSystem.svelte"
+    import AddSystem from "components/add/AddSystem.svelte"
+    import ProviderReader from "components/read/ProviderReader.svelte"
     import UserSettings from "components/user/settings/UserSettings.svelte"
-    import SystemMain from "components/user/systems/SystemMain.svelte"
+    import SystemMain from "components/user/sys/SystemMain.svelte"
 
     import {fade, fly, slide} from "svelte/transition"
 

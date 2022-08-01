@@ -8,9 +8,11 @@
         modal.notify(
             `Выйти из аккаунта ${$appState.username}?`, [{
                 text: "Да",
+                keyCodes: [13,32],
                 callback: logout,
             }, {
                 text: "Нет",
+                keyCodes: [27],
                 callback: null,
             }],
         )

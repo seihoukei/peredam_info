@@ -29,6 +29,7 @@
       "components/*" : ["src/components/*"],
       "utility/*" : ["src/utility/*"],
       "stores/*" : ["src/stores/*"],
+      "help/*" : ["src/help/*"],
       "events/*" : ["src/events/*"]
     }
   },

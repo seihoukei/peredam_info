@@ -72,7 +72,7 @@
     {/if}
 
     <div class="top-central">
-        <TopLogo/>
+        <TopLogo loginState={state}/>
     </div>
 
     {#if stage === "login"}

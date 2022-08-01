@@ -1,6 +1,6 @@
 import library from "stores/library.js"
 
-import {failure, success} from "utility/messages.js"
+import Messages from "utility/messages.js"
 import Web from "utility/web.js"
 import Values from "utility/values.js"
 
@@ -31,7 +31,7 @@ export default class Api {
         }
         
         if (result?.success !== true) {
-            return failure(result?.error ?? "Неизвестная ошибка")
+            return Messages.failure(result?.error ?? "Неизвестная ошибка")
         }
         
         return result
@@ -41,10 +41,10 @@ export default class Api {
         const result = await Web.getJSONData(this.#apiUrl(api))
         
         if (result.error) {
-            return failure(result?.error ?? "Неизвестная ошибка")
+            return Messages.failure(result?.error ?? "Неизвестная ошибка")
         }
         
-        return success(result)
+        return Messages.success(result)
     }
     
     static async #fakeFetch(delay) {
@@ -78,7 +78,7 @@ export default class Api {
     
     static async getUserSystems(token = null) {
         if (!token) {
-            return failure()
+            return Messages.failure()
         }
         
         const result = await this.#call("systems/list", {
@@ -97,7 +97,7 @@ export default class Api {
                     } : null,
                 }))
             } catch (e) {
-                return failure("Неизвестная ошибка")
+                return Messages.failure("Неизвестная ошибка")
             }
         }
         
@@ -106,10 +106,10 @@ export default class Api {
     
     static async getProviderRecords(token, page = 0) {
         if (!token) {
-            return failure()
+            return Messages.failure()
         }
         
-        const result = await this.#call("provider/list", {
+        const result = await this.#call("read/list", {
             token,
             page,
         })
@@ -123,7 +123,7 @@ export default class Api {
                     record: Values.fillTemplate(template, JSON.parse(record.values)),
                 }))
             } catch (e) {
-                return failure("Неизвестная ошибка")
+                return Messages.failure("Неизвестная ошибка")
             }
         }
         return result
@@ -131,7 +131,7 @@ export default class Api {
     
     static async addSystem(token, system) {
         if (!token) {
-            return failure()
+            return Messages.failure()
         }
         
         return await this.#call("systems/add", {
@@ -145,7 +145,7 @@ export default class Api {
     
     static async updateSystem(token, id, values) {
         if (!token) {
-            return failure()
+            return Messages.failure()
         }
         
         return await this.#call("systems/update", {
@@ -159,7 +159,7 @@ export default class Api {
     
     static async removeSystem(token, id) {
         if (!token) {
-            return failure()
+            return Messages.failure()
         }
         
         return await this.#call("systems/remove", {
@@ -178,7 +178,7 @@ export default class Api {
     }
     
     static async submitAnonymousValues(provider_id, values, queue = false) {
-        return await this.#call("submit/anonymous", {
+        return await this.#call("submit/anon", {
             provider_id,
             values: JSON.stringify(values),
             queue,
