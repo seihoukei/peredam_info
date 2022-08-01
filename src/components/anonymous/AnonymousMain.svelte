@@ -13,58 +13,46 @@
 
     import Api from "utility/api.js"
     import Values from "utility/values.js"
-    import Address from "utility/address.js"
     import Transitions from "utility/transitions.js"
 
-    let input = Values.inputTemplate()
+    let input = {}
 
     let isInputReady = false
-    let isManualMethod = Api.isManualByDefault
+    let choseManualMethod = Api.forceManualMethod
 
     $: provider_id = $appState.provider_id
 
     $: provider = library.providers[provider_id] ?? null
-    $: resetProvider(provider)
+    $: resetOnChange(provider)
 
-
-    $: appState.setData(Address.stringify(input))
+    $: valuesToSubmit = Values.formatValues(provider?.values, input)
 
     $: onlineMethodAvailable = provider?.onlineMethod || provider?.usesStoreMethod
-    $: offline = !onlineMethodAvailable || isManualMethod
+    $: useManualMethods = !onlineMethodAvailable || choseManualMethod
+
     $: canSend = isInputReady && !$modal.waiting
 
-    function resetProvider() {
-        resetInput()
-        isManualMethod = Api.isManualByDefault
+    function resetOnChange() {
+        choseManualMethod = Api.forceManualMethod
     }
 
-    function setManual() {
-        isManualMethod = true
+    function chooseManualMethod() {
+        choseManualMethod = true
     }
 
-    function resetInput() {
-        input = Object.keys(provider?.values ?? {})
-            .reduce((output, key) => ({
-                ...output,
-                [key]: "",
-            }), {})
-        Object.assign(input, Values.inputTemplate($appState.data))
-    }
-
-    async function submitOnline() {
-        const submitValues = Values.formatValues(provider.values, input)
-
+    async function submit() {
         const result = await modal.await(
-            Api.submitAnonymousValues(provider_id, submitValues, true),
+            Api.submitAnonymousValues(provider_id, valuesToSubmit, true),
             "Передача показаний...",
         )
 
         if (result.success) {
+            modal.success("Показания переданы!")
             finalize()
 
         } else {
             modal.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
-            isManualMethod = true
+            choseManualMethod = true
 
         }
     }
@@ -88,7 +76,7 @@
 
     <SelectCity/>
     <SelectProvider/>
-    <SetValues all="true" bind:ready={isInputReady} bind:values={input}/>
+    <SetValues bind:isInputReady bind:input/>
 
     {#if !isInputReady && provider !== null}
         <div class="large important center-text spacy-below" transition:slide>
@@ -96,21 +84,33 @@
         </div>
     {/if}
 
-    {#if isInputReady && offline && provider !== null}
-        {#if Api.isManualByDefault}
-            <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
+    {#if isInputReady && useManualMethods && provider !== null}
+        {#if Api.forceManualMethod}
+            <span class="center-text spacy-below" transition:slide>
+                Пока что доступна только отправка вручную.
+            </span>
+
+        {:else if !onlineMethodAvailable}
+            <span class="center-text spacy-below" transition:slide>
+                Для данного поставщика услуг доступна только отправка вручную.
+            </span>
+
         {/if}
 
-        <SelectMethod values={input} methods={provider.methods}/>
+        <SelectMethod valuesToSend={input} methods={provider.methods}/>
     {/if}
 
     <div class="row-flex spacy-below" transition:slide>
-        {#if !offline}
-            <button on:click={submitOnline} disabled={!canSend}>Отправить</button>
-            <button on:click={setManual} disabled={!canSend}>Вручную</button>
+        {#if !useManualMethods}
+            <button on:click={submit}
+                    disabled={!canSend}>Отправить</button>
+
+            <button on:click={chooseManualMethod}
+                    disabled={!canSend}>Вручную</button>
 
         {:else if provider !== null}
-            <button on:click={finalize} disabled={!canSend}>Готово</button>
+            <button on:click={finalize}
+                    disabled={!canSend}>Готово</button>
 
         {/if}
 

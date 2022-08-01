@@ -1,19 +1,19 @@
 <script>
-    import Rules from "./Rules.svelte"
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
-    import Transitions from "../../../../utility/transitions.js"
+
+    import Transitions from "utility/transitions.js"
+
+    const dispatch = createEventDispatcher()
+    // confirm - create new user
+    // cancel - different user
 
     export let login
 
-    let agreed = false
-    let showRules = false
+    let agreedToRules = false
+    let agreedToData = false
 
-    const dispatch = createEventDispatcher()
-
-    function rules() {
-        showRules = true
-    }
+    $: agreed = agreedToRules && agreedToData
 
     function cancel() {
         dispatch("cancel")
@@ -22,19 +22,44 @@
     function confirm() {
         dispatch("confirm")
     }
+
 </script>
 
 <div class="flex central centered spaced wrapper" transition:fly={Transitions.loginFlyLeft}>
     <p class="large">Пользователь <span class="nowrap">{login}</span> не найден.</p>
-    <p>Если вы здесь впервые, то для регистрации вам необходимо подтвердить, что вы принимаете <a on:click={rules}>условия
-        использования сервиса</a> и задать пароль.</p>
+
+    <p>Если вы здесь впервые, то для регистрации вам необходимо подтвердить, что вы принимаете
+        <a href="/agreement/rules.html"
+           rel="noopener noreferrer"
+           target="_blank"> условия использования сервиса</a>
+
+        , согласны на
+
+        <a href="/agreement/personal.html"
+           rel="noopener noreferrer"
+           target="_blank" >обработку персональных данных</a>
+        
+        и задать пароль.</p>
+
     <label>
-        <input bind:checked={agreed} type="checkbox"/> Я принимаю условия пользования сервисом.
+        <input bind:checked={agreedToRules} type="checkbox"/>
+        Я принимаю условия пользования сервисом
+        (<a href="/agreement/rules.html"
+            rel="noopener noreferrer"
+            target="_blank">Подробнее</a>).
     </label>
+
+    <label>
+        <input bind:checked={agreedToData} type="checkbox"/>
+        Я даю согласие на обработку моих персональных данных
+        (<a href="/agreement/personal.html"
+            rel="noopener noreferrer"
+            target="_blank" >Подробнее</a>)
+    </label>
+
     <div class="row-flex">
         <button on:click={cancel}>◀ Другой пользователь</button>
         <button disabled={!agreed} on:click={confirm}>Задать пароль ▶</button>
     </div>
-</div>
 
-<Rules bind:visible={showRules}/>
+</div>

@@ -1,8 +1,10 @@
 <script>
-    import EmailSettings from "./EmailSettings.svelte"
-    import PushSettings from "./PushSettings.svelte"
-    import appState from "../../../stores/app-state.js"
+    import EmailSettings from "components/user/settings/EmailSettings.svelte"
+    import PushSettings from "components/user/settings/PushSettings.svelte"
+
     import {slide} from "svelte/transition"
+
+    import appState from "stores/app-state.js"
 
     function back() {
         appState.setPage("")

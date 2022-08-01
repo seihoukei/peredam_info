@@ -1,6 +1,7 @@
-import {failure, success} from "./messages.js"
 import CryptoJS from "crypto-js/core.js"
 import AES from "crypto-js/aes.js"
+
+import {failure, success} from "utility/messages.js"
 
 export default class Tokens {
     static store(tokens) {

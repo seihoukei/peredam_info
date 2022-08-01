@@ -1,12 +1,15 @@
-import {failure, success} from "./messages.js"
-import Web from "./web.js"
-import fillTemplate from "./template.js"
-import library from "../stores/library.js"
+import library from "stores/library.js"
+
+import {failure, success} from "utility/messages.js"
+import Web from "utility/web.js"
+import Values from "utility/values.js"
 
 let apiServer = "https://dev-api.peredam.info/"
+
 if (import.meta.env.MODE === "development") {
     apiServer = "http://localhost:5174/"
 }
+
 if (new URL(window.location).origin === "https://peredam.info") {
     apiServer = "https://api.peredam.info/"
 }
@@ -14,7 +17,7 @@ if (new URL(window.location).origin === "https://peredam.info") {
 export default class Api {
     static server = apiServer
     static library = `${apiServer}library/library.json`
-    static isManualByDefault = apiServer === "https://api.peredam.info/"
+    static forceManualMethod = apiServer === "https://api.peredam.info/"
     
     static #apiUrl(address) {
         return `${this.server}${address}`
@@ -117,7 +120,7 @@ export default class Api {
                 result.data.records = result.data.records.map(record => ({
                     date: record.date,
                     type: record.type,
-                    record: fillTemplate(template, JSON.parse(record.values)),
+                    record: Values.fillTemplate(template, JSON.parse(record.values)),
                 }))
             } catch (e) {
                 return failure("Неизвестная ошибка")

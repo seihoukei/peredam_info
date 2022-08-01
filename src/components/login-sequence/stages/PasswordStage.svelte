@@ -1,9 +1,10 @@
 <script>
-    import SetPassword from "./password/SetPassword.svelte"
-    import RequestPassword from "./password/RequestPassword.svelte"
+    import SetPassword from "components/login-sequence/stages/password/SetPassword.svelte"
+    import RequestPassword from "components/login-sequence/stages/password/RequestPassword.svelte"
 
-    import Api from "../../../utility/api.js"
-    import modal from "../../../stores/modal.js"
+    import modal from "stores/modal.js"
+
+    import Api from "utility/api.js"
 
     export let state
 
@@ -20,6 +21,7 @@
         )
 
         if (result.success) {
+            modal.success("Пользователь зарегистрирован!")
             state.tokens.current = result.data.token
             state.user_provider_id = null
             state.stage = "code"
@@ -31,13 +33,14 @@
         }
     }
 
-    async function log_in() {
+    async function logIn() {
         const result = await modal.await(
             Api.logIn(login, password),
             "Попытка входа",
         )
 
         if (result.success) {
+            modal.success("Вход удался!")
             state.tokens.current = result.data.token
             state.user_provider_id = result.data.provider ?? null
             state.stage = "code"
@@ -45,6 +48,7 @@
         } else {
             modal.error(result.error)
             password = ""
+
         }
     }
 
@@ -57,7 +61,9 @@
 {#if stage === "password"}
     {#if isNewUser}
         <SetPassword {login} bind:password on:cancel={back} on:submit={register}/>
+
     {:else}
-        <RequestPassword {login} bind:password on:cancel={back} on:submit={log_in}/>
+        <RequestPassword {login} bind:password on:cancel={back} on:submit={logIn}/>
+
     {/if}
 {/if}

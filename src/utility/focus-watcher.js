@@ -1,4 +1,4 @@
-import ScrollWindow from "./scroll-window.js"
+import ScrollWindow from "utility/scroll-window.js"
 
 export default class FocusWatcher {
     static elements = []

@@ -11,48 +11,40 @@
     import appState from "stores/app-state.js"
 
     import Api from "utility/api.js"
-    import Address from "utility/address.js"
     import Values from "utility/values.js"
 
     const dispatch = createEventDispatcher()
     // add (newSystem) - to notify userMain that system was succesfully added and should be displayed
 
-    let inputReady = false
+    let input = {}
+    let isInputReady = false
 
     $: provider_id = $appState.provider_id
     $: page = $appState.page
 
-    $: values = inputTemplate(provider_id)
-    $: appState.setData(Address.stringify(values))
+    $: provider = library.providers[provider_id] ?? null
 
-    $: canSend = inputReady || $modal.waiting
+    $: canSend = isInputReady || $modal.waiting
 
     $: newSystem = {
-        provider_id, values,
-    }
-
-    function inputTemplate() {
-        const template = $appState.data
-        if (template) {
-            return Address.parse(template)
-        }
-        return {}
+        provider_id,
+        values : Values.formatValues(provider?.values, input),
     }
 
     async function finalize() {
-        newSystem.values = Values.formatValues(library.providers[provider_id].values, newSystem.values)
-
         const result = await modal.await(
             Api.addSystem($appState.token, newSystem),
             "Добавление данных",
         )
 
-        if (!result.success) {
-            modal.error(result.error)
-
-        } else {
+        if (result.success) {
+            modal.success("Данные добавлены!")
             newSystem.id = result.data.id
             dispatch("add", newSystem)
+
+        } else {
+            modal.error(result.error)
+
         }
     }
 
@@ -73,10 +65,14 @@
 {#if page === 'add'}
     <SelectCity/>
     <SelectProvider/>
-    <SetValues bind:values bind:inputReady/>
+    <SetValues bind:input bind:isInputReady setOnlyConstants="true"/>
 
     <div class="spacy-below row-flex" transition:slide>
-        <button on:click={finalize} disabled={!canSend}>Добавить</button>
+        <button on:click={finalize}
+                disabled={!canSend}>Добавить</button>
+
         <button on:click={back}>◀ Назад</button>
+
     </div>
+
 {/if}

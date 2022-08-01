@@ -1,65 +1,77 @@
 <script>
-    import library from "../../../stores/library.js"
-    import {slide} from "svelte/transition"
-    import StaticDetail from "../../common/system-management/StaticDetail.svelte"
-    import VariableDetail from "../../common/system-management/VariableDetail.svelte"
-    import SelectMethod from "../../common/select-method/methods/SelectMethod.svelte"
-    import Period from "../../../utility/period.js"
-    import Api from "../../../utility/api.js"
+    import ValueDisplay from "components/common/system-management/ValueDisplay.svelte"
+    import ValueEdit from "components/common/system-management/ValueEdit.svelte"
+    import SelectMethod from "components/common/select-method/methods/SelectMethod.svelte"
+
     import {createEventDispatcher} from "svelte"
-    import modal from "../../../stores/modal.js"
-    import Values from "../../../utility/values.js"
-    import Address from "../../../utility/address.js"
-    import appState from "../../../stores/app-state.js"
+    import {slide} from "svelte/transition"
+
+    import library from "stores/library.js"
+    import modal from "stores/modal.js"
+    import appState from "stores/app-state.js"
+
+    import Api from "utility/api.js"
+    import Period from "utility/period.js"
+    import Values from "utility/values.js"
+
+    const dispatch = createEventDispatcher()
+    // remove (id) - remove system
 
     export let system = {}
 
-    let input = Values.inputTemplate()
-    let editorValues = {}
-    let manual = Api.isManualByDefault
-    let container
+    let choseManualMethod = Api.forceManualMethod
+    let input = {}
+    let valueReadiness = {}
 
     $: system_id = $appState.system_id
     $: mode = $appState.mode
 
     $: provider = library.providers[system?.provider_id] ?? null
-    $: resetProvider(provider)
-
     $: onlineMethodAvailable = provider?.onlineMethod || provider?.usesStoreMethod
-
     $: period = new Period(provider?.period)
-    $: ready = validate(values, editorValues)
-    $: offline = !onlineMethodAvailable || manual
+    $: resetOnChange(mode, provider)
 
-    $: values = Values.formatValues(provider?.values, {
+    $: isInputReady = Object.values(valueReadiness).every(Boolean)
+    $: canSend = isInputReady && !$modal.waiting
+
+    $: useManualMethod = !onlineMethodAvailable || choseManualMethod
+
+    $: valuesToSend = Values.formatValues(provider?.values, {
         ...system?.values,
         ...input,
     })
 
-    $: appState.setData(Address.stringify(input))
+    $: appState.setData(Values.stringify(input))
 
-    const dispatch = createEventDispatcher()
+    function resetOnChange() {
+        choseManualMethod = Api.forceManualMethod
 
-    function resetProvider() {
-        resetInput()
-        manual = Api.isManualByDefault
+        if (mode === `edit`)
+            input = {...system.values}
+        else
+            input = {}
+
+        Object.assign(input, Values.parse($appState.data))
+
+        valueReadiness = {}
+
+        if (mode === `send`)
+            checkPeriod()
     }
 
-    function resetInput() {
-        input = Object.entries(provider?.values ?? {})
-            .filter(([key, value]) => !value.constant)
-            .reduce((output, [key, value]) => ({
-                ...output,
-                [key]: "",
-            }), {})
-        Object.assign(input, Values.inputTemplate($appState.data))
+    function setSendingMode() {
+        appState.setMode(`send`)
     }
 
-    function setManual() {
-        manual = true
+    function setEditingMode() {
+        appState.setMode(`edit`)
     }
 
-    function startSending() {
+    function cancel() {
+        appState.setMode(``)
+    }
+
+    function checkPeriod() {
         const data = period.analyze(system.last?.date)
         const outsidePeriod = !data.inside
         const alreadySubmitted = data.recent
@@ -75,41 +87,25 @@
         }
 
         if (confirmation !== null) {
-            modal.notify(confirmation,
-                [
-                    {
-                        text: "Всё равно передать",
-                        callback: () => appState.setMode(`send`),
-                    }, {
-                    text: "Отмена",
+            modal.notify(confirmation, [{
+                    text: "Всё равно передать",
                     callback: null,
-                },
-                ])
-        } else {
-            appState.setMode(`send`)
+                }, {
+                    text: "Отмена",
+                    callback: cancel,
+                }])
         }
-
-        (() => appState.setMode(`send`))
     }
 
-    function startEditing() {
-        editorValues = {...system.values}
-        appState.setMode(`edit`)
+    function chooseManualMethod() {
+        choseManualMethod = true
     }
 
-    function stopSending() {
-        appState.setMode(``)
-    }
-
-    function stopEditing() {
-        appState.setMode(``)
-    }
-
-    function startRemoving() {
+    function confirmRemoval() {
         modal.notify("После удаления систему невозможно восстановить!", [
             {
                 text: "Всё равно удалить",
-                callback: () => remove(),
+                callback: remove,
             }, {
                 text: "Отмена",
                 callback: null,
@@ -124,9 +120,8 @@
         )
 
         if (result.success) {
+            modal.success("Данные удалены!")
             dispatch("remove", system.id)
-            input = {}
-            system = null
             appState.setMode(``)
 
         } else {
@@ -136,15 +131,16 @@
     }
 
     async function saveEdit() {
-        editorValues = Values.formatValues(provider.values, editorValues)
+        input = Values.formatValues(provider.values, input)
 
         const result = await modal.await(
-            Api.updateSystem($appState.token, system.id, editorValues),
+            Api.updateSystem($appState.token, system.id, input),
             "Обновление данных...",
         )
 
         if (result.success) {
-            system.values = editorValues
+            modal.success("Данные обновлены!")
+            system.values = input
             appState.setMode(``)
 
         } else {
@@ -154,23 +150,37 @@
 
     }
 
-    function validate() {
-        let valuesToValidate = values
-        let valuesToCheckAgainst = Object.entries(provider?.values ?? [])
+    async function submitOnline() {
+        const result = await modal.await(
+            Api.submitUserValues($appState.token, system, valuesToSend, true),
+            "Передача показаний...",
+        )
 
-        if (mode === `edit`) {
-            valuesToValidate = Values.formatValues(provider?.values, editorValues)
-            valuesToCheckAgainst = valuesToCheckAgainst.filter(x => x[1].constant)
+        if (result.success) {
+            modal.success("Показания переданы!")
+            finalize()
+
+        } else {
+            modal.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
+            choseManualMethod = true
+
         }
+    }
 
-        if (!valuesToValidate || !valuesToCheckAgainst) {
-            return false
+    async function reportSubmission() {
+        const result = await modal.await(
+            Api.submitUserValues($appState.token, system, valuesToSend),
+            "Сохранение данных...",
+        )
+
+        if (result.success) {
+            modal.success("Данные сохранены!")
+            finalize()
+
+        } else {
+            modal.error("Не удалось сохранить данные. Это не страшно, если вы передали данные вручную.")
+
         }
-
-        return valuesToCheckAgainst.every(([id, value]) => {
-            return valuesToValidate[id] !== null ||
-                !value.mandatory && valuesToValidate[id] === ""
-        })
     }
 
     function finalize() {
@@ -179,39 +189,7 @@
             values: input,
         }
 
-        input = {}
         appState.setSystemId(null)
-    }
-
-    async function submitOnline() {
-        const result = await modal.await(
-            Api.submitUserValues($appState.token, system, values, true),
-            "Передача показаний...",
-        )
-
-        if (result.success) {
-            finalize()
-
-        } else {
-            modal.error("Не удалось передать данные, используйте ручные методы или попробуйте позже.")
-            manual = true
-
-        }
-    }
-
-    async function reportSubmission() {
-        const result = await modal.await(
-            Api.submitUserValues($appState.token, system, values),
-            "Сохранение данных...",
-        )
-
-        if (result.success) {
-            finalize()
-
-        } else {
-            modal.error("Не удалось сохранить данные. Это не страшно, если вы передали данные вручную.")
-
-        }
     }
 
     function back() {
@@ -222,58 +200,103 @@
 
 {#if system_id !== null && system !== null}
     {#if provider !== null}
-        <div class="flex" bind:this={container}>
+        <div class="flex">
             {#if mode !== `send`}
-                <StaticDetail name="Поставщик" value={provider?.name}/>
+                <ValueDisplay name="Поставщик" value={provider?.name}/>
             {/if}
+
             {#each Object.entries(provider.values) as [id, value], index (id)}
                 {#if value.constant}
                     {#if mode === `edit`}
-                        <VariableDetail name={value.name} bind:value={editorValues[id]} type={value.type}
-                                        priority={index}/>
+                        <ValueEdit description={value}
+                                   priority={index}
+                                   bind:value={input[id]}
+                                   bind:isValueReady={valueReadiness[id]}/>
+
                     {:else}
-                        <StaticDetail name={value.name} value={system.values[id]}/>
+                        <ValueDisplay name={value.name}
+                                      value={system.values[id]}/>
+
                     {/if}
+
                 {:else if mode === `send`}
-                    <VariableDetail name={value.name} bind:value={input[id]} old={system.last?.values[id]}
-                                    type={value.type} priority={index}/>
+                    <ValueEdit description={value}
+                               placeholder={system.last?.values[id]}
+                               priority={index}
+                               bind:value={input[id]}
+                               bind:isValueReady={valueReadiness[id]}/>
+
                 {/if}
+
             {/each}
+
         </div>
+
         {#if mode === `edit`}
             <div class="row-flex spacy-below" transition:slide>
-                <button on:click={saveEdit} disabled={$modal.waiting || !ready}>Сохранить</button>
-                <button on:click={startRemoving} disabled={$modal.waiting}>Удалить</button>
-                <button on:click={stopEditing}>◀ Отмена</button>
+                <button on:click={saveEdit}
+                        disabled={!canSend}>Сохранить</button>
+
+                <button on:click={confirmRemoval}
+                        disabled={$modal.waiting}>Удалить</button>
+
+                <button on:click={cancel}>◀ Отмена</button>
             </div>
+
         {:else if mode === `send`}
-            {#if !ready}
+            {#if !isInputReady}
                 <div class="large important center-text spacy-below" transition:slide>
                     Заполните поля для показаний выше
                 </div>
             {/if}
-            {#if ready && offline}
-                {#if Api.isManualByDefault}
-                    <span class="spacy-below" transition:slide> Пока что доступна только отправка вручную.</span>
+
+            {#if isInputReady && useManualMethod}
+                {#if Api.forceManualMethod}
+                    <span class="center-text spacy-below" transition:slide>
+                        Пока что доступна только отправка вручную.
+                    </span>
+
+                {:else if !onlineMethodAvailable}
+                    <span class="center-text spacy-below" transition:slide>
+                        Для данного поставщика услуг доступна только отправка вручную.
+                    </span>
+
                 {/if}
-                <SelectMethod {values} methods={provider.methods}/>
-                <span class="spacy-below" transition:slide>После успешной передачи показаний нажмите "Сохранить".</span>
+
+                <SelectMethod {valuesToSend} methods={provider.methods}/>
+
+                <span class="center-text spacy-below" transition:slide>
+                    После успешной передачи показаний нажмите "Сохранить".
+                </span>
+
             {/if}
+
             <div class="row-flex spacy-below" transition:slide>
-                {#if !offline}
-                    <button on:click={submitOnline} disabled={!ready || $modal.waiting}>Отправить</button>
-                    <button on:click={setManual} disabled={!ready || $modal.waiting}>Вручную</button>
+                {#if !useManualMethod}
+                    <button on:click={submitOnline}
+                            disabled={!canSend}>Отправить</button>
+
+                    <button on:click={chooseManualMethod}
+                            disabled={!canSend}>Вручную</button>
+
                 {:else}
-                    <button on:click={reportSubmission} disabled={!ready || $modal.waiting}>Сохранить</button>
+                    <button on:click={reportSubmission}
+                            disabled={!canSend}>Сохранить</button>
+
                 {/if}
-                <button on:click={stopSending}>◀ Отмена</button>
+
+                <button on:click={cancel}>◀ Отмена</button>
+
             </div>
+
         {:else}
             <div class="row-flex spacy-below" transition:slide>
-                <button on:click={startSending}>Передать</button>
-                <button on:click={startEditing}>Изменить</button>
+                <button on:click={setSendingMode}>Передать</button>
+                <button on:click={setEditingMode}>Изменить</button>
                 <button on:click={back}>◀ Назад</button>
+
             </div>
+
         {/if}
 
     {:else}

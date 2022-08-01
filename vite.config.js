@@ -10,7 +10,7 @@ export default defineConfig({
 	svelte(),
 	VitePWA({
 		registerType: 'autoUpdate',
-		includeAssets: ['fonts/*.ttf', 'images/*.*', 'icons/*.*'],
+		includeAssets: ['fonts/*.ttf', 'images/*.*', 'icons/*.*', "agreement/*.html"],
 		manifest:{
 			"short_name": "Передам.инфо",
 			"name": "Передача показаний",
@@ -59,7 +59,8 @@ export default defineConfig({
 	  alias: {
 		  'components': path.resolve('./src/components'),
 		  'utility': path.resolve('./src/utility'),
-		  'stores': path.resolve('./src/stores')
+		  'stores': path.resolve('./src/stores'),
+		  'events': path.resolve('./src/events')
 	  }
 	}
 })

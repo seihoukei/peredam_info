@@ -16,11 +16,14 @@
     --background: #C0C2C4;
     --text-color: #000000;
     --link-color: #003366;
+    --important-color: #004488;
 
     --element-background: #737476;
     --element-text-color: #FFFFFF;
+
     --disabled-element-background: #9A9B9D;
-    --disabled-element-text-color: #777777;
+    --disabled-element-text-color: #555555;
+
     --input-placeholder-color: #C7C7C8;
 
     --status-ok-color: #008800;
@@ -36,11 +39,14 @@
 
         --text-color: #FFFFFF;
         --link-color: #99CCFF;
+        --important-color: #FFFF88;
+
         --element-background: #081D25;
         --element-text-color: #FFFFFF;
 
         --disabled-element-background: #0B2631;
         --disabled-element-text-color: #777777;
+
         --input-placeholder-color: #6B7777;
 
         --status-ok-color: #44CC44;
@@ -153,6 +159,10 @@ div.dialog {
     white-space: nowrap;
 }
 
+.important {
+    color: var(--important-color);
+}
+
 button, input {
     font: var(--font-size) Exo2, sans-serif;
     background-color: var(--element-background);
@@ -171,7 +181,7 @@ a {
     cursor: pointer;
 }
 
-button {
+button, input[type='submit'] {
     cursor: pointer;
 }
 
@@ -179,7 +189,7 @@ button.large input.large {
     padding: 9px 14px 12px;
 }
 
-button:disabled {
+button:disabled, input:disabled {
     background-color: var(--disabled-element-background);
     color: var(--disabled-element-text-color);
     cursor: default;

@@ -1,7 +1,11 @@
 <script>
     import {createEventDispatcher, onDestroy, onMount} from "svelte"
-    import {failure, success} from "../../../utility/messages.js"
-    import FocusWatcher from "../../../utility/focus-watcher.js"
+
+    import {failure, success} from "utility/messages.js"
+    import FocusWatcher from "utility/focus-watcher.js"
+
+    const dispatch = createEventDispatcher()
+    // submit (value) - submit value
 
     export let type = "text"
     export let value
@@ -9,14 +13,17 @@
     export let minLength = 5
     export let maxLength = 32
     export let extraCheck = success()
-    export let login = ""//password form
+    export let login = ""
     export let autocomplete = ""
 
     let element
 
-    const dispatch = createEventDispatcher()
-
     $: validityCheck = validate(value, extraCheck)
+
+    onMount(() => {
+        FocusWatcher.addElement(element)
+        FocusWatcher.focus(false)
+    })
 
     function validate(value) {
         if (!extraCheck.success) {
@@ -34,17 +41,11 @@
         return success()
     }
 
-
     function submit() {
         if (validityCheck.success) {
             dispatch("submit", value)
         }
     }
-
-    onMount(() => {
-        FocusWatcher.addElement(element)
-        FocusWatcher.focus(false)
-    })
 
     onDestroy(() => {
         FocusWatcher.removeElement(element)
@@ -54,26 +55,60 @@
 
 <div class="flex centered spaced container">
     <span class="large center-text prompt"><slot/></span>
-    <div class="input row-flex centered">
-        <form on:submit|preventDefault={submit}>
+
+    <form on:submit|preventDefault={submit}>
+        <div class="input row-flex centered">
             {#if type === "tel"}
                 <span class="tel-icon large">📞</span>
-                <input {autocomplete} bind:this={element} class="large tel" type="tel" bind:value placeholder={hint}
-                       maxlength={maxLength}/>
+                <input class="large tel"
+                       type="tel"
+                       placeholder={hint}
+                       {maxLength}
+                       {autocomplete}
+                       bind:this={element}
+                       bind:value/>
+
             {:else if type === "number"}
-                <input {autocomplete} bind:this={element} class="large" type="number" bind:value placeholder={hint}
-                       maxlength={maxLength}/>
+                <input class="large"
+                       type="number"
+                       placeholder={hint}
+                       {maxLength}
+                       {autocomplete}
+                       bind:this={element}
+                       bind:value/>
+
             {:else if type === "password"}
-                <input autocomplete="username" type="text" style:display="none" value={login}/>
-                <input {autocomplete} bind:this={element} class="large" type="password" bind:value placeholder={hint}
-                       maxlength={maxLength}/>
+                <input autocomplete="username"
+                       type="text"
+                       style:display="none"
+                       value={login}/>
+
+                <input class="large"
+                       type="password"
+                       placeholder={hint}
+                       {autocomplete}
+                       {maxLength}
+                       bind:this={element}
+                       bind:value/>
+
             {:else}
-                <input {autocomplete} bind:this={element} class="large" bind:value placeholder={hint}/>
+                <input class="large"
+                       type="text"
+                       placeholder={hint}
+                       {maxLength}
+                       {autocomplete}
+                       bind:this={element}
+                       bind:value/>
             {/if}
+
             <input class="large submit" disabled={!validityCheck.success} type="submit" value="▶"/>
-        </form>
-    </div>
+
+        </div>
+    </form>
+
+
     <span class="font-high" class:error={!validityCheck.success}>{validityCheck.data ?? ""}</span>
+
 </div>
 
 <style>
@@ -85,17 +120,22 @@
         color: var(--status-error-color);
     }
 
-    input {
-        border-radius: 20px 0 0 20px;
+    input:not([type='submit']) {
+        border-radius: 32px 0 0 32px;
+        height : 32px;
+
     }
 
     input.submit {
         margin-left: 0;
-        border-radius: 0 20px 20px 0;
+        height : 45px;
+        border-radius: 0 32px 32px 0;
     }
 
     div.input {
         column-gap: 2px;
+        justify-content: center;
+        align-items: center;
     }
 
     input.tel {
@@ -104,7 +144,7 @@
 
     span.tel-icon {
         position: absolute;
-        padding: 5px;
+        left : 7px;
         pointer-events: none;
     }
 </style>

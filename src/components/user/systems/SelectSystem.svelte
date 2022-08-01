@@ -1,7 +1,9 @@
 <script>
-    import SystemShortInfo from "./SystemShortInfo.svelte"
-    import appState from "../../../stores/app-state.js"
-    import ScrollWindow from "../../../utility/scroll-window.js"
+    import SystemShortInfo from "components/user/systems/SystemShortInfo.svelte"
+
+    import appState from "stores/app-state.js"
+
+    import ScrollWindow from "utility/scroll-window.js"
 
     export let systems = []
 
@@ -14,13 +16,16 @@
     $: if (system_id !== null) {
         ScrollWindow.to(180)
     }
+
 </script>
 
 {#each systems as system (system.id)}
     {#if system_id === null || system_id === +system.id}
         <SystemShortInfo {system}/>
     {/if}
+
     {#if system_id === +system.id}
         <slot/>
     {/if}
+
 {/each}

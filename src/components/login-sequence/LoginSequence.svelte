@@ -1,12 +1,14 @@
 <script>
-    import TopLogo from "../common/TopLogo.svelte"
-    import LoginStage from "./stages/LoginStage.svelte"
-    import PasswordStage from "./stages/PasswordStage.svelte"
-    import CodeStage from "./stages/CodeStage.svelte"
+    import TopLogo from "components/common/TopLogo.svelte"
+    import LoginStage from "components/login-sequence/stages/LoginStage.svelte"
+    import PasswordStage from "components/login-sequence/stages/PasswordStage.svelte"
+    import CodeStage from "components/login-sequence/stages/CodeStage.svelte"
 
-    import Tokens from "../../utility/tokens.js"
     import {onMount} from "svelte"
-    import appState from "../../stores/app-state.js"
+
+    import appState from "stores/app-state.js"
+
+    import Tokens from "utility/tokens.js"
 
     let state = {
         stage: "",
@@ -16,7 +18,6 @@
         user_provider_id: localStorage.user_provider_id ?? "",
     }
 
-    //decoupling updates from storages
     $: page = $appState.page
     $: isAnonymousPage = $appState.isAnonymousPage
     $: token = $appState.token
@@ -34,12 +35,16 @@
     onMount(() => {
         if (tokens.current !== "") {
             state.stage = "complete"
+
         } else if (tokens.encrypted !== "") {
             state.stage = "code"
+
         } else if (state.login !== "") {
             state.stage = "password"
+
         } else {
             state.stage = "login"
+
         }
     })
 

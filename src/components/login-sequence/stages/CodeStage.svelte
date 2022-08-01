@@ -1,9 +1,10 @@
 <script>
-    import SetCode from "./code/SetCode.svelte"
-    import RequestCode from "./code/RequestCode.svelte"
+    import SetCode from "components/login-sequence/stages/code/SetCode.svelte"
+    import RequestCode from "components/login-sequence/stages/code/RequestCode.svelte"
 
-    import Tokens from "../../../utility/tokens.js"
-    import modal from "../../../stores/modal.js"
+    import modal from "stores/modal.js"
+
+    import Tokens from "utility/tokens.js"
 
     export let state
 
@@ -55,7 +56,9 @@
 {#if stage === "code"}
     {#if setting}
         <SetCode {login} bind:code on:submit={setCode}/>
+
     {:else}
         <RequestCode {login} bind:code on:cancel={back} on:submit={checkCode}/>
+
     {/if}
 {/if}

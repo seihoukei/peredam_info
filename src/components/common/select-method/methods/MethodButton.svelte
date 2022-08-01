@@ -1,6 +1,4 @@
 <script>
-    export let type
-
     const texts = {
         "E-MAIL": "E-mail",
         "PHONE": "Оператор",
@@ -8,6 +6,8 @@
         "SMS": "SMS",
         "SITE": "Сайт",
     }
+
+    export let type
 
     $: text = texts[type] ?? "?"
 </script>

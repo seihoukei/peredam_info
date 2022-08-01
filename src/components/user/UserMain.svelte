@@ -1,16 +1,18 @@
 <script>
-    import TopLogo from "../common/TopLogo.svelte"
-    import UserMenu from "../common/user-menu/UserMenu.svelte"
-    import {fade, fly, slide} from "svelte/transition"
-    import Transitions from "../../utility/transitions.js"
-    import SelectSystem from "./systems/SelectSystem.svelte"
-    import AddSystem from "./systems/AddSystem.svelte"
+    import TopLogo from "components/common/TopLogo.svelte"
+    import UserMenu from "components/common/user-menu/UserMenu.svelte"
+    import SelectSystem from "components/user/systems/SelectSystem.svelte"
+    import AddSystem from "components/user/systems/AddSystem.svelte"
+    import ProviderReader from "components/user/provider/ProviderReader.svelte"
+    import UserSettings from "components/user/settings/UserSettings.svelte"
+    import SystemMain from "components/user/systems/SystemMain.svelte"
 
-    import Systems from "../../utility/systems.js"
-    import appState from "../../stores/app-state.js"
-    import ProviderReader from "./provider/ProviderReader.svelte"
-    import UserSettings from "./settings/UserSettings.svelte"
-    import SystemMain from "./systems/SystemMain.svelte"
+    import {fade, fly, slide} from "svelte/transition"
+
+    import appState from "stores/app-state.js"
+
+    import Systems from "utility/systems.js"
+    import Transitions from "utility/transitions.js"
 
     export let user = {
         systems: [],
@@ -23,6 +25,7 @@
     $: page = $appState.page
     $: user_provider_id = $appState.user_provider_id
     $: system_id = $appState.system_id
+
     $: system = user.systems.find(system => +system.id === system_id)
 
     $: if (page === "") {
@@ -32,7 +35,6 @@
             appState.setPage("user")
         }
     }
-
 
     function add({detail: system}) {
         systems = [
@@ -63,8 +65,10 @@
 
     {#if page === 'read'}
         <ProviderReader/>
+
     {:else}
         <UserMenu {username}/>
+
         {#if page === 'add'}
             <AddSystem on:add={add}/>
 
@@ -73,7 +77,7 @@
 
         {:else}
             <SelectSystem {systems}>
-                <SystemMain on:remove={remove} {system}/>
+                <SystemMain on:remove={remove} bind:system/>
             </SelectSystem>
 
             {#if system_id === null}
@@ -84,6 +88,7 @@
             {/if}
 
         {/if}
+
     {/if}
 
 </div>

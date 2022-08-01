@@ -1,14 +1,16 @@
 <script>
-    import modal from "../../stores/modal.js"
     import {fade} from "svelte/transition"
-    import Transitions from "../../utility/transitions.js"
-    import FocusWatcher from "../../utility/focus-watcher.js"
+
+    import modal from "stores/modal.js"
+
+    import Transitions from "utility/transitions.js"
+    import FocusWatcher from "utility/focus-watcher.js"
+
+    let dialog
 
     $: error = $modal.error
     $: waiting = $modal.waiting
     $: asking = $modal.asking
-
-    let dialog
 
     $: focus(error, waiting, asking)
 
@@ -29,7 +31,6 @@
     function focus() {
         dialog?.focus?.()
     }
-
 
 </script>
 

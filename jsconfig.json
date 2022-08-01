@@ -28,7 +28,8 @@
     "paths" : {
       "components/*" : ["src/components/*"],
       "utility/*" : ["src/utility/*"],
-      "stores/*" : ["src/stores/*"]
+      "stores/*" : ["src/stores/*"],
+      "events/*" : ["src/events/*"]
     }
   },
   /**

@@ -4,10 +4,8 @@
     export let code = ""
     export let length = 4
 
-    $: maskedCode =
-        "● ".repeat(Math.max(0, code.length - 1)) +
-        code.slice(-1) +
-        " ○".repeat(Math.max(0, length - code.length))
+    const dispatch = createEventDispatcher()
+    // submit (code) - submit code
 
     // keyCodes: [user, numpad without numlock, numpad with numlock]
     //noinspection MagicNumberJS
@@ -26,7 +24,11 @@
         {text: "<", keyCodes: [8], action: () => back()},
     ]
 
-    const dispatch = createEventDispatcher()
+    $: maskedCode =
+        "● ".repeat(Math.max(0, code.length - 1)) +
+        code.slice(-1) +
+        " ○".repeat(Math.max(0, length - code.length))
+
 
     function add(x) {
         code += x

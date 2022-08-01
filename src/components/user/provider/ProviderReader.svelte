@@ -1,19 +1,22 @@
 <script>
-    import UserMenu from "../../common/user-menu/UserMenu.svelte"
-    import library from "../../../stores/library.js"
-    import Api from "../../../utility/api.js"
-    import appState from "../../../stores/app-state.js"
+    import UserMenu from "components/common/user-menu/UserMenu.svelte"
 
-    $: user_provider_id = $appState.user_provider_id
-    $: provider = library.providers[user_provider_id] ?? null
-    $: token = $appState.token
+    import library from "stores/library.js"
+    import appState from "stores/app-state.js"
+
+    import Api from "utility/api.js"
+
+    let listPage = 0
 
     let end = new Date()
     let start = new Date()
+
     start.setDate(end.getDate() - 1)
 
-    const listPage = 0
+    $: user_provider_id = $appState.user_provider_id
+    $: token = $appState.token
 
+    $: provider = library.providers[user_provider_id] ?? null
     $: listRequest = Api.getProviderRecords(token, listPage)
 
     function update() {
@@ -24,10 +27,12 @@
 
 <UserMenu username={provider?.name}/>
 
-<button class="large" on:click={update}>Обновить</button>
+<button class="large"
+        on:click={update}>Обновить</button>
 
 {#await listRequest}
     Получение записей...
+
 {:then result}
     {#if result.success && result.data?.records?.length}
         <table>
@@ -38,6 +43,7 @@
                 <th>Тип</th>
             </tr>
             </thead>
+
             {#each result.data.records as record}
                 <tr>
                     <td> {new Date(record.date).toString().split(" ").slice(1, 5).join(" ")} </td>
@@ -45,8 +51,12 @@
                     <td> {record.type} </td>
                 </tr>
             {/each}
+
         </table>
+
     {:else}
         Нет записей.
+
     {/if}
+
 {/await}

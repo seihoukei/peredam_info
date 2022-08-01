@@ -1,5 +1,5 @@
-import Period from "./period.js"
-import library from "../stores/library.js"
+import Period from "utility/period.js"
+import library from "stores/library.js"
 
 export default class Systems {
     static createDateMap(systems) {

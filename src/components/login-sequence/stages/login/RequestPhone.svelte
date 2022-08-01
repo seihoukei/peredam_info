@@ -1,27 +1,31 @@
 <script>
-    import LoginPrompt from "../../elements/LoginPrompt.svelte"
+    import LoginPrompt from "components/login-sequence/elements/LoginPrompt.svelte"
+
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
-    import Transitions from "../../../../utility/transitions.js"
-    import {failure, success} from "../../../../utility/messages.js"
-    import appState from "../../../../stores/app-state.js"
+
+    import appState from "stores/app-state.js"
+
+    import {failure, success} from "utility/messages.js"
+    import Transitions from "utility/transitions.js"
+
+    const dispatch = createEventDispatcher()
+    // nophone - switch to username method
 
     export let phone
 
-    let raw = ""
+    let input = ""
 
-    const dispatch = createEventDispatcher()
+    $: phone = `📞${input.replace(/[^0-9]*/g, "").slice(-10)}`
+    $: extraCheck = checkPhone(phone)
 
-    function noPhone() {
+    function useLogin() {
         dispatch("nophone")
     }
 
-    function nologin() {
+    function setAnonymousMode() {
         appState.setPage("anon")
     }
-
-    $: phone = `📞${raw.replace(/[^0-9]*/g, "").slice(-10)}`
-    $: extraCheck = checkPhone(phone)
 
     function checkPhone() {
         if (phone.slice(2).length < 5) {
@@ -38,10 +42,16 @@
 </script>
 
 <div class="central centered spaced flex container" transition:fly={Transitions.loginFlyLeft}>
-    <LoginPrompt autocomplete="tel-national" bind:value={raw} {extraCheck} hint="Номер телефона" on:submit type="tel">
+    <LoginPrompt autocomplete="tel-national"
+                 hint="Номер телефона"
+                 {extraCheck}
+                 bind:value={input}
+                 on:submit type="tel">
         Введите номер телефона
     </LoginPrompt>
-    <button on:click={noPhone}>◀ Вход без телефона</button>
+
+    <button on:click={useLogin}>◀ Вход без телефона</button>
+
     <br>
-    <button on:click={nologin}>Просто передать показания</button>
+    <button on:click={setAnonymousMode}>Просто передать показания</button>
 </div>

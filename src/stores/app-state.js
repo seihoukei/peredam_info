@@ -1,6 +1,8 @@
 import {writable} from "svelte/store"
-import Address from "../utility/address.js"
-import library from "./library.js"
+
+import library from "stores/library.js"
+
+import Address from "utility/address.js"
 
 const ANONYMOUS_PAGES = ["anon", "info"]
 
@@ -15,6 +17,7 @@ const DEFAULT_STATE = {
     mode: ``,
     data: ``,
     token: ``,
+    helpPage: ``,
 }
 
 const {set, update, subscribe} = writable({...DEFAULT_STATE})
@@ -101,6 +104,10 @@ const appState = {
         }
     },
     
+    setHelpPage(value = "") {
+        this.setValue("helpPage", value, appState.UPDATE_ADDRESS.NO)
+    },
+    
     reset(updateAddress = appState.UPDATE_ADDRESS.PUSH) {
         this.set({...DEFAULT_STATE})
         if (updateAddress !== appState.UPDATE_ADDRESS.NO) {
@@ -138,35 +145,43 @@ const appState = {
                         case "sys":
                             this.setSystemId(+id || null, appState.UPDATE_ADDRESS.NO)
                             break
+                        
                         case "city":
                             this.setCityId(+id || null, appState.UPDATE_ADDRESS.NO)
                             break
+                        
                         case "prov":
                             this.setProviderId(+id || null, appState.UPDATE_ADDRESS.NO)
                             break
+                        
                     }
                     break
+                
                 case "system_id":
                     this.setSystemId(+value || null, appState.UPDATE_ADDRESS.NO)
                     break
+                
                 case "city_id":
                     this.setCityId(+value || null, appState.UPDATE_ADDRESS.NO)
                     break
+                
                 case "provider_id":
                     this.setProviderId(+value || null, appState.UPDATE_ADDRESS.NO)
                     break
+                
                 case "mode":
                     this.setMode(value || "", appState.UPDATE_ADDRESS.NO)
                     break
+                
                 case "data":
                     this.setData(value || "", appState.UPDATE_ADDRESS.NO)
                     break
+                
                 default:
                     this.setValue(item, value || null, appState.UPDATE_ADDRESS.NO)
             }
         })
     },
-    
 }
 
 export default appState

@@ -1,10 +1,11 @@
 <script>
-    import RequestPhone from "./login/RequestPhone.svelte"
-    import RequestUsername from "./login/RequestUsername.svelte"
-    import ConfirmNewUser from "./login/ConfirmNewUser.svelte"
+    import RequestPhone from "components/login-sequence/stages/login/RequestPhone.svelte"
+    import RequestUsername from 'components/login-sequence/stages/login/RequestUsername.svelte'
+    import ConfirmNewUser from "components/login-sequence/stages/login/ConfirmNewUser.svelte"
 
-    import Api from "../../../utility/api.js"
-    import modal from "../../../stores/modal.js"
+    import modal from "stores/modal.js"
+
+    import Api from "utility/api.js"
 
     export let state
 
@@ -27,16 +28,25 @@
     }
 
     async function checkLogin() {
-        const result = await modal.await(Api.loginExists(state.login), "Поиск пользователя")
+        const result = await modal.await(
+            Api.loginExists(state.login),
+            "Поиск пользователя"
+        )
 
         if (result.success) {
             if (result.data.exists) {
+                modal.success("Пользователь найден!")
                 state.stage = "password"
+
             } else {
+                modal.success("Новый пользователь!")
                 isNewUser = true
+
             }
+
         } else {
             modal.error(result.error)
+
         }
     }
 
@@ -54,9 +64,12 @@
 {#if state.stage === "login"}
     {#if isNewUser}
         <ConfirmNewUser {login} on:cancel={back} on:confirm={confirmNewUser}/>
+
     {:else if isUsingPhone}
         <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin}/>
+
     {:else}
         <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone}/>
+
     {/if}
 {/if}

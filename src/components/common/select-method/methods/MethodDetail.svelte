@@ -2,7 +2,7 @@
     export let name
 </script>
 
-<div class="detail">
-    <span class="name">{name}: </span>
-    <span class="content"><slot></slot></span>
+<div>
+    <span>{name}: </span>
+    <span><slot/></span>
 </div>

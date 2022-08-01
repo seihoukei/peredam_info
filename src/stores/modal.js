@@ -40,6 +40,10 @@ const modal = {
         
     },
     
+    success(message) {
+        //TODO: Display positive result and disappear
+    },
+    
     close(callback) {
         update(state => ({
             ...state,

@@ -1,0 +1,60 @@
+@font-face {
+    font-family: "Exo2";
+    src: url("/resources/fonts/exo2.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 350;
+}
+
+:root {
+    --background: #C0C2C4;
+    --text-color: #000000;
+    --link-color: #003366;
+
+    --font-size: 18px;
+
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0E303D;
+
+        --text-color: #FFFFFF;
+        --link-color: #99CCFF;
+
+    }
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+
+    font: var(--font-size) 'Exo2', sans-serif;
+    background-color: var(--background);
+    color: var(--text-color);
+    overflow: hidden auto;
+}
+
+body {
+    max-width: 600px;
+    margin : auto;
+
+}
+
+a {
+    color: var(--link-color);
+    cursor: pointer;
+}
+
+li {
+    margin: 0 0 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+div {
+    text-align: center;
+}

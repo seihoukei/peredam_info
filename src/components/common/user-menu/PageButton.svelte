@@ -1,6 +1,7 @@
 <script>
-    import appState from "../../../stores/app-state.js"
     import {slide} from "svelte/transition"
+
+    import appState from "stores/app-state.js"
 
     export let page = ""
 

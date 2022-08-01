@@ -1,6 +1,3 @@
-import appState from "stores/app-state.js"
-import Address from "utility/address.js"
-
 export default class Values {
     static formatValue(format, value) {
         if (value === "") {
@@ -38,10 +35,34 @@ export default class Values {
         return result
     }
     
-    static inputTemplate(template = "") {
-        if (template) {
-            return Address.parse(template)
-        }
+    static fillTemplate(template = "", values) {
+        return template.replace(/\<.*?\>/g, match => values[match.slice(1, -1)])
+    }
+    
+    static stringify(object) {
+        return Object.entries(object)
+            .filter(([key, value]) => value)
+            .map(([key, value]) => key + "=" + encodeURIComponent(value))
+            .join("&")
+    }
+    
+    static parse(string = "") {
+        if (string === "")
+            return {}
+        
+        return string
+            .split("&").map(x => x.split("="))
+            .reduce((object, [id, value]) => ({
+                ...object,
+                [id]: decodeURIComponent(value),
+            }), {})
+    }
+    
+    static isEmpty(value) {
+        return value === "" || value === null
+    }
+    
+    static emptyOnChange() {
         return {}
     }
 }

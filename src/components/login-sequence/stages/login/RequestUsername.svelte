@@ -1,31 +1,40 @@
 <script>
-    import LoginPrompt from "../../elements/LoginPrompt.svelte"
+    import LoginPrompt from "components/login-sequence/elements/LoginPrompt.svelte"
+
     import {createEventDispatcher} from "svelte"
     import {fly} from "svelte/transition"
-    import Transitions from "../../../../utility/transitions.js"
-    import appState from "../../../../stores/app-state.js"
+
+    import appState from "stores/app-state.js"
+
+    import Transitions from "utility/transitions.js"
+
+    const dispatch = createEventDispatcher()
+    // phone - switch to phone method
 
     export let username
 
-    const dispatch = createEventDispatcher()
+    $: username = username.replace(/[^0-9a-zA-Zа-яА-Я_\- ]*/g, "")
 
-    function phone() {
+    function usePhone() {
         dispatch("phone")
     }
 
-    function nologin() {
+    function setAnonymousMode() {
         appState.setPage("anon")
     }
-
-    $: username = username.replace(/[^0-9a-zA-Zа-яА-Я_\- ]*/g, "")
 
 </script>
 
 <div class="central centered spaced flex container" transition:fly={Transitions.loginFlyLeft}>
-    <LoginPrompt autocomplete="username" bind:value={username} hint="Имя пользователя" on:submit>
+    <LoginPrompt autocomplete="username"
+                 hint="Имя пользователя"
+                 bind:value={username}
+                 on:submit>
         Введите имя пользователя
     </LoginPrompt>
-    <button on:click={phone}>◀ Вход по номеру телефона</button>
+
+    <button on:click={usePhone}>◀ Вход по номеру телефона</button>
+
     <br>
-    <button on:click={nologin}>Просто передать показания</button>
+    <button on:click={setAnonymousMode}>Просто передать показания</button>
 </div>

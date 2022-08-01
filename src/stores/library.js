@@ -1,7 +1,9 @@
 import {writable} from "svelte/store"
-import Api from "../utility/api.js"
-import modal from "./modal.js"
-import Serializer from "../utility/serializer.js"
+
+import modal from "stores/modal.js"
+
+import Api from "utility/api.js"
+import Serializer from "utility/serializer.js"
 
 let library = {
     cities: {},
@@ -25,10 +27,13 @@ export const loadLibrary = Api.getLibrary().then(result => {
         
         localStorage.library = Serializer.serialize(library)
         libraryReady.set(true)
+
     } else if (localStorage.library) {
         library = Serializer.deserialize(localStorage.library)
         libraryReady.set(true)
+
     } else {
         modal.error("Не удалось загрузить основную базу. Попробуйте позже.")
+
     }
 })

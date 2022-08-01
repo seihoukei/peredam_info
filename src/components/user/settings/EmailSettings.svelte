@@ -30,17 +30,27 @@
 
 <div class="centered flex">
     E-mail для оповещений:
-    <input bind:value={newMail} class="large" type="email">
+    <input class="large"
+           type="email"
+           bind:value={newMail}>
 
     {#if state !== "confirmed"}
-        <button on:click={subscribe} disabled={invalid} transition:slide>Подписаться</button>
+        <button on:click={subscribe}
+                disabled={invalid}
+                transition:slide>Подписаться</button>
 
         {#if state === "sent"}
             <div class="centered flex" transition:slide>
                 Код подтверджения адреса {email}
-                <input type="text" class="large" bind:value={code}>
+
+                <input class="large"
+                       type="text"
+                       bind:value={code}>
+
                 <button on:click={confirm}>Подтвердить</button>
+
             </div>
+
         {/if}
 
     {:else}

@@ -1,7 +1,9 @@
 <script>
+    import TopLogo from "components/common/TopLogo.svelte"
+
     import {fade, fly} from "svelte/transition"
-    import Transitions from "../../utility/transitions.js"
-    import TopLogo from "../common/TopLogo.svelte"
+
+    import Transitions from "utility/transitions.js"
 
     const hour = new Date().getHours()
 
@@ -21,11 +23,16 @@
 
     {#if isNight}
         Доброй ночи!
+
     {:else if isMorning}
         Доброе утро!
+
     {:else if isDay}
         Добрый день!
+
     {:else if isEvening}
         Добрый вечер!
+
     {/if}
+
 </div>

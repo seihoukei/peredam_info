@@ -1,54 +1,55 @@
 <script>
-    import library from "../../../stores/library.js"
-    import VariableDetail from "./VariableDetail.svelte"
+    import ValueEdit from "components/common/system-management/ValueEdit.svelte"
+
     import {slide} from "svelte/transition"
-    import Values from "../../../utility/values.js"
-    import appState from "../../../stores/app-state.js"
+
+    import library from "stores/library.js"
+    import appState from "stores/app-state.js"
+
+    import Values from "utility/values.js"
+
+    export let setOnlyConstants = false
+
+    export let input = {}
+    export let isInputReady
+
+    let valueReadiness = {}
 
     $: provider_id = $appState.provider_id
-
-    export let values = {}
-    export let ready
-    export let all = false
-
     $: provider = library.providers[provider_id] || null
-    $: valuesToFill = getValuesToFill(provider)
-    $: ready = validate(valuesToFill, values)
+    $: valuesToSet = provider?.values ?? {}
+    $: resetInputOnChange(provider)
 
-    function getValuesToFill(provider) {
-        const result = []
-        if (provider === null) {
-            return result
-        }
+    $: appState.setData(Values.stringify(input))
 
-        for (const [id, value] of Object.entries(provider.values)) {
-            if (value.constant || all) {
-                result.push({
-                    name: value.name,
-                    type: value.type,
-                    mandatory: value.mandatory,
-                    id,
-                })
-            }
-        }
-        return result
+    $: isInputReady = Object.values(valueReadiness).every(Boolean)
+
+    function resetInputOnChange() {
+        input = Values.parse($appState.data)
+        valueReadiness = {}
     }
 
-    function validate() {
-        if (provider === null) {
-            return false
-        }
-        return valuesToFill.every(value => {
-            return Values.formatValue(value.type, values[value.id]) !== null || !value.mandatory && values[value.id] === ""
-        })
-    }
 </script>
 
 {#if provider !== null}
     <div class="centered flex">
-        <div class="important large spacy-below" transition:slide>Заполните обязательные поля:</div>
-        {#each valuesToFill as value, index}
-            <VariableDetail name={value.name} type={value.type} bind:value={values[value.id]} priority={index}/>
+        {#if !isInputReady}
+            <div class="important large spacy-below" transition:slide>
+                Заполните обязательные поля:
+            </div>
+        {/if}
+
+        {#each Object.entries(valuesToSet) as [id, value], index}
+            {#if value.constant || !setOnlyConstants}
+                <ValueEdit description={value}
+                           priority={index}
+                           bind:value={input[id]}
+                           bind:isValueReady={valueReadiness[id]} />
+
+            {/if}
+
         {/each}
+
     </div>
+
 {/if}

@@ -1,7 +1,7 @@
 import "./app.css"
 import App from "./App.svelte"
-import appState from "./stores/app-state.js"
-import Address from "./utility/address.js"
+import appState from "stores/app-state.js"
+import Address from "utility/address.js"
 
 const app = new App({
     target: document.getElementById("app"),

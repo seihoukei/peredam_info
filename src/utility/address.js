@@ -58,17 +58,4 @@ export default class Address {
             window.history.pushState(state, null, path)
         }
     }
-    
-    static stringify(object) {
-        return Object.entries(object).filter(([key, value]) => value).map(([key, value]) => key + "=" + encodeURIComponent(value)).join("&")
-    }
-    
-    static parse(string = "") {
-        return string
-            .split("&").map(x => x.split("="))
-            .reduce((object, [id, value]) => ({
-                ...object,
-                [id]: decodeURIComponent(value),
-            }), {})
-    }
 }

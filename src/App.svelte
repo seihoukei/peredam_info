@@ -5,7 +5,6 @@
     import ModalDialog from "components/common/ModalDialog.svelte"
     import KnowledgeBase from "components/knowledge/KnowledgeBase.svelte"
     import Welcome from "components/welcome/Welcome.svelte"
-    import Error from "components/login-sequence/elements/Error.svelte"
 
     import {onMount} from "svelte"
 
@@ -13,8 +12,12 @@
     import appState from "stores/app-state.js"
 
     import Api from "utility/api.js"
+    import modal from "stores/modal.js"
 
     let attempt = 0
+    let user = {
+        systems: []
+    }
 
     $: token = $appState.token
     $: page = $appState.page
@@ -30,14 +33,28 @@
         attempt++
     }
 
-    async function loadUser(token) {
+    async function loadUser() {
         if (!$libraryReady) {
             await loadLibrary
         }
 
         appState.restorePageData(page)
 
-        return await Api.getUserSystems(token)
+        user = {systems: []}
+
+        const result = await Api.getUserSystems(token)
+
+        if (result.success) {
+            user.systems = result.data
+
+        } else if (token !== "") {
+            modal.error(result.error, [{
+                text: "Повторить попытку",
+                callback : retry,
+            }])
+        }
+
+        return result
     }
 
 </script>
@@ -64,10 +81,10 @@
             {/if}
 
         {:else if result?.success}
-            <UserMain user={{systems:result.data}}/>
+            <UserMain bind:user/>
 
         {:else}
-            <Error message={result?.error ?? "Ошибка связи"} on:click={retry}/>
+            <Welcome />
 
         {/if}
 
