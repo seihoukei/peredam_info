@@ -19,6 +19,7 @@
 
     let isInputReady = false
     let choseManualMethod = Api.forceManualMethod
+    let agreed = false
 
     $: provider_id = $appState.provider_id
 
@@ -31,6 +32,7 @@
     $: useManualMethods = !onlineMethodAvailable || choseManualMethod
 
     $: canSend = isInputReady && !$modal.waiting
+    $: canAutoSend = canSend && agreed
 
     function resetOnChange() {
         choseManualMethod = Api.forceManualMethod
@@ -99,11 +101,23 @@
 
         <SelectMethod valuesToSend={input} methods={provider.methods}/>
     {/if}
+    {#if !useManualMethods && provider_id !== null}
+        <div class="centered spacy-below flex">
+            <label>
+                <input bind:checked={agreed} type="checkbox"/>
+                Я даю согласие на обработку моих персональных данных
+                (<a href="/agreement/personal.html"
+                    rel="noopener noreferrer"
+                    target="_blank" >Подробнее</a>)
+            </label>
+        </div>
+
+    {/if}
 
     <div class="row-flex spacy-below" transition:slide>
         {#if !useManualMethods}
             <button on:click={submit}
-                    disabled={!canSend}>Отправить</button>
+                    disabled={!canAutoSend}>Отправить</button>
 
             <button on:click={chooseManualMethod}
                     disabled={!canSend}>Вручную</button>

@@ -5,19 +5,20 @@
     import Api from "utility/api.js"
     import {onMount} from "svelte"
 
-    export let emailProperties = {}
+    export let emailProperties = {
+    }
 
-    let newAddress = emailProperties.address
+    let newAddress = emailProperties.address ?? ""
     let code = ""
     let updateTimeout = null
     let remembered = null
 
-    $: isAddressInvalid = !newAddress.match(/.+@.+/) || newAddress === emailProperties.address
+    $: isAddressInvalid = newAddress && (!newAddress.match(/.+@.+/) || newAddress === emailProperties.address)
     $: isExpectingConfirmation = emailProperties.address !== "" && !emailProperties.confirmed
 
     $: extraSettings = {
-        email_reminders: emailProperties.reminders,
-        email_send_copy: emailProperties.sendCopy,
+        email_reminders: emailProperties.reminders ?? false,
+        email_send_copy: emailProperties.sendCopy ?? false,
     }
 
     onMount(() => {
@@ -85,6 +86,8 @@
             return
 
         updateTimeout = setTimeout(async () => {
+            clearTimeout(updateTimeout)
+
             const result = await modal.await(
                 Api.setEmailSettings($appState.token, extraSettings),
                 "Установка настроек уведомлений...",

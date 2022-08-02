@@ -1,29 +1,13 @@
 <script>
     import appState from "stores/app-state.js"
+    import Address from "utility/address.js"
 
     export let loginState = null
 
     function help() {
-        if (loginState) {
-            appState.setHelpPage(`login/${
-                loginState.stage
-            }${
-                loginState.isNewUser && loginState.stage !== `code` ? `/new` : ``
-            }${
-                loginState.tokens.current ? `/set` : ``
-            }`)
-        } else {
-            appState.setHelpPage(`${
-                $appState.page
-            }${
-                $appState.system_id ? "/sys" :
-                $appState.provider_id ? "/prov" :
-                $appState.city_id ? "/city" :
-                ""
-            }${
-                $appState.mode ? `/${$appState.mode}` : ""
-            }`)
-        }
+        appState.setHelpPage(
+            Address.getRelevantHelpPage($appState, loginState)
+        )
     }
 
 </script>

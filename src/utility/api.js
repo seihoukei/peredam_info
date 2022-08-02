@@ -98,11 +98,9 @@ export default class Api {
                         } : null,
                     })),
                     properties: {
-                        email: {
-                            address: result.data.properties.email ?? "",
-                            confirmed : Boolean(result.data.properties.email_confirmed),
-                            reminders : Boolean(result.data.properties.email_reminders),
-                            sendCopy : Boolean(result.data.properties.email_send_copy),
+                        email: result.data.properties.email || {
+                            address : "",
+                            confirmed : true,
                         },
                     },
                 })

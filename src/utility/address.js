@@ -58,4 +58,32 @@ export default class Address {
             window.history.pushState(state, null, path)
         }
     }
+    
+    static getRelevantHelpPage(appState, loginState = null) {
+        let page = ``
+        
+        if (loginState) {
+            page = `${page}/login/${loginState.stage}`
+            
+            if (loginState.isNewUser && loginState.stage !== `code`)
+                page = `${page}/new`
+
+            if (loginState.stage === `code` && loginState.tokens.current)
+                page = `${page}/set`
+        
+        } else {
+            page = `${page}/${appState.page}`
+            
+            if (appState.system_id)
+                page = `${page}/sys`
+            else if (appState.provider_id)
+                page = `${page}/prov`
+            else if (appState.city_id)
+                page = `${page}/city`
+            
+            if (appState.mode)
+                page = `${page}/${appState.mode}`
+        }
+        return page
+    }
 }
