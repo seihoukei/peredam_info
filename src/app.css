@@ -137,6 +137,10 @@ div.dialog {
     position: relative;
 }
 
+.limited {
+    max-width : 600px;
+}
+
 .opaque {
     background-color: var(--background);
 }
@@ -208,4 +212,8 @@ button:disabled, input:disabled {
 
 .debug.bottom {
     bottom: 0;
+}
+
+.debug.left {
+    left: -200px;
 }

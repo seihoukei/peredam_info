@@ -69,10 +69,15 @@ const modal = {
         }))
     },
     
-    async await(promise, message = "Ожидание...") {
-        this.startWaiting(message)
+    async await(promise, message = "Ожидание...", silent = false) {
+        //TODO: proper silent waiting
+        if (!silent)
+            this.startWaiting(message)
+        
         const result = await promise
-        this.stopWaiting()
+        
+        if (!silent)
+            this.stopWaiting()
         
         return result
     },

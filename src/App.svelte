@@ -23,12 +23,9 @@
     $: page = $appState.page
     $: isAnonymousPage = $appState.isAnonymousPage
 
-    $: loading = loadUser(token, attempt)
-
     onMount(() => {
         appState.restorePage()
     })
-
     function retry() {
         attempt++
     }
@@ -40,12 +37,20 @@
 
         appState.restorePageData(page)
 
-        user = {systems: []}
+        user = {
+            systems: [],
+            properties : {},
+        }
 
-        const result = await Api.getUserSystems(token)
+        if (token === "")
+            return
+
+        console.log(token)
+
+        const result = await Api.getUserData(token)
 
         if (result.success) {
-            user.systems = result.data
+            user = result.data
 
         } else if (token !== "") {
             modal.error(result.error, [{
@@ -67,7 +72,7 @@
     <LoginSequence/>
 
 {:else}
-    {#await loading}
+    {#await loadUser(token, attempt)}
         <Welcome/>
 
     {:then result}

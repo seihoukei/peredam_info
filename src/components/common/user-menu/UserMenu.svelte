@@ -28,7 +28,6 @@
 
     {#if showMenu}
         <div class="spaced centered flex" transition:slide on:click={hideMenu}>
-<!--
             <PageButton page="user">
                 Управление показаниями
             </PageButton>
@@ -36,7 +35,6 @@
             <PageButton page="conf">
                 Настройки уведомлений
             </PageButton>
--->
 
             <LogoutButton/>
 

@@ -76,26 +76,37 @@ export default class Api {
         })
     }
     
-    static async getUserSystems(token = null) {
+    static async getUserData(token = null) {
         if (!token) {
             return Messages.failure()
         }
         
-        const result = await this.#call("systems/list", {
+        const result = await this.#call("user/data", {
             token,
         })
         
         if (result.success) {
             try {
-                result.data = result.data.map(record => ({
-                    id: +record.id,
-                    provider_id: +record.provider_id,
-                    values: JSON.parse(record.values),
-                    last: record.last_values ? {
-                        date: record.last_date * 1000,
-                        values: JSON.parse(record.last_values),
-                    } : null,
-                }))
+                return Messages.success({
+                    systems : result.data.systems.map(record => ({
+                        id: +record.id,
+                        provider_id: +record.provider_id,
+                        values: JSON.parse(record.values),
+                        last: record.last_values ? {
+                            date: record.last_date * 1000,
+                            values: JSON.parse(record.last_values),
+                        } : null,
+                    })),
+                    properties: {
+                        email: {
+                            address: result.data.properties.email ?? "",
+                            confirmed : Boolean(result.data.properties.email_confirmed),
+                            reminders : Boolean(result.data.properties.email_reminders),
+                            sendCopy : Boolean(result.data.properties.email_send_copy),
+                        },
+                    },
+                })
+                
             } catch (e) {
                 return Messages.failure("Неизвестная ошибка")
             }
@@ -182,6 +193,24 @@ export default class Api {
             provider_id,
             values: JSON.stringify(values),
             queue,
+        })
+    }
+    
+    static async setEmail(token, address) {
+        return await this.#call("email/set", {
+            token, address
+        })
+    }
+    
+    static async setEmailSettings(token, settings) {
+        return await this.#call("email/update_settings", {
+            token, settings
+        })
+    }
+    
+    static async confirmEmail(token, code) {
+        return await this.#call("email/confirm", {
+            token, code
         })
     }
 }

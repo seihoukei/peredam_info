@@ -4,7 +4,7 @@
     import SelectSystem from "components/user/SelectSystem.svelte"
     import AddSystem from "components/add/AddSystem.svelte"
     import ProviderReader from "components/read/ProviderReader.svelte"
-    import UserSettings from "components/user/settings/UserSettings.svelte"
+    import UserSettings from "components/conf/UserSettings.svelte"
     import SystemMain from "components/user/sys/SystemMain.svelte"
 
     import {fade, fly, slide} from "svelte/transition"
@@ -16,6 +16,7 @@
 
     export let user = {
         systems: [],
+        properties: {}
     }
 
     let systems = Systems.sortByDate(user.systems)
@@ -73,7 +74,7 @@
             <AddSystem on:add={add}/>
 
         {:else if page === 'conf'}
-            <UserSettings/>
+            <UserSettings bind:userProperties={user.properties} />
 
         {:else}
             <SelectSystem {systems}>
