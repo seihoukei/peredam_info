@@ -5,7 +5,7 @@
     export let value = ""
 </script>
 
-<div class="centered flex" transition:slide>
-    <span class="center-text">{name}</span>
-    <span class="center-text large spacy-below">{value}</span>
+<div class="centered row-flex spacy-below" transition:slide>
+    <span class="">{name}</span>
+    <span class="center-text large">{value}</span>
 </div>

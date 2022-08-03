@@ -24,6 +24,7 @@
     let valueReadiness = {}
 
     $: system_id = $appState.system_id
+    $: page = $appState.page
     $: mode = $appState.mode
 
     $: provider = library.providers[system?.provider_id] ?? null
@@ -202,7 +203,7 @@
 
 </script>
 
-{#if system_id !== null && system !== null}
+{#if system_id !== null && system !== null && page === "user"}
     {#if mode === ``}
         <div class="large important spacy-below center-text" transition:slide>
             Проверьте данные и выберите действие

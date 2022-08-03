@@ -1,5 +1,5 @@
 <script>
-    import {slide} from "svelte/transition"
+        import {slide} from "svelte/transition"
     import modal from "stores/modal.js"
     import appState from "stores/app-state.js"
     import Api from "utility/api.js"
@@ -17,8 +17,8 @@
     $: isExpectingConfirmation = emailProperties.address !== "" && !emailProperties.confirmed
 
     $: extraSettings = {
-        email_reminders: emailProperties.reminders ?? false,
-        email_send_copy: emailProperties.sendCopy ?? false,
+        reminders: emailProperties.reminders ?? false,
+        send_copy: emailProperties.send_copy ?? false,
     }
 
     onMount(() => {
@@ -42,6 +42,7 @@
             modal.success("Код подтверждения выслан")
             emailProperties.address = newAddress
             emailProperties.confirmed = false
+            code = ""
 
         } else {
             modal.error(result.error)
@@ -63,6 +64,7 @@
         if (result.success) {
             modal.success("Адрес успешно подтвержден")
             emailProperties.confirmed = true
+            Object.assign(emailProperties, result.data)
             newAddress = emailProperties.address
 
         } else {
@@ -109,7 +111,7 @@
 </script>
 
 <div class="centered limited flex">
-    <div class="centered spacy-below flex">
+    <div class="centered spacy-below flex" transition:slide|local>
         <form on:submit|preventDefault={setNewAddress}>
             <div class="centered center-text flex">
                 E-mail для оповещений:
@@ -121,11 +123,11 @@
                 {#if emailProperties.address !== newAddress && newAddress !== ""}
                     <input type="submit"
                            disabled={isAddressInvalid}
-                           transition:slide
+                           transition:slide|local
                            value="Установить новый адрес">
 
                 {:else if emailProperties.address !== "" && (emailProperties.confirmed || newAddress === "") }
-                    <button transition:slide
+                    <button transition:slide|local
                             on:click={unsubscribe}>
                         Отписаться
                     </button>
@@ -136,13 +138,13 @@
 
         {#if isExpectingConfirmation}
             <form on:submit|preventDefault={checkConfirmationCode}>
-                <div class="centered important center-text spacy-below flex" transition:slide>
+                <div class="centered important center-text spacy-below flex" transition:slide|local>
                     На ваш адрес было выслано письмо с кодом подтверждения.
                     <br>
                     Введите полученный код и нажмите кнопку "Подтвердить".
                 </div>
 
-                <div class="centered nowrap flex" transition:slide>
+                <div class="centered nowrap flex" transition:slide|local>
                     Код подтверждения адреса {emailProperties.address}:
 
                     <input class="spacy-below large"
@@ -159,7 +161,7 @@
     </div>
 
     {#if emailProperties.address !== "" && emailProperties.confirmed}
-        <div class="centered spaced spacy-below flex" transition:slide>
+        <div class="centered spaced spacy-below flex" transition:slide|local>
             <label>
                 <input type="checkbox"
                        bind:checked={emailProperties.reminders}>
@@ -168,7 +170,7 @@
 
             <label>
                 <input type="checkbox"
-                       bind:checked={emailProperties.sendCopy}>
+                       bind:checked={emailProperties.send_copy}>
 
                 Дублировать информацию о переданных показаниях на электронную почту
             </label>

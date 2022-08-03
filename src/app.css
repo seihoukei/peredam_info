@@ -13,45 +13,25 @@
 }
 
 :root {
-    --background: #C0C2C4;
-    --text-color: #000000;
-    --link-color: #003366;
-    --important-color: #004488;
+    --background: #0E303D;
 
-    --element-background: #737476;
+    --text-color: #FFFFFF;
+    --link-color: #99CCFF;
+    --important-color: #EEFF88;
+
+    --element-background: #081D25;
     --element-text-color: #FFFFFF;
 
-    --disabled-element-background: #9A9B9D;
-    --disabled-element-text-color: #555555;
+    --disabled-element-background: #0B2631;
+    --disabled-element-text-color: #777777;
 
-    --input-placeholder-color: #C7C7C8;
+    --input-placeholder-color: #6B7777;
 
-    --status-ok-color: #008800;
-    --status-error-color: #880000;
+    --status-ok-color: #44CC44;
+    --status-error-color: #CC4444;
 
     --font-size: 18px;
 
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0E303D;
-
-        --text-color: #FFFFFF;
-        --link-color: #99CCFF;
-        --important-color: #EEFF88;
-
-        --element-background: #081D25;
-        --element-text-color: #FFFFFF;
-
-        --disabled-element-background: #0B2631;
-        --disabled-element-text-color: #777777;
-
-        --input-placeholder-color: #6B7777;
-
-        --status-ok-color: #44CC44;
-        --status-error-color: #CC4444;
-    }
 }
 
 html, body {
@@ -86,6 +66,12 @@ div.row-flex {
 
 div.flex.centered {
     align-items: center;
+    justify-content: center;
+}
+
+div.row-flex.centered {
+    align-items: center;
+    justify-content: center;
 }
 
 div.flex.spaced {
@@ -150,6 +136,10 @@ div.dialog {
     text-align: center;
 }
 
+.right-text {
+    text-align: right;
+}
+
 .spacy-below {
     margin-bottom: 20px;
 }
@@ -205,7 +195,7 @@ button:disabled, input:disabled {
 .debug {
     color: var(--text-color);
     position: absolute;
-    opacity: 0.2;
+    opacity: 0.2    ;
     font-size: 20px;
     pointer-events: none;
     z-index: 100;

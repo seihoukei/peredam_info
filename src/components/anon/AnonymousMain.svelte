@@ -102,7 +102,7 @@
         <SelectMethod valuesToSend={input} methods={provider.methods}/>
     {/if}
     {#if !useManualMethods && provider_id !== null}
-        <div class="centered spacy-below flex">
+        <div class="centered spacy-below center-text flex">
             <label>
                 <input bind:checked={agreed} type="checkbox"/>
                 Я даю согласие на обработку моих персональных данных

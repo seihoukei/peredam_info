@@ -45,8 +45,6 @@
         if (token === "")
             return
 
-        console.log(token)
-
         const result = await Api.getUserData(token)
 
         if (result.success) {
