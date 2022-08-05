@@ -1,6 +1,4 @@
 <script>
-    import {slide} from "svelte/transition"
-
     import library from "stores/library"
     import appState from "stores/app-state"
 
@@ -28,7 +26,7 @@
 </script>
 
 {#if provider !== null}
-    <div class="centered flex" transition:slide>
+    <div class="centered flex">
         <button class="large"
                 on:click={switchCurrent}>{displayName}</button>
 

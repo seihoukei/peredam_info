@@ -4,9 +4,8 @@
     import SetValues from "components/common/system-management/SetValues.svelte"
 
     import {createEventDispatcher} from "svelte"
-    import {slide} from "svelte/transition"
 
-    import modal from "stores/modal"
+    import apiStatus from "stores/api-status.js"
     import library from "stores/library"
     import appState from "stores/app-state"
 
@@ -19,12 +18,14 @@
     let input = {}
     let isInputReady = false
 
+    $: city_id = $appState.city_id
     $: provider_id = $appState.provider_id
     $: page = $appState.page
 
+    $: city = library.cities[city_id] ?? null
     $: provider = library.providers[provider_id] ?? null
 
-    $: canSend = isInputReady || $modal.waiting
+    $: canSend = isInputReady || $apiStatus.waiting
 
     $: newSystem = {
         provider_id,
@@ -32,18 +33,18 @@
     }
 
     async function finalize() {
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.addSystem($appState.token, newSystem),
             "Добавление данных",
         )
 
         if (result.success) {
-            modal.success("Данные добавлены!")
+            apiStatus.success("Данные добавлены!")
             newSystem.id = result.data.id
             dispatch("add", newSystem)
 
         } else {
-            modal.error(result.error)
+            apiStatus.error(result.error)
 
         }
     }
@@ -62,12 +63,14 @@
     <pre class="debug bottom">Добавление системы{JSON.stringify(newSystem, null, 1)}</pre>
 {/if}
 
-{#if page === 'add'}
-    <SelectCity/>
-    <SelectProvider/>
-    <SetValues bind:input bind:isInputReady setOnlyConstants="true"/>
+<div class="centered flex">
+    <SelectCity>
+        <SelectProvider {city}>
+            <SetValues {provider} bind:input bind:isInputReady setOnlyConstants="true"/>
+        </SelectProvider>
+    </SelectCity>
 
-    <div class="spacy-below row-flex" transition:slide>
+    <div class="spacy-below row-flex">
         <button on:click={finalize}
                 disabled={!canSend}>Добавить</button>
 
@@ -75,4 +78,4 @@
 
     </div>
 
-{/if}
+</div>

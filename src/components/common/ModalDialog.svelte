@@ -1,21 +1,21 @@
 <script>
     import {fade} from "svelte/transition"
 
-    import modal from "stores/modal.js"
-
     import Transitions from "utility/transitions.js"
     import FocusWatcher from "utility/focus-watcher.js"
+    import modal from "stores/modal.js"
 
     let dialog
 
-    $: error = $modal.error
-    $: waiting = $modal.waiting
-    $: asking = $modal.asking
+    $: isShown = $modal.isShown
+    $: isError = $modal.isError
+    $: message = $modal.message
+    $: buttons = $modal.buttons
 
-    $: focus(error, waiting, asking)
+    $: focus(isShown)
 
     function checkKey(event) {
-        if (error || asking) {
+        if (isShown) {
             for (let button of $modal.buttons) {
                 if (button.keyCodes?.includes(event.keyCode)) {
                     event.stopPropagation()
@@ -36,29 +36,18 @@
 
 <svelte:window on:keydown={checkKey}/>
 
-{#if error || waiting || asking}
+{#if isShown}
     <div class="fullscreen-container" transition:fade={Transitions.fastFade}>
         <div class="dialog" tabindex="0" bind:this={dialog}>
-            {#if $modal.error}
+            {#if isError}
                 <span class="large">Ошибка</span>
-                <span class="center-text">{$modal.errorMessage}</span>
-                <div class="spaced row-flex">
-                    {#each $modal.buttons as button}
-                        <button on:click={() => modal.close(button.callback)}>{button.text}</button>
-                    {/each}
-                </div>
-            {:else if $modal.asking}
-                <span class="large">Внимание!</span>
-                <span class="center-text">{$modal.askingMessage}</span>
-                <div class="spaced row-flex">
-                    {#each $modal.buttons as button}
-                        <button on:click={() => modal.close(button.callback)}>{button.text}</button>
-                    {/each}
-                </div>
-            {:else}
-                <span class="large">Ожидание</span>
-                <span class="center-text">{$modal.waitingMessage}</span>
             {/if}
+            <span class="center-text">{message}</span>
+            <div class="spaced row-flex">
+                {#each buttons as button}
+                    <button on:click={() => modal.close(button.callback)}>{button.text}</button>
+                {/each}
+            </div>
         </div>
     </div>
 {/if}

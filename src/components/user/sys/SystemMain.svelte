@@ -7,17 +7,19 @@
     import {slide} from "svelte/transition"
 
     import library from "stores/library.js"
-    import modal from "stores/modal.js"
+    import apiStatus from "stores/api-status.js"
     import appState from "stores/app-state.js"
 
     import Api from "utility/api.js"
     import Period from "utility/period.js"
     import Values from "utility/values.js"
+    import modal from "stores/modal.js"
 
     const dispatch = createEventDispatcher()
     // remove (id) - remove system
 
     export let system = {}
+    export let offline = false
 
     let choseManualMethod = Api.forceManualMethod
     let input = {}
@@ -33,9 +35,9 @@
     $: resetOnChange(mode, provider)
 
     $: isInputReady = Object.values(valueReadiness).every(Boolean)
-    $: canSend = isInputReady && !$modal.waiting
+    $: canSend = isInputReady && !$apiStatus.waiting
 
-    $: useManualMethod = !onlineMethodAvailable || choseManualMethod
+    $: useManualMethod = !onlineMethodAvailable || choseManualMethod || offline
 
     $: valuesToSend = Values.formatValues(provider?.values, {
         ...system?.values,
@@ -69,7 +71,7 @@
     }
 
     function cancel() {
-        appState.setMode(``)
+        appState.setMode(``, appState.UPDATE_ADDRESS.NO)
     }
 
     function checkPeriod() {
@@ -95,6 +97,7 @@
                 }, {
                     text: "Отмена",
                     keyCodes: [27],
+                    back: true,
                     callback: cancel,
                 }])
         }
@@ -113,24 +116,25 @@
             }, {
                 text: "Отмена",
                 keyCodes: [27],
+                back: true,
                 callback: null,
             },
         ])
     }
 
     async function remove() {
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.removeSystem($appState.token, system.id),
             "Удаление данных...",
         )
 
         if (result.success) {
-            modal.success("Данные удалены!")
+            apiStatus.success("Данные удалены!")
             dispatch("remove", system.id)
             appState.setMode(``)
 
         } else {
-            modal.error(result.error)
+            apiStatus.error(result.error)
 
         }
     }
@@ -138,31 +142,31 @@
     async function saveEdit() {
         input = Values.formatValues(provider.values, input)
 
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.updateSystem($appState.token, system.id, input),
             "Обновление данных...",
         )
 
         if (result.success) {
-            modal.success("Данные обновлены!")
+            apiStatus.success("Данные обновлены!")
             system.values = input
             appState.setMode(``)
 
         } else {
-            modal.error(result.error)
+            apiStatus.error(result.error)
 
         }
 
     }
 
     async function submitOnline() {
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.submitUserValues($appState.token, system, valuesToSend, true),
             "Передача показаний...",
         )
 
         if (result.success) {
-            modal.success("Показания переданы!")
+            apiStatus.success("Показания переданы!")
             finalize()
 
         } else {
@@ -173,13 +177,13 @@
     }
 
     async function reportSubmission() {
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.submitUserValues($appState.token, system, valuesToSend),
             "Сохранение данных...",
         )
 
         if (result.success) {
-            modal.success("Данные сохранены!")
+            apiStatus.success("Данные сохранены!")
             finalize()
 
         } else {
@@ -203,76 +207,72 @@
 
 </script>
 
-{#if system_id !== null && system !== null && page === "user"}
-    {#if mode === ``}
-        <div class="large important spacy-below center-text" transition:slide>
-            Проверьте данные и выберите действие
-        </div>
-    {:else if mode === `edit`}
-        <div class="large important spacy-below center-text" transition:slide>
-            Уточните данные или удалите систему
-        </div>
-    {/if}
+<div class="centered flex">
+    {#if system !== null}
+        {#if mode === ``}
+            <div class="large important spacy-below center-text" transition:slide|local>
+                Проверьте данные и выберите действие
+            </div>
+        {:else if mode === `edit`}
+            <div class="large important spacy-below center-text" transition:slide|local>
+                Уточните данные или удалите систему
+            </div>
+        {/if}
 
-    {#if provider !== null}
-        <div class="flex">
+        {#if provider !== null}
             {#if mode !== `send`}
-                <ValueDisplay name="Поставщик" value={provider?.name}/>
+                <div transition:slide|local>
+                    <ValueDisplay name="Поставщик" value={provider?.name}/>
+                </div>
             {/if}
 
             {#each Object.entries(provider.values) as [id, value], index (id)}
                 {#if value.constant}
                     {#if mode === `edit`}
-                        <ValueEdit description={value}
-                                   priority={index}
-                                   bind:value={input[id]}
-                                   bind:isValueReady={valueReadiness[id]}/>
+                        <div transition:slide|local>
+                            <ValueEdit description={value}
+                                       priority={index}
+                                       bind:value={input[id]}
+                                       bind:isValueReady={valueReadiness[id]}/>
+                        </div>
 
                     {:else}
-                        <ValueDisplay name={value.name}
-                                      value={system.values[id]}/>
+                        <div transition:slide|local>
+                            <ValueDisplay name={value.name}
+                                          value={system.values[id]}/>
+                        </div>
 
                     {/if}
 
-                {:else if mode === `send`}
-                    <ValueEdit description={value}
-                               placeholder={system.last?.values[id]}
-                               priority={index}
-                               bind:value={input[id]}
-                               bind:isValueReady={valueReadiness[id]}/>
+                {:else}
+                    {#if mode === `send`}
+                        <div transition:slide|local>
+                            <ValueEdit description={value}
+                                       placeholder={system.last?.values[id]}
+                                       priority={index}
+                                       bind:value={input[id]}
+                                       bind:isValueReady={valueReadiness[id]}/>
+                        </div>
+                    {/if}
 
                 {/if}
 
             {/each}
 
-        </div>
-
-        {#if mode === `edit`}
-            <div class="row-flex spacy-below" transition:slide>
-                <button on:click={saveEdit}
-                        disabled={!canSend}>Сохранить</button>
-
-                <button on:click={confirmRemoval}
-                        disabled={$modal.waiting}>Удалить</button>
-
-                <button on:click={cancel}>◀ Отмена</button>
-            </div>
-
-        {:else if mode === `send`}
-            {#if !isInputReady}
-                <div class="large important center-text spacy-below" transition:slide>
+            {#if mode === `send` && !isInputReady}
+                <div class="large important center-text spacy-below" transition:slide|local>
                     Заполните поля для показаний выше
                 </div>
             {/if}
 
-            {#if isInputReady && useManualMethod}
+            {#if mode === `send` && isInputReady && useManualMethod}
                 {#if Api.forceManualMethod}
-                    <span class="center-text spacy-below" transition:slide>
+                    <span class="center-text spacy-below" transition:slide|local>
                         Пока что доступна только отправка вручную.
                     </span>
 
                 {:else if !onlineMethodAvailable}
-                    <span class="center-text spacy-below" transition:slide>
+                    <span class="center-text spacy-below" transition:slide|local>
                         Для данного поставщика услуг доступна только отправка вручную.
                     </span>
 
@@ -280,43 +280,60 @@
 
                 <SelectMethod {valuesToSend} methods={provider.methods}/>
 
-                <span class="center-text spacy-below" transition:slide>
+                <span class="center-text spacy-below" transition:slide|local>
                     После успешной передачи показаний нажмите "Сохранить".
                 </span>
 
             {/if}
 
-            <div class="row-flex spacy-below" transition:slide>
-                {#if !useManualMethod}
-                    <button on:click={submitOnline}
-                            disabled={!canSend}>Отправить</button>
+            {#if mode === `edit`}
+                <div class="row-flex spacy-below" transition:slide|local>
+                    <button on:click={saveEdit}
+                            disabled={!canSend || offline}>Сохранить</button>
 
-                    <button on:click={chooseManualMethod}
-                            disabled={!canSend}>Вручную</button>
+                    <button on:click={confirmRemoval}
+                            disabled={$apiStatus.waiting || offline}>Удалить</button>
 
-                {:else}
-                    <button on:click={reportSubmission}
-                            disabled={!canSend}>Сохранить</button>
+                    <button on:click={cancel}>◀ Отмена</button>
+                </div>
 
-                {/if}
+            {:else if mode === `send`}
+                <div class="row-flex spacy-below" transition:slide|local>
+                    {#if !useManualMethod}
+                        <button on:click={submitOnline}
+                                disabled={!canSend || offline}>Отправить</button>
 
-                <button on:click={cancel}>◀ Отмена</button>
+                        <button on:click={chooseManualMethod}
+                                disabled={!canSend}>Вручную</button>
 
-            </div>
+                    {:else}
+                        {#if offline}
+                            <button on:click={back}
+                                    disabled={!canSend}>Готово</button>
+                        {:else}
+                            <button on:click={reportSubmission}
+                                    disabled={!canSend}>Сохранить</button>
+                        {/if}
+
+                    {/if}
+
+                    <button on:click={cancel}>◀ Отмена</button>
+
+                </div>
+
+            {:else}
+                <div class="row-flex spacy-below" transition:slide|local>
+                    <button on:click={setSendingMode}>Передать</button>
+                    <button on:click={setEditingMode} disabled={offline}>Изменить</button>
+                    <button on:click={back}>◀ Назад</button>
+
+                </div>
+
+            {/if}
 
         {:else}
-            <div class="row-flex spacy-below" transition:slide>
-                <button on:click={setSendingMode}>Передать</button>
-                <button on:click={setEditingMode}>Изменить</button>
-                <button on:click={back}>◀ Назад</button>
-
-            </div>
+            <span class="error" transition:slide|local>Неизвестный поставщик услуг</span>
 
         {/if}
-
-    {:else}
-        <span class="error" transition:slide>Неизвестный поставщик услуг</span>
-
     {/if}
-
-{/if}
+</div>

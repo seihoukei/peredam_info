@@ -1,8 +1,8 @@
 <script>
     import appState from "stores/app-state.js"
-    import modal from "stores/modal.js"
 
     import Tokens from "utility/tokens.js"
+    import modal from "stores/modal.js"
 
     function confirmLogout() {
         modal.notify(
@@ -13,6 +13,7 @@
             }, {
                 text: "Нет",
                 keyCodes: [27],
+                back : true,
                 callback: null,
             }],
         )

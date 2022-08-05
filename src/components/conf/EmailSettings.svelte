@@ -1,6 +1,6 @@
 <script>
-        import {slide} from "svelte/transition"
-    import modal from "stores/modal.js"
+    import {slide} from "svelte/transition"
+    import apiStatus from "stores/api-status.js"
     import appState from "stores/app-state.js"
     import Api from "utility/api.js"
     import {onMount} from "svelte"
@@ -33,19 +33,19 @@
         if (isAddressInvalid)
             return
 
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.setEmail($appState.token, newAddress),
             "Установка нового адреса и отправка кода подтверждения..."
         )
 
         if (result.success) {
-            modal.success("Код подтверждения выслан")
+            apiStatus.success("Код подтверждения выслан")
             emailProperties.address = newAddress
             emailProperties.confirmed = false
             code = ""
 
         } else {
-            modal.error(result.error)
+            apiStatus.error(result.error)
 
         }
     }
@@ -56,19 +56,19 @@
     }
 
     async function checkConfirmationCode() {
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.confirmEmail($appState.token, code),
             "Проверка кода..."
         )
 
         if (result.success) {
-            modal.success("Адрес успешно подтвержден")
+            apiStatus.success("Адрес успешно подтвержден")
             emailProperties.confirmed = true
             Object.assign(emailProperties, result.data)
             newAddress = emailProperties.address
 
         } else {
-            modal.error(result.error)
+            apiStatus.error(result.error)
 
         }
     }
@@ -90,18 +90,18 @@
         updateTimeout = setTimeout(async () => {
             clearTimeout(updateTimeout)
 
-            const result = await modal.await(
+            const result = await apiStatus.await(
                 Api.setEmailSettings($appState.token, extraSettings),
                 "Установка настроек уведомлений...",
                 true
             )
 
             if (result.success) {
-                modal.success("Уведомления успешно установлены")
+                apiStatus.success("Уведомления успешно установлены")
                 rememberSettings(result.data)
 
             } else {
-                modal.error(result.error)
+                apiStatus.error(result.error)
 
             }
         }, 1000)
@@ -110,8 +110,8 @@
 
 </script>
 
-<div class="centered limited flex">
-    <div class="centered spacy-below flex" transition:slide|local>
+<div class="centered flex">
+    <div class="centered spacy-below flex">
         <form on:submit|preventDefault={setNewAddress}>
             <div class="centered center-text flex">
                 E-mail для оповещений:
@@ -177,6 +177,4 @@
 
         </div>
     {/if}
-
-
 </div>

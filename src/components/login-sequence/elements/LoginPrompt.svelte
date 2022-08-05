@@ -3,6 +3,7 @@
 
     import Messages from "utility/messages.js"
     import FocusWatcher from "utility/focus-watcher.js"
+    import apiStatus from "stores/api-status.js"
 
     const dispatch = createEventDispatcher()
     // submit (value) - submit value
@@ -101,7 +102,7 @@
                        bind:value/>
             {/if}
 
-            <input class="large submit" disabled={!validityCheck.success} type="submit" value="▶"/>
+            <input class="large submit" disabled={!validityCheck.success || $apiStatus.waiting} type="submit" value="▶"/>
 
         </div>
     </form>

@@ -1,5 +1,4 @@
 <script>
-    import {slide} from "svelte/transition"
     import {onDestroy, onMount} from "svelte"
 
     import FocusWatcher from "utility/focus-watcher.js"
@@ -39,7 +38,7 @@
     })
 </script>
 
-<div class="centered flex" transition:slide>
+<div class="centered flex spacy-below">
     <span class="center-text" class:important={isInvalid}>
         {description.name}
         {#if description.mandatory}
@@ -48,7 +47,7 @@
     </span>
 
     {#if inputType === "NUM"}
-        <input class="large spacy-below"
+        <input class="large"
                type="number"
                {placeholder}
                bind:this={element}
@@ -56,7 +55,7 @@
                on:keydown={checkKey} />
 
     {:else}
-        <input class="large spacy-below"
+        <input class="large"
                type="text"
                {placeholder}
                bind:this={element}

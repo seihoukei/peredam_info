@@ -5,17 +5,15 @@ const DEFAULT_BUTTONS = [
         text: "Закрыть",
         keyCodes: [13, 27, 32], //enter, esc, space
         callback: null,
+        back : true,
     },
 ]
 
 const {subscribe, update} = writable({
-    error: false,
-    errorMessage: "",
-    
-    waiting: false,
-    waitingMessage: "",
-    
-    buttons: [],
+    isError: false,
+    isShown : false,
+    message : '',
+    buttons : [],
 })
 
 const modal = {
@@ -24,63 +22,42 @@ const modal = {
     error(message = "", buttons = DEFAULT_BUTTONS) {
         update(state => ({
             ...state,
-            error: true,
-            errorMessage: message,
+            isShown : true,
+            isError: true,
+            message,
             buttons,
         }))
+        history.pushState(history.state, "")
     },
     
     notify(message = "", buttons = DEFAULT_BUTTONS) {
         update(state => ({
             ...state,
-            asking: true,
-            askingMessage: message,
+            isShown : true,
+            isError: false,
+            message,
             buttons,
         }))
-        
-    },
-    
-    success(message) {
-        //TODO: Display positive result and disappear
+        history.pushState(history.state, "")
     },
     
     close(callback) {
         update(state => ({
             ...state,
-            error: false,
-            asking: false,
+            isShown: false,
+            isError: false,
         }))
         
         callback?.()
     },
     
-    startWaiting(message = "") {
-        update(state => ({
-            ...state,
-            waiting: true,
-            waitingMessage: message,
-        }))
-    },
+    backAction() {
+        let buttons = null
+        this.subscribe(value => buttons = value.buttons)()
+        const backButton = buttons.find((button) => button.back)
+        this.close(backButton?.callback)
+    }
     
-    stopWaiting() {
-        update(state => ({
-            ...state,
-            waiting: false,
-        }))
-    },
-    
-    async await(promise, message = "Ожидание...", silent = false) {
-        //TODO: proper silent waiting
-        if (!silent)
-            this.startWaiting(message)
-        
-        const result = await promise
-        
-        if (!silent)
-            this.stopWaiting()
-        
-        return result
-    },
 }
 
 export default modal

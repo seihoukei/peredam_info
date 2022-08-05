@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/resources/icons/full_128.png" />
+    <link rel="manifest" href="/resources/peredam.webmanifest">
     <meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="theme-color" content="#0E303D">
     <title>Передам.инфо</title>
@@ -10,5 +11,6 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>navigator.serviceWorker.register("./sw.js", {scope:"./"})</script>
   </body>
 </html>

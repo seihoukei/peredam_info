@@ -1,9 +1,8 @@
 import {writable} from "svelte/store"
 
-import modal from "stores/modal.js"
-
 import Api from "utility/api.js"
 import Serializer from "utility/serializer.js"
+import modal from "stores/modal.js"
 
 let library = {
     cities: {},

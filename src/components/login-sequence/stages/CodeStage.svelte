@@ -2,7 +2,7 @@
     import SetCode from "components/login-sequence/stages/code/SetCode.svelte"
     import RequestCode from "components/login-sequence/stages/code/RequestCode.svelte"
 
-    import modal from "stores/modal.js"
+    import apiStatus from "stores/api-status.js"
 
     import Tokens from "utility/tokens.js"
 
@@ -30,7 +30,7 @@
                 state.stage = "complete"
 
             } else {
-                modal.error("Ошибка шифрования")
+                apiStatus.error("Ошибка шифрования")
             }
         }
     }
@@ -43,7 +43,7 @@
             state.stage = "complete"
 
         } else {
-            modal.error("Неправильный код")
+            apiStatus.error("Неправильный код")
             code = ""
         }
     }

@@ -7,6 +7,7 @@
     import clickOutside from "events/click-outside.js"
 
     export let username
+    export let offline = false
 
     let showMenu = false
 
@@ -21,7 +22,11 @@
 
 <div class="centered spacy-below flex" use:clickOutside on:click_outside={hideMenu}>
     <div class="spacy-below row-flex">
-        <button on:click={toggleMenu}>☰</button>
+        {#if offline}
+            <button on:click={() => location.reload()}>↻</button>
+        {:else}
+            <button on:click={toggleMenu}>☰</button>
+        {/if}
         <span class="large username">{username}</span>
 
     </div>

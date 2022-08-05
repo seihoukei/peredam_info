@@ -6,13 +6,18 @@
     import KnowledgeBase from "components/knowledge/KnowledgeBase.svelte"
     import Welcome from "components/welcome/Welcome.svelte"
 
+    import {fade, fly} from "svelte/transition"
     import {onMount} from "svelte"
 
     import {libraryReady, loadLibrary} from "stores/library.js"
     import appState from "stores/app-state.js"
 
     import Api from "utility/api.js"
+    import Transitions from "utility/transitions.js"
+    import StatusDisplay from "components/common/StatusDisplay.svelte"
     import modal from "stores/modal.js"
+    import apiStatus from "stores/api-status.js"
+    import Messages from "utility/messages.js"
 
     let attempt = 0
     let user = {
@@ -26,8 +31,21 @@
     onMount(() => {
         appState.restorePage()
     })
+
     function retry() {
         attempt++
+    }
+
+    function offlineMode() {
+        try {
+            user = {
+                systems : JSON.parse(atob(localStorage.offlineSystems)),
+                offline : true,
+            }
+        } catch (e) {
+            modal.error("Автономный режим недоступен")
+        }
+        retry()
     }
 
     async function loadUser() {
@@ -37,6 +55,10 @@
 
         appState.restorePageData(page)
 
+        if (user.offline) {
+            return Messages.success(user)
+        }
+
         user = {
             systems: [],
             properties : {},
@@ -45,16 +67,32 @@
         if (token === "")
             return
 
-        const result = await Api.getUserData(token)
+        const result = await await apiStatus.await(
+            Api.getUserData(token),
+            "Загрузка данных пользователя"
+        )
 
         if (result.success) {
             user = result.data
 
         } else if (token !== "") {
-            modal.error(result.error, [{
-                text: "Повторить попытку",
-                callback : retry,
-            }])
+            if (localStorage.offlineSystems) {
+                modal.error(result.error, [{
+                    text: "Повторить попытку",
+                    callback : retry,
+                    back : true,
+                },{
+                    text: "Автономная работа",
+                    callback : offlineMode,
+                    back : true,
+                }])
+            } else {
+                modal.error(result.error, [{
+                    text: "Повторить попытку",
+                    callback : retry,
+                    back : true,
+                }])
+            }
         }
 
         return result
@@ -71,12 +109,16 @@
 
 {:else}
     {#await loadUser(token, attempt)}
-        <Welcome/>
+        <div in:fade out:fade>
+            <Welcome />
+        </div>
 
     {:then result}
         {#if isAnonymousPage}
             {#if page === 'anon'}
-                <AnonymousMain/>
+                <div in:fade out:fly={Transitions.dialogFlyUp}>
+                    <AnonymousMain offline={user.offline}/>
+                </div>
 
             {:else if page === 'info'}
                 info stub
@@ -84,10 +126,14 @@
             {/if}
 
         {:else if result?.success}
-            <UserMain bind:user/>
+            <div in:fade out:fly={Transitions.dialogFlyUp}>
+                <UserMain bind:user/>
+            </div>
 
         {:else}
-            <Welcome />
+            <div in:fade out:fade>
+                <Welcome />
+            </div>
 
         {/if}
 
@@ -97,3 +143,4 @@
 
 <KnowledgeBase/>
 <ModalDialog/>
+<StatusDisplay/>

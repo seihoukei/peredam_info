@@ -7,12 +7,11 @@
     import UserSettings from "components/conf/UserSettings.svelte"
     import SystemMain from "components/user/sys/SystemMain.svelte"
 
-    import {fade, fly, slide} from "svelte/transition"
+    import {slide} from "svelte/transition"
 
     import appState from "stores/app-state.js"
 
     import Systems from "utility/systems.js"
-    import Transitions from "utility/transitions.js"
 
     export let user = {
         systems: [],
@@ -21,6 +20,7 @@
 
     let systems = Systems.sortByDate(user.systems)
     $: user.systems = Systems.sortByDate(systems)
+    $: localStorage.offlineSystems = btoa(JSON.stringify(user.systems))
 
     $: username = $appState.username
     $: page = $appState.page
@@ -61,32 +61,49 @@
 
 </script>
 
-<div class="centered top-central wrapper flex" in:fade out:fly={Transitions.dialogFlyUp}>
+<div class="centered top-central wrapper flex">
     <TopLogo/>
 
     {#if page === 'read'}
-        <ProviderReader/>
+        <div transition:slide|local>
+            <ProviderReader/>
+        </div>
 
     {:else}
-        <UserMenu {username}/>
+        <UserMenu {username} offline={user.offline}/>
+        {#if user.offline}
+            <div class="spacy-below center-text">
+                Автономная работа.<br>
+                Данные могут быть переданы в ручном режиме, но не будут отмечены в базе напоминаний и статистике.
+            </div>
+        {/if}
 
-        {#if page === 'add'}
-            <AddSystem on:add={add}/>
+        {#if page === 'add' && !user.offline}
+            <div transition:slide|local>
+                <AddSystem on:add={add}/>
+            </div>
 
-        {:else if page === 'conf'}
-            <UserSettings bind:userProperties={user.properties} />
+        {:else if page === 'conf' && !user.offline}
+            <div transition:slide|local>
+                <UserSettings bind:userProperties={user.properties} />
+            </div>
 
         {:else}
-            <SelectSystem {systems}>
-                <SystemMain on:remove={remove} bind:system/>
-            </SelectSystem>
+            <div class="centered flex" transition:slide|local>
+                <SelectSystem {systems}>
+                    <SystemMain on:remove={remove} bind:system offline={user.offline}/>
+                </SelectSystem>
 
-            {#if system_id === null}
-                <div class="spaced centered flex" transition:slide>
-                    <button on:click={toAdd}>＋ Добавить систему</button>
-                    <button on:click={toAnon}>Передать без запоминания</button>
-                </div>
-            {/if}
+                {#if system_id === null}
+                    <div class="spaced centered flex" transition:slide|local>
+                        {#if !user.offline}
+                        <button on:click={toAdd}>＋ Добавить систему</button>
+                        {/if}
+                        <button on:click={toAnon}>Передать без запоминания</button>
+                    </div>
+                {/if}
+
+            </div>
 
         {/if}
 

@@ -5,19 +5,22 @@ import Web from "utility/web.js"
 import Values from "utility/values.js"
 
 let apiServer = "https://dev-api.peredam.info/"
+let publicPushKey = "BA2iyEu6lro5moczY3kEBtSWIFu4fmT9ZQw57Z727FOhbt8hqPE-HmVcB2Gz9SD4iecmYnhzX6C1Khc2hHRu1-Y"
 
 if (import.meta.env.MODE === "development") {
     apiServer = "http://localhost:5174/"
 }
 
 if (new URL(window.location).origin === "https://peredam.info") {
+    publicPushKey = "BFYrwDah-OiZGlLyu2tJNBABd8P5gvlZ8_Ey1e3KIyk3ndzEv0dd_wFReQS4xAjG27LzclCOhEs7qFd93U0KN9Y"
     apiServer = "https://api.peredam.info/"
 }
 
 export default class Api {
     static server = apiServer
     static library = `${apiServer}library/library.json`
-    static forceManualMethod = apiServer === "https://api.peredam.info/"
+    static forceManualMethod = false // apiServer === "https://api.peredam.info/"
+    static publicPushKey = publicPushKey
     
     static #apiUrl(address) {
         return `${this.server}${address}`
@@ -213,6 +216,18 @@ export default class Api {
     static async confirmEmail(token, code) {
         return await this.#call("email/confirm", {
             token, code
+        })
+    }
+    
+    static async registerPushSubscription(token, subscription) {
+        return await this.#call("push/subscribe", {
+            token, subscription
+        })
+    }
+
+    static async unregisterPushSubscription(token, subscription) {
+        return await this.#call("push/unsubscribe", {
+            token, subscription
         })
     }
 }

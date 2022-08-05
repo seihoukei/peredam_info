@@ -1,10 +1,6 @@
 <script>
     import TopLogo from "components/common/TopLogo.svelte"
 
-    import {fade, fly} from "svelte/transition"
-
-    import Transitions from "utility/transitions.js"
-
     const hour = new Date().getHours()
 
     const MORNING_HOUR = 6
@@ -18,7 +14,7 @@
     const isEvening = EVENING_HOUR <= hour && hour < NIGHT_HOUR
 </script>
 
-<div class="top-central centered large flex" in:fade out:fly={Transitions.dialogFlyDown}>
+<div class="top-central centered large flex">
     <TopLogo/>
 
     {#if isNight}

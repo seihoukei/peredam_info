@@ -33,8 +33,8 @@
 
 </script>
 
-{#if provider_id === null}
-    <div class="centered flex" transition:slide>
+<div class="centered flex">
+    {#if provider_id === null}
         {#if city_id === null}
             <div class="large spacy-below important" transition:slide|local>
                 Выберите город:
@@ -46,20 +46,24 @@
             </div>
 
         {/if}
+    {/if}
 
-        {#each Object.entries(library.cities) as [id, city] (id)}
-            {#if city_id === null || city_id === +id}
-                <button on:click={()=>switchCurrent(+id)}
-                        class="large spacy-below"
-                        transition:slide|local>
-                        {city_id === +id ? "◀" : ""}
-                        {city.name}
-                </button>
+    {#each Object.entries(library.cities) as [id, city] (id)}
+        {#if (city_id === null || city_id === +id) && provider_id === null}
+            <button on:click={()=>switchCurrent(+id)}
+                    class="large spacy-below"
+                    transition:slide|local>
+                    {city_id === +id ? "◀" : ""}
+                    {city.name}
+            </button>
+        {/if}
 
-            {/if}
+        {#if city_id === +id}
+            <div transition:slide|local>
+                <slot/>
+            </div>
+        {/if}
 
-        {/each}
+    {/each}
 
-    </div>
-
-{/if}
+</div>

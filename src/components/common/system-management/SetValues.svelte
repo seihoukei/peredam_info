@@ -3,20 +3,18 @@
 
     import {slide} from "svelte/transition"
 
-    import library from "stores/library.js"
     import appState from "stores/app-state.js"
 
     import Values from "utility/values.js"
 
     export let setOnlyConstants = false
 
+    export let provider = {}
     export let input = {}
     export let isInputReady
 
     let valueReadiness = {}
 
-    $: provider_id = $appState.provider_id
-    $: provider = library.providers[provider_id] || null
     $: valuesToSet = provider?.values ?? {}
     $: resetInputOnChange(provider)
 
@@ -27,14 +25,18 @@
     function resetInputOnChange() {
         input = Values.parse($appState.data)
         valueReadiness = {}
+
+        for (let [key, value] of Object.entries(provider.values))
+            if (value.constant || !setOnlyConstants)
+                valueReadiness[key] = false
     }
 
 </script>
 
-{#if provider !== null}
-    <div class="centered flex">
+<div class="centered flex">
+    {#if provider !== null}
         {#if !isInputReady}
-            <div class="important large center-text spacy-below" transition:slide>
+            <div class="important large center-text spacy-below" transition:slide|local>
                 Заполните обязательные поля:
             </div>
         {/if}
@@ -50,6 +52,6 @@
 
         {/each}
 
-    </div>
+    {/if}
 
-{/if}
+</div>

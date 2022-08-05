@@ -1,9 +1,9 @@
 <script>
     import RequestPhone from "components/login-sequence/stages/login/RequestPhone.svelte"
-    import RequestUsername from 'components/login-sequence/stages/login/RequestUsername.svelte'
+    import RequestUsername from "components/login-sequence/stages/login/RequestUsername.svelte"
     import ConfirmNewUser from "components/login-sequence/stages/login/ConfirmNewUser.svelte"
 
-    import modal from "stores/modal.js"
+    import apiStatus from "stores/api-status.js"
 
     import Api from "utility/api.js"
 
@@ -28,24 +28,24 @@
     }
 
     async function checkLogin() {
-        const result = await modal.await(
+        const result = await apiStatus.await(
             Api.loginExists(state.login),
             "Поиск пользователя"
         )
 
         if (result.success) {
             if (result.data.exists) {
-                modal.success("Пользователь найден!")
+                apiStatus.success("Пользователь найден!")
                 state.stage = "password"
 
             } else {
-                modal.success("Новый пользователь!")
+                apiStatus.success("Новый пользователь!")
                 isNewUser = true
 
             }
 
         } else {
-            modal.error(result.error)
+            apiStatus.error(result.error)
 
         }
     }
