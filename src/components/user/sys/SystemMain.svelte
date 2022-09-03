@@ -14,6 +14,7 @@
     import Period from "utility/period.js"
     import Values from "utility/values.js"
     import modal from "stores/modal.js"
+    import SystemHistory from "components/user/sys/SystemHistory.svelte"
 
     const dispatch = createEventDispatcher()
     // remove (id) - remove system
@@ -25,7 +26,6 @@
     let input = {}
     let valueReadiness = {}
 
-    $: system_id = $appState.system_id
     $: page = $appState.page
     $: mode = $appState.mode
 
@@ -39,7 +39,7 @@
 
     $: useManualMethod = !onlineMethodAvailable || choseManualMethod || offline
 
-    $: valuesToSend = Values.formatValues(provider?.values, {
+    $: valuesToSubmit = Values.formatValues(provider?.values, {
         ...system?.values,
         ...input,
     })
@@ -66,6 +66,10 @@
         appState.setMode(`send`)
     }
 
+    function setHistoryMode() {
+        appState.setMode(`history`)
+    }
+
     function setEditingMode() {
         appState.setMode(`edit`)
     }
@@ -82,7 +86,7 @@
         let confirmation = null
 
         if (outsidePeriod) {
-            confirmation = `Поставщик рекомендует отправлять показания в период ${period.toString()}. Показания, отправленные сейчас, могут быть не приняты!`
+            confirmation = `Поставщик рекомендует отправлять показания в период \n ${period.toString()}. \nПоказания, отправленные сейчас, могут быть не приняты!`
         }
 
         if (alreadySubmitted) {
@@ -161,7 +165,7 @@
 
     async function submitOnline() {
         const result = await apiStatus.await(
-            Api.submitUserValues($appState.token, system, valuesToSend, true),
+            Api.submitUserValues($appState.token, system, valuesToSubmit, true),
             "Передача показаний...",
         )
 
@@ -178,7 +182,7 @@
 
     async function reportSubmission() {
         const result = await apiStatus.await(
-            Api.submitUserValues($appState.token, system, valuesToSend),
+            Api.submitUserValues($appState.token, system, valuesToSubmit),
             "Сохранение данных...",
         )
 
@@ -220,48 +224,58 @@
         {/if}
 
         {#if provider !== null}
-            {#if mode !== `send`}
+
+            {#if mode === `history`}
                 <div transition:slide|local>
-                    <ValueDisplay name="Поставщик" value={provider?.name}/>
+                    <SystemHistory {system} />
+
                 </div>
-            {/if}
-
-            {#each Object.entries(provider.values) as [id, value], index (id)}
-                {#if value.constant}
-                    {#if mode === `edit`}
+            {:else}
+                <div class="centered center-text flex" transition:slide|local>
+                    {#if mode !== `send`}
                         <div transition:slide|local>
-                            <ValueEdit description={value}
-                                       priority={index}
-                                       bind:value={input[id]}
-                                       bind:isValueReady={valueReadiness[id]}/>
-                        </div>
-
-                    {:else}
-                        <div transition:slide|local>
-                            <ValueDisplay name={value.name}
-                                          value={system.values[id]}/>
-                        </div>
-
-                    {/if}
-
-                {:else}
-                    {#if mode === `send`}
-                        <div transition:slide|local>
-                            <ValueEdit description={value}
-                                       placeholder={system.last?.values[id]}
-                                       priority={index}
-                                       bind:value={input[id]}
-                                       bind:isValueReady={valueReadiness[id]}/>
+                            <ValueDisplay name="Поставщик" value={provider?.name}/>
                         </div>
                     {/if}
 
-                {/if}
+                    {#each Object.entries(provider.values) as [id, value], index (id)}
+                        {#if value.constant}
+                            {#if mode === `edit`}
+                                <div transition:slide|local>
+                                    <ValueEdit description={value}
+                                               priority={index}
+                                               bind:value={input[id]}
+                                               bind:isValueReady={valueReadiness[id]}/>
+                                </div>
 
-            {/each}
+                            {:else}
+                                <div transition:slide|local>
+                                    <ValueDisplay name={value.name}
+                                                  value={system.values[id]}/>
+                                </div>
 
-            {#if mode === `send` && !isInputReady}
-                <div class="large important center-text spacy-below" transition:slide|local>
-                    Заполните поля для показаний выше
+                            {/if}
+
+                        {:else}
+                            {#if mode === `send`}
+                                <div transition:slide|local>
+                                    <ValueEdit description={value}
+                                               placeholder={system.last?.values[id]}
+                                               priority={index}
+                                               bind:value={input[id]}
+                                               bind:isValueReady={valueReadiness[id]}/>
+                                </div>
+                            {/if}
+
+                        {/if}
+
+                    {/each}
+
+                    {#if mode === `send` && !isInputReady}
+                        <div class="large important center-text spacy-below" transition:slide|local>
+                            Заполните поля для показаний выше
+                        </div>
+                    {/if}
                 </div>
             {/if}
 
@@ -278,7 +292,7 @@
 
                 {/if}
 
-                <SelectMethod {valuesToSend} methods={provider.methods}/>
+                <SelectMethod {valuesToSubmit} methods={provider.methods}/>
 
                 <span class="center-text spacy-below" transition:slide|local>
                     После успешной передачи показаний нажмите "Сохранить".
@@ -321,10 +335,17 @@
 
                 </div>
 
+            {:else if mode === `history`}
+                <div class="row-flex spacy-below" transition:slide|local>
+                    <button on:click={cancel}>◀ Назад</button>
+
+                </div>
+
             {:else}
                 <div class="row-flex spacy-below" transition:slide|local>
                     <button on:click={setSendingMode}>Передать</button>
-                    <button on:click={setEditingMode} disabled={offline}>Изменить</button>
+                    <button on:click={setHistoryMode}>История</button>
+                    <button on:click={setEditingMode} disabled={offline}>✎</button>
                     <button on:click={back}>◀ Назад</button>
 
                 </div>

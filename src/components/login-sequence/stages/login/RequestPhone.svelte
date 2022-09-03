@@ -19,8 +19,8 @@
     $: phone = `📞${input.replace(/[^0-9]*/g, "").slice(-10)}`
     $: extraCheck = checkPhone(phone)
 
-    function useLogin() {
-        dispatch("nophone")
+    function otherMethod() {
+        dispatch("cancel")
     }
 
     function setAnonymousMode() {
@@ -50,7 +50,7 @@
         Введите номер телефона
     </LoginPrompt>
 
-    <button on:click={useLogin}>◀ Вход без телефона</button>
+    <button on:click={otherMethod}>◀ Другой способ входа</button>
 
     <br>
     <button on:click={setAnonymousMode}>Просто передать показания</button>

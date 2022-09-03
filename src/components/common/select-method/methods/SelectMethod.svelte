@@ -15,7 +15,7 @@
         "SITE": SiteMethod,
     }
 
-    export let valuesToSend
+    export let valuesToSubmit
     export let methods
 
     let current = null
@@ -40,7 +40,7 @@
 
     {#if current !== null}
         {#key current}
-            <svelte:component this={METHOD_COMPONENTS[current.type]} {valuesToSend} method={current}/>
+            <svelte:component this={METHOD_COMPONENTS[current.type]} {valuesToSubmit} method={current}/>
         {/key}
     {/if}
 

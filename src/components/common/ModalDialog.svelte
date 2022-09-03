@@ -42,7 +42,7 @@
             {#if isError}
                 <span class="large">Ошибка</span>
             {/if}
-            <span class="center-text">{message}</span>
+            <span class="center-text pre">{message}</span>
             <div class="spaced row-flex">
                 {#each buttons as button}
                     <button on:click={() => modal.close(button.callback)}>{button.text}</button>

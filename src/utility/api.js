@@ -3,6 +3,7 @@ import library from "stores/library.js"
 import Messages from "utility/messages.js"
 import Web from "utility/web.js"
 import Values from "utility/values.js"
+import Base64 from "utility/base64.js"
 
 let apiServer = "https://dev-api.peredam.info/"
 let publicPushKey = "BA2iyEu6lro5moczY3kEBtSWIFu4fmT9ZQw57Z727FOhbt8hqPE-HmVcB2Gz9SD4iecmYnhzX6C1Khc2hHRu1-Y"
@@ -181,6 +182,31 @@ export default class Api {
         return await this.#call("systems/remove", {
             token, id,
         })
+    }
+    
+    static async getSystemHistory(token, id) {
+        if (!token) {
+            return Messages.failure()
+        }
+        
+         const result = await this.#call("systems/history", {
+            token, id,
+        })
+    
+        if (result.success) {
+            try {
+                for (let submission of result.data) {
+                    submission.values = JSON.parse(submission.values)
+                    if (submission.reply)
+                        submission.reply = Base64.decode(submission.reply)
+                }
+                return result
+            
+            } catch (e) {
+                return Messages.failure("Неизвестная ошибка")
+            }
+        }
+        return result
     }
     
     static async submitUserValues(token, system, values, queue = false) {

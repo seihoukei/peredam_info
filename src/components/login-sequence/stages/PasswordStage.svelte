@@ -53,7 +53,8 @@
     }
 
     function back() {
-        state.stage = "login"
+        state.stage = "select"
+        delete localStorage.login
     }
 
 </script>

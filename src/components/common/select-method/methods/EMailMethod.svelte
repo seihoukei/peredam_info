@@ -6,11 +6,11 @@
     import Values from "utility/values.js"
 
     export let method
-    export let valuesToSend
+    export let valuesToSubmit
 
-    $: message = Values.fillTemplate(method.message, valuesToSend)
-    $: subject = Values.fillTemplate(method.subject, valuesToSend)
-    $: comment = Values.fillTemplate(method.comment, valuesToSend)
+    $: message = Values.fillTemplate(method.message, valuesToSubmit)
+    $: subject = Values.fillTemplate(method.subject, valuesToSubmit)
+    $: comment = Values.fillTemplate(method.comment, valuesToSubmit)
 
     $: link = `mailto:${
         method.address

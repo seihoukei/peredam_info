@@ -9,6 +9,7 @@
     import appState from "stores/app-state.js"
 
     import Tokens from "utility/tokens.js"
+    import SelectLoginTypeStage from "components/login-sequence/stages/SelectLoginTypeStage.svelte"
 
     let state = {
         stage: "",
@@ -43,7 +44,7 @@
             state.stage = "password"
 
         } else {
-            state.stage = "login"
+            state.stage = "select"
 
         }
     })
@@ -75,7 +76,10 @@
         <TopLogo loginState={state}/>
     </div>
 
-    {#if stage === "login"}
+    {#if stage === "select"}
+        <SelectLoginTypeStage bind:state/>
+
+    {:else if stage === "login"}
         <LoginStage bind:state/>
 
     {:else if stage === "password"}

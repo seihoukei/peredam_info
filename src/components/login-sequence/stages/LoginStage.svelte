@@ -9,23 +9,12 @@
 
     export let state
 
-    let isUsingPhone = true
     let login = state?.login ?? ""
     let isNewUser = false
 
     $: state.isNewUser = isNewUser
     $: state.login = login
     $: stage = state.stage
-
-    function useLogin() {
-        isUsingPhone = false
-        login = ""
-    }
-
-    function usePhone() {
-        isUsingPhone = true
-        login = ""
-    }
 
     async function checkLogin() {
         const result = await apiStatus.await(
@@ -57,6 +46,7 @@
     function back() {
         isNewUser = false
         login = ""
+        state.stage = "select"
     }
 
 </script>
@@ -65,11 +55,11 @@
     {#if isNewUser}
         <ConfirmNewUser {login} on:cancel={back} on:confirm={confirmNewUser}/>
 
-    {:else if isUsingPhone}
-        <RequestPhone bind:phone={login} on:submit={checkLogin} on:nophone={useLogin}/>
+    {:else if state.usePhone}
+        <RequestPhone bind:phone={login} on:submit={checkLogin} on:cancel={back}/>
 
     {:else}
-        <RequestUsername bind:username={login} on:submit={checkLogin} on:phone={usePhone}/>
+        <RequestUsername bind:username={login} on:submit={checkLogin} on:cancel={back}/>
 
     {/if}
 {/if}

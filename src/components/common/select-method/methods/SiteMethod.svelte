@@ -6,9 +6,9 @@
     import Values from "utility/values.js"
 
     export let method
-    export let valuesToSend
+    export let valuesToSubmit
 
-    $: comment = Values.fillTemplate(method.comment, valuesToSend)
+    $: comment = Values.fillTemplate(method.comment, valuesToSubmit)
 
     $: link = method.address
 

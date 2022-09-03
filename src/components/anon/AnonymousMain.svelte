@@ -109,7 +109,7 @@
 
         {/if}
 
-        <SelectMethod valuesToSend={input} methods={provider.methods}/>
+        <SelectMethod valuesToSubmit={input} methods={provider.methods}/>
     {/if}
 
     {#if !useManualMethods && provider_id !== null}

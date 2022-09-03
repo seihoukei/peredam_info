@@ -17,9 +17,11 @@
     export let isValueReady
 
     let element = null
+    let temp = value ?? ""
 
     $: inputType = description.type.split(":")[0]
-    $: isInvalid = description.mandatory && Values.formatValue(description.type, value) === null
+    $: value = Values.formatValue(description.type, temp)
+    $: isInvalid = description.mandatory && value === ""
     $: isValueReady = !isInvalid
 
     onMount(() => {
@@ -51,7 +53,7 @@
                type="number"
                {placeholder}
                bind:this={element}
-               bind:value
+               bind:value={temp}
                on:keydown={checkKey} />
 
     {:else}
@@ -59,7 +61,7 @@
                type="text"
                {placeholder}
                bind:this={element}
-               bind:value
+               bind:value={temp}
                on:keydown={checkKey} />
 
     {/if}

@@ -156,6 +156,10 @@ div.dialog {
     white-space: nowrap;
 }
 
+.pre {
+    white-space: pre-line;
+}
+
 .important {
     color: var(--important-color);
 }

@@ -1,7 +1,7 @@
 export default class Values {
-    static formatValue(format, value) {
+    static formatValue(format, value = "") {
         if (value === "") {
-            return null
+            return ""
         }
         
         const [type, parameters = ""] = format.split(":")
@@ -10,19 +10,27 @@ export default class Values {
             let result = parseFloat(value)
             
             if (isNaN(result)) {
-                return null
+                return ""
             }
             
             const [digits = "", decimal = ""] = parameters.split(",")
             
             if (digits !== "" && result >= 10 ** +digits) {
-                return null
+                return ""
             }
             
-            return result.toFixed(decimal || 0)
+            let output = result.toFixed(decimal || 0)
+            
+            if (digits !== "") {
+                const integer = output.split(/,\./)[0]
+                const delta = +digits - integer.length
+                output = "0".repeat(delta) + output
+            }
+            
+            return output
         }
-        
-        return null
+    
+        return ""
     }
     
     static formatValues(data = {}, values) {
@@ -36,7 +44,7 @@ export default class Values {
     }
     
     static fillTemplate(template = "", values) {
-        return template.replace(/\<.*?\>/g, match => values[match.slice(1, -1)])
+        return template.replace(/\<.*?\>/g, match => values[match.slice(1, -1)] ?? "")
     }
     
     static stringify(object) {

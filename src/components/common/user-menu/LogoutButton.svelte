@@ -21,6 +21,7 @@
 
     function logout() {
         Tokens.clear()
+        delete localStorage.login
         appState.reset()
     }
 

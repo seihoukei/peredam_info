@@ -15,8 +15,8 @@
 
     $: username = username.replace(/[^0-9a-zA-Zа-яА-Я_\- ]*/g, "")
 
-    function usePhone() {
-        dispatch("phone")
+    function otherMethod() {
+        dispatch("cancel")
     }
 
     function setAnonymousMode() {
@@ -33,7 +33,7 @@
         Введите имя пользователя
     </LoginPrompt>
 
-    <button on:click={usePhone}>◀ Вход по номеру телефона</button>
+    <button on:click={otherMethod}>◀ Другой способ входа</button>
 
     <br>
     <button on:click={setAnonymousMode}>Просто передать показания</button>

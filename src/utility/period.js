@@ -29,7 +29,12 @@ export default class Period {
     
     static dayMonthString(date) {
         const then = new Date(date)
-        return `${then.getDate()} ${MONTHS[then.getMonth()]}`
+        return `${then.getDate()} ${MONTHS[then.getMonth()]}`
+    }
+
+    static dateString(date) {
+        const then = new Date(date)
+        return `${then.getDate()} ${MONTHS[then.getMonth()]} ${`${then.getFullYear()}`.slice(-2)}`
     }
     
     static dayString(date) {

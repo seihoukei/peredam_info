@@ -6,10 +6,10 @@
     import Values from "utility/values.js"
 
     export let method
-    export let valuesToSend
+    export let valuesToSubmit
 
-    $: message = Values.fillTemplate(method.message, valuesToSend)
-    $: comment = Values.fillTemplate(method.comment, valuesToSend)
+    $: message = Values.fillTemplate(method.message, valuesToSubmit)
+    $: comment = Values.fillTemplate(method.comment, valuesToSubmit)
 
     $: link = `sms:${method.number}?body=${encodeURIComponent(message)}`
 
