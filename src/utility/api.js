@@ -29,7 +29,7 @@ export default class Api {
     static async #call(api, data) {
         const result = await Web.getJSONData(this.#apiUrl(api), data, true)
         
-        if (import.meta.env.MODE === "development") {
+        if (import.meta.env.MODE === "development" || !result?.success) {
             console.log(api, data, {...result})
         }
         
