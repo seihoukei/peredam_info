@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Подключение аккаунта VK</title>
+</head>
+<body>
+    <script>
+        const url = new URL(`${window.location}`.replace("#","?"))
+        const user_id = url.searchParams.get("user_id")
+        window.opener.postMessage({
+            type : "attach_user",
+            user_id
+        })
+        setTimeout(() => window.close(), 0)
+    </script>
+</body>
+</html>

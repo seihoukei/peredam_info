@@ -4,9 +4,21 @@ import AES from "crypto-js/aes.js"
 import Messages from "utility/messages.js"
 
 export default class Tokens {
+    static AUTH_VERSION = 1
+    
+    static checkAuthVer() {
+        if (!localStorage.authVer || localStorage.authVer < this.AUTH_VERSION) {
+            delete localStorage.openToken
+            delete localStorage.encryptedToken
+            delete localStorage.login
+            delete localStorage.displayName
+        }
+    }
+    
     static store(tokens) {
         localStorage.openToken = tokens.open
         localStorage.encryptedToken = tokens.encrypted
+        localStorage.authVer = this.AUTH_VERSION
     }
     
     static retrieve() {

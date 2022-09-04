@@ -14,6 +14,7 @@ const DEFAULT_STATE = {
     system_id: null,
     user_provider_id: null,
     username: "",
+    display_name: "",
     mode: ``,
     data: ``,
     token: ``,
@@ -121,6 +122,7 @@ const appState = {
         
         this.setPage(Address.getPart(0), appState.UPDATE_ADDRESS.NO)
         
+        this.setValue("display_name", localStorage.displayName ?? "", appState.UPDATE_ADDRESS.NO)
         this.setValue("username", localStorage.login ?? "", appState.UPDATE_ADDRESS.NO)
         this.setValue("user_provider_id", localStorage.provider_id ?? null, appState.UPDATE_ADDRESS.NO)
         

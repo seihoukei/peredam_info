@@ -24,6 +24,7 @@
             apiStatus.success("Пользователь зарегистрирован!")
             state.tokens.current = result.data.token
             state.user_provider_id = null
+            state.display_name = result.data.display_name ?? state.login
             state.stage = "code"
 
         } else {
@@ -43,6 +44,7 @@
             apiStatus.success("Вход удался!")
             state.tokens.current = result.data.token
             state.user_provider_id = result.data.provider ?? null
+            state.display_name = result.data.display_name ?? state.login
             state.stage = "code"
 
         } else {

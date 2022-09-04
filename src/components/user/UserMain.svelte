@@ -4,7 +4,7 @@
     import SelectSystem from "components/user/SelectSystem.svelte"
     import AddSystem from "components/add/AddSystem.svelte"
     import ProviderReader from "components/read/ProviderReader.svelte"
-    import UserSettings from "components/conf/UserSettings.svelte"
+    import NotificationSettings from "components/conf/notifications/NotificationSettings.svelte"
     import SystemMain from "components/user/sys/SystemMain.svelte"
 
     import {slide} from "svelte/transition"
@@ -12,6 +12,7 @@
     import appState from "stores/app-state.js"
 
     import Systems from "utility/systems.js"
+    import UserSettings from "components/conf/user/UserSettings.svelte"
 
     export let user = {
         systems: [],
@@ -22,7 +23,7 @@
     $: user.systems = Systems.sortByDate(systems)
     $: localStorage.offlineSystems = btoa(JSON.stringify(user.systems))
 
-    $: username = $appState.username
+    $: display_name = $appState.display_name
     $: page = $appState.page
     $: user_provider_id = $appState.user_provider_id
     $: system_id = $appState.system_id
@@ -70,7 +71,7 @@
         </div>
 
     {:else}
-        <UserMenu {username} offline={user.offline}/>
+        <UserMenu {display_name} offline={user.offline}/>
         {#if user.offline}
             <div class="spacy-below center-text">
                 Автономная работа.<br>
@@ -83,7 +84,12 @@
                 <AddSystem on:add={add}/>
             </div>
 
-        {:else if page === 'conf' && !user.offline}
+        {:else if page === 'conf_notifications' && !user.offline}
+            <div transition:slide|local>
+                <NotificationSettings bind:userProperties={user.properties} />
+            </div>
+
+        {:else if page === 'conf_user' && !user.offline}
             <div transition:slide|local>
                 <UserSettings bind:userProperties={user.properties} />
             </div>

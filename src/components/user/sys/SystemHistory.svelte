@@ -7,8 +7,6 @@
 
     export let system = {}
 
-    let replySubmission = null
-
     $: provider = library.providers[system?.provider_id] ?? null
     $: variable = Object.entries(provider?.values ?? {}).filter(([name, value]) => !value.constant)
 
@@ -52,7 +50,7 @@
                             <td>
                                 {#if difference >= 0}
                                     {@const days = Math.max(1,(submission.date - result.data[index+1].date) / 86400)}
-                                    +{difference}
+                                    +{difference.toFixed(1)}
                                     <br>{(difference/days).toFixed(2)}/д
                                 {/if}
                             </td>

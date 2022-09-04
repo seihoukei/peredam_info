@@ -20,15 +20,15 @@ if (new URL(window.location).origin === "https://peredam.info") {
 export default class Api {
     static server = apiServer
     static library = `${apiServer}library/library.json`
-    static forceManualMethod = false // apiServer === "https://api.peredam.info/"
+    static forceManualMethod = true // apiServer === "https://api.peredam.info/"
     static publicPushKey = publicPushKey
     
-    static #apiUrl(address) {
+    static apiUrl(address) {
         return `${this.server}${address}`
     }
     
     static async #call(api, data) {
-        const result = await Web.getJSONData(this.#apiUrl(api), data, true)
+        const result = await Web.getJSONData(this.apiUrl(api), data, true)
         
         if (import.meta.env.MODE === "development" || !result?.success) {
             console.log(api, data, {...result})
@@ -42,7 +42,7 @@ export default class Api {
     }
     
     static async #get(api) {
-        const result = await Web.getJSONData(this.#apiUrl(api))
+        const result = await Web.getJSONData(this.apiUrl(api))
         
         if (result.error) {
             return Messages.failure(result?.error ?? "Неизвестная ошибка")
@@ -110,6 +110,10 @@ export default class Api {
                             address : "",
                             confirmed : true,
                         },
+                        user: result.data.properties.user || {
+                            vk_id : null,
+                            display_name : "",
+                        }
                     },
                 })
                 
@@ -230,6 +234,18 @@ export default class Api {
     static async setEmail(token, address) {
         return await this.#call("email/set", {
             token, address
+        })
+    }
+    
+    static async setDisplayName(token, name) {
+        return await this.#call("user/set_display_name", {
+            token, name
+        })
+    }
+    
+    static async setVKAccount(token, vk_id = 0) {
+        return await this.#call("user/set_vk", {
+            token, vk_id
         })
     }
     

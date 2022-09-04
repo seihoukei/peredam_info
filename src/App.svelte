@@ -74,6 +74,7 @@
 
         if (result.success) {
             user = result.data
+            appState.setValue("display_name", result.data.properties.user.display_name, appState.UPDATE_ADDRESS.NO)
 
         } else if (token !== "") {
             if (localStorage.offlineSystems) {

@@ -1,8 +1,8 @@
 <script>
     import {slide} from "svelte/transition"
-    import apiStatus from "stores/api-status.js"
-    import appState from "stores/app-state.js"
-    import Api from "utility/api.js"
+    import apiStatus from "stores/api-status"
+    import appState from "stores/app-state"
+    import Api from "utility/api"
     import {onMount} from "svelte"
 
     export let emailProperties = {

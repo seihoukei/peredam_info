@@ -6,7 +6,7 @@
 
     import clickOutside from "events/click-outside.js"
 
-    export let username
+    export let display_name
     export let offline = false
 
     let showMenu = false
@@ -27,7 +27,7 @@
         {:else}
             <button on:click={toggleMenu}>☰</button>
         {/if}
-        <span class="large username">{username}</span>
+        <span class="large username">{display_name}</span>
 
     </div>
 
@@ -37,7 +37,11 @@
                 Управление показаниями
             </PageButton>
 
-            <PageButton page="conf">
+            <PageButton page="conf_user">
+                Настройки пользователя
+            </PageButton>
+
+            <PageButton page="conf_notifications">
                 Настройки уведомлений
             </PageButton>
 

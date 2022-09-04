@@ -6,7 +6,7 @@
 
     function confirmLogout() {
         modal.notify(
-            `Выйти из аккаунта ${$appState.username}?`, [{
+            `Выйти из аккаунта ${$appState.display_name}?`, [{
                 text: "Да",
                 keyCodes: [13,32],
                 callback: logout,
@@ -22,6 +22,8 @@
     function logout() {
         Tokens.clear()
         delete localStorage.login
+        delete localStorage.displayName
+        delete localStorage.authVer
         appState.reset()
     }
 

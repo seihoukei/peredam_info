@@ -2,27 +2,16 @@
     import Transitions from "utility/transitions.js"
     import {fly} from "svelte/transition"
     import appState from "stores/app-state.js"
+    import SideAuth from "utility/side-auth.js"
 
     export let state
 
     function useVK() {
-        window.location = `https://oauth.vk.com/authorize
-            ?client_id=51413821
-            &display=page
-            &redirect_uri=http://localhost:5173/auth/vk.html
-            &scope=email
-            &response_type=code
-            &v=5.131
-        `.split(/[ \t\n]/).join("")
+        window.location = SideAuth.getVkLoginUrl()
     }
 
     function useGoogle() {
-        window.location = `https://accounts.google.com/o/oauth2/v2/auth
-            ?client_id=689057572164-bp6kpaeqhogqpnu8usqp6oq68l2ho0cu.apps.googleusercontent.com
-            &redirect_uri=http://localhost:5173/auth/google.html
-            &response_type=code
-            &scope=openid%20profile%20email
-        `.split(/[ \t\n]/).join("")
+        window.location = SideAuth.getGoogleLoginUrl()
     }
 
     function usePhone() {

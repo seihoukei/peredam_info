@@ -1,0 +1,26 @@
+@font-face {
+    font-family: "Exo2";
+    src: url("../resources/fonts/exo2.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 350;
+}
+
+html, body {
+    background: #0E303D url("../resources/images/top.png") center 30px no-repeat;
+    background-size: 183px 70px;
+    padding : 0;
+    margin : 0;
+    color : #FFFFFF;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font: 24px Exo2;
+}
+
+div {
+    display : flex;
+    width : 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}

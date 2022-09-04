@@ -11,12 +11,15 @@
     import Tokens from "utility/tokens.js"
     import SelectLoginTypeStage from "components/login-sequence/stages/SelectLoginTypeStage.svelte"
 
+    Tokens.checkAuthVer()
+
     let state = {
         stage: "",
         login: localStorage.login ?? "",
         isNewUser: false,
         tokens: Tokens.retrieve(),
         user_provider_id: localStorage.user_provider_id ?? "",
+        display_name: localStorage.displayName ?? "",
     }
 
     $: page = $appState.page
@@ -51,8 +54,10 @@
 
     function finalize() {
         localStorage.login = state.login
+        localStorage.displayName = state.display_name
         appState.setUserProviderId(user_provider_id)
         appState.setValue("username", state.login, appState.UPDATE_ADDRESS.NO)
+        appState.setValue("display_name", state.display_name, appState.UPDATE_ADDRESS.NO)
         appState.setToken(tokens.current)
 
         if (user_provider_id && page !== "read") {

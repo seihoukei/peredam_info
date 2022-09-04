@@ -1,12 +1,9 @@
 <script>
-    import EmailSettings from "components/conf/EmailSettings.svelte"
-    import PushSettings from "components/conf/PushSettings.svelte"
-
-    import appState from "stores/app-state"
+    import appState from "stores/app-state.js"
+    import DisplayName from "components/conf/user/DisplayName.svelte"
+    import VKConnection from "components/conf/user/VKConnection.svelte"
 
     export let userProperties
-
-    $: page = $appState.page
 
     function back() {
         appState.setPage("")
@@ -18,8 +15,8 @@
 {/if}
 
 <div class="spaced centered limited flex">
-    <EmailSettings bind:emailProperties={userProperties.email} />
-    <PushSettings/>
+    <DisplayName userSettings={userProperties.user}/>
+    <VKConnection userSettings={userProperties.user} />
 
     <div class="row-flex spacy-below">
         <button on:click={back}>◀ Назад</button>

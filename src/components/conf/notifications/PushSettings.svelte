@@ -1,7 +1,7 @@
 <script>
     import {slide} from "svelte/transition"
-    import Api from "utility/api.js"
-    import appState from "stores/app-state.js"
+    import Api from "utility/api"
+    import appState from "stores/app-state"
 
     const supported = ("serviceWorker" in navigator) && ("PushManager" in window)
 
