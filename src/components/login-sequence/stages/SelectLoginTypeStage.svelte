@@ -33,7 +33,7 @@
 
 <div class="central centered spaced flex container" transition:fly={Transitions.loginFlyRight}>
     <button on:click={useVK}>Войти через ВКонтакте</button>
-    <button on:click={useGoogle}>Войти через Google</button>
+    <!--<button on:click={useGoogle}>Войти через Google</button>-->
     <button on:click={usePhone}>Войти по номеру телефона</button>
     <button on:click={useLogin}>Войти по имени пользователя</button>
 
