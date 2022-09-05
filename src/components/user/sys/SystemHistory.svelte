@@ -9,6 +9,8 @@
 
     export let system = {}
 
+    const request = apiStatus.await(Api.getSystemHistory($appState.token, system.id), "Запрос истории...")
+
     $: provider = library.providers[system?.provider_id] ?? null
     $: variable = Object.entries(provider?.values ?? {}).filter(([name, value]) => !value.constant)
 
@@ -20,9 +22,9 @@
 
 <div class="spacy-below centered center-text flex">
     <div class="centered center-text spacy-below">В таблице отображаются только данные, переданные через сайт.</div>
-    {#await apiStatus.await(Api.getSystemHistory($appState.token, system.id), "Запрос истории...")}
-        <div transition:slide|local>
-            ...
+    {#await request}
+        <div class="large important" transition:slide|local>
+            Подождите...
         </div>
     {:then result}
         <div transition:slide|local>

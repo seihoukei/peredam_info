@@ -281,7 +281,7 @@
 
             {#if mode === `send` && isInputReady && useManualMethod}
                 {#if Api.forceManualMethod}
-                    <span class="center-text spacy-below" transition:slide|local>
+                    <span class="center-text spacy-below" transition:slide>
                         Пока что доступна только отправка вручную.
                     </span>
 
