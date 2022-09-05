@@ -12,6 +12,7 @@
 
     $: isNewUser = state.isNewUser
     $: login = state.login
+    $: display_name = login.replace("phone:", "📞")
     $: stage = state.stage
 
     async function register() {
@@ -63,10 +64,10 @@
 
 {#if stage === "password"}
     {#if isNewUser}
-        <SetPassword {login} bind:password on:cancel={back} on:submit={register}/>
+        <SetPassword {login} {display_name} bind:password on:cancel={back} on:submit={register}/>
 
     {:else}
-        <RequestPassword {login} bind:password on:cancel={back} on:submit={logIn}/>
+        <RequestPassword {login} {display_name} bind:password on:cancel={back} on:submit={logIn}/>
 
     {/if}
 {/if}

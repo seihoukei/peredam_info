@@ -10,7 +10,7 @@
     // cancel - use password
 
     export let code
-    export let login
+    export let display_name
 
     function cancel() {
         dispatch("cancel")
@@ -21,7 +21,7 @@
 <div class="centered central spaced flex" transition:fly={Transitions.loginFlyRight}>
     <div class="large important center-text" transition:slide|local>
         Введите код для быстрого входа как
-        <span class="nowrap">{login}</span>:
+        <span class="nowrap">{display_name}</span>:
     </div>
 
     <CodeInput bind:code on:submit/>

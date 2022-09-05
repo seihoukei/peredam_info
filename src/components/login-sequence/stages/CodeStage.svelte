@@ -12,6 +12,7 @@
 
     $: tokens = state.tokens
     $: login = state.login
+    $: display_name = login.replace("phone:", "📞")
     $: setting = tokens.current !== ""
     $: stage = state.stage
 
@@ -55,10 +56,10 @@
 
 {#if stage === "code"}
     {#if setting}
-        <SetCode {login} bind:code on:submit={setCode}/>
+        <SetCode {display_name} bind:code on:submit={setCode}/>
 
     {:else}
-        <RequestCode {login} bind:code on:cancel={back} on:submit={checkCode}/>
+        <RequestCode {display_name} bind:code on:cancel={back} on:submit={checkCode}/>
 
     {/if}
 {/if}

@@ -13,6 +13,7 @@
 
     export let login
     export let password
+    export let display_name
 
     function cancel() {
         dispatch("cancel")
@@ -32,7 +33,7 @@
                  bind:value={password}
                  on:submit>
         Введите пароль пользователя
-        <span class="nowrap">{login}</span>
+        <span class="nowrap">{display_name}</span>
     </LoginPrompt>
 
     <button on:click={cancel}>◀ Другой пользователь</button>

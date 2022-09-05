@@ -16,7 +16,7 @@
 
     let input = ""
 
-    $: phone = `📞${input.replace(/[^0-9]*/g, "").slice(-10)}`
+    $: phone = `phone:${input.replace(/[^0-9]*/g, "").slice(-10)}`
     $: extraCheck = checkPhone(phone)
 
     function otherMethod() {
@@ -28,11 +28,11 @@
     }
 
     function checkPhone() {
-        if (phone.slice(2).length < 5) {
+        if (phone.slice(6).length < 5) {
             return Messages.failure("Слишком короткий номер")
         }
 
-        if (phone.slice(2).length > 11) {
+        if (phone.slice(6).length > 11) {
             return Messages.failure("Слишком длинный номер")
         }
 

@@ -80,8 +80,9 @@
 <div class="top-central centered wrapper flex">
     <TopLogo/>
 
-    <div class="large center-text spacy-below">
-        Работа без регистрации
+    <div class="large center-text spacy-below row-flex">
+        <button on:click={back}>◀</button>
+        <span>Работа без регистрации</span>
     </div>
 
     <SelectCity>

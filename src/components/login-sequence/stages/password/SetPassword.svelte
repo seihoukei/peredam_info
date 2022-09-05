@@ -12,6 +12,7 @@
 
     export let login
     export let password
+    export let display_name
 
     let first = ""
     let repeat = false
@@ -57,7 +58,7 @@
             {#if first === "" && !repeat}
                 <div class="center-text" transition:slide|local>
                     Введите новый пароль для пользователя
-                    <span class="nowrap">{login}</span>:
+                    <span class="nowrap">{display_name}</span>:
                 </div>
 
             {:else if first === ""}

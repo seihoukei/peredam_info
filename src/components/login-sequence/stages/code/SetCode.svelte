@@ -11,7 +11,7 @@
     // cancel - don't change code (in changing mode)
 
     export let code
-    export let login
+    export let display_name
     export let changing = false
 
     let first = ""
@@ -51,7 +51,7 @@
         {#if first === "" && !repeat}
             <div class="large important center-text" transition:slide|local>
                 Введите новый код для быстрого входа как
-                <span class="nowrap">{login}</span>:
+                <span class="nowrap">{display_name}</span>:
             </div>
 
         {:else if first === ""}
