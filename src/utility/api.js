@@ -91,6 +91,7 @@ export default class Api {
         
         if (result.success) {
             try {
+                this.forceManualMethod = !result.data.online
                 return Messages.success({
                     systems : result.data.systems.map(record => ({
                         id: +record.id,

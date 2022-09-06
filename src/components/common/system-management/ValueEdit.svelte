@@ -14,7 +14,7 @@
         mandatory : false
     }
 
-    export let isValueReady
+    export let isValueReady = false
 
     let element = null
     let temp = value ?? ""

@@ -25,6 +25,7 @@
     let choseManualMethod = Api.forceManualMethod
     let input = {}
     let valueReadiness = {}
+    let lastMode = $appState.mode
 
     $: page = $appState.page
     $: mode = $appState.mode
@@ -34,7 +35,8 @@
     $: period = new Period(provider?.period)
     $: resetOnChange(mode, provider)
 
-    $: isInputReady = Object.values(valueReadiness).every(Boolean)
+    $: readinessValues = Object.values(valueReadiness)
+    $: isInputReady = readinessValues.length && readinessValues.every(Boolean)
     $: canSend = isInputReady && !$apiStatus.waiting
 
     $: useManualMethod = !onlineMethodAvailable || choseManualMethod || offline
@@ -47,6 +49,7 @@
     $: appState.setData(Values.stringify(input))
 
     function resetOnChange() {
+        console.log({...valueReadiness}, mode, {...provider})
         choseManualMethod = Api.forceManualMethod
 
         if (mode === `edit`)
@@ -56,7 +59,10 @@
 
         Object.assign(input, Values.parse($appState.data))
 
-        valueReadiness = {}
+        if (lastMode !== mode)
+            valueReadiness = {}
+
+        lastMode = mode
 
         if (mode === `send`)
             checkPeriod()
