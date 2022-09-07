@@ -102,8 +102,6 @@ export default class Api {
                             sent: (record.last_sent * 1000) || null,
                             values: JSON.parse(record.last_values),
                             type : record.last_type,
-                            replied: (record.last_replied * 1000) || null,
-                            reply: record.last_reply || null
                         } : null,
                     })),
                     properties: {

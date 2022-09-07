@@ -49,7 +49,6 @@
     $: appState.setData(Values.stringify(input))
 
     function resetOnChange() {
-        console.log({...valueReadiness}, mode, {...provider})
         choseManualMethod = Api.forceManualMethod
 
         if (mode === `edit`)
